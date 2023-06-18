@@ -17,6 +17,9 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
     console.log('User connected with id: ' + socket.id)
+    socket.on('hello', (data) => {
+        console.log(data)
+    })
 })
 
 server.listen(3001, () => {
