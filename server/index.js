@@ -20,6 +20,16 @@ io.on('connection', (socket) => {
     socket.on('hello', (data) => {
         console.log(data)
     })
+    socket.on('join-room', ({code}) => {
+        console.log('Attemping to join room with code: ' + code)
+        /* Disallow joining non-existent rooms */
+        if(!io.sockets.adapter.rooms[code]) {
+            socket.to(socket.id).emit('join-room-status', {success: false})
+            return
+        }
+        socket.join(code)
+        socket.to(socket.id).emit('join-room-status', {success: true})
+    })
 })
 
 server.listen(3001, () => {
