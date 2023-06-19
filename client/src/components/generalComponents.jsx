@@ -6,7 +6,11 @@ export function GBText({text}) {
             sx={{
                 color: '#FFFFFF',
                 fontFamily: 'Verdana',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                '::selection': {
+                    color: '#121212',
+                    backgroundColor: '#FFFFFF'
+                }
             }}
         >
             {text}
