@@ -10,13 +10,13 @@ export default function Home() {
         setJoinCode(value)
     }
     function createAndJoinRoom() {
-        socket.emit('create-room', {roomName: 'Test Room'}, createResponse)
+        socket.emit('create-room', {roomName: 'Test Room', creatorName: userName}, createResponse)
     }
     function createResponse(res) {
         console.log(res)
     }
     function joinRoom() {
-        socket.emit('join-room', {code: joinCode}, joinResponse)
+        socket.emit('join-room', {code: joinCode, userName: userName}, joinResponse)
     }
     function joinResponse(res) {
         console.log(res)
