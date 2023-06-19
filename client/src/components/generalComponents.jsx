@@ -36,26 +36,14 @@ export function GBTextInput({value, onChange, variant="standard", width=250, pla
                     }
                 },
                 '& .MuiInput-underline': {
-                    ':hover:not(.Mui-disabled, .Mui-error):before': {
-                        borderColor: color
-                    },
-                    ':before': {
-                        borderColor: color
-                    },
-                    ':after': {
-                        borderColor: color
-                    },
+                    ':hover:not(.Mui-disabled, .Mui-error):before': { borderColor: color },
+                    ':before': { borderColor: color },
+                    ':after': { borderColor: color },
                 },
                 '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                        borderColor: color
-                    },
-                    '&:hover fieldset': {
-                        borderColor: color
-                    },
-                    '&.Mui-focused fieldset': {
-                        borderColor: color
-                    }
+                    '& fieldset': { borderColor: color },
+                    '&:hover fieldset': { borderColor: color },
+                    '&.Mui-focused fieldset': { borderColor: color }
                 }
             }}
         />
