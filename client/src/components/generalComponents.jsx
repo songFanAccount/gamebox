@@ -50,8 +50,8 @@ export function GBTextInput({value, onChange, variant="outlined", width=250, pla
         />
     )
 }
-export function GBButton({onClick, children, color='#121212', backgroundColor='#FFFFFF', width='fit-content', className,
-                          hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
+export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#121212', width='fit-content', className, border=1,
+                          invert=false, hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
     return (
         <Button
             className={className}
@@ -60,8 +60,9 @@ export function GBButton({onClick, children, color='#121212', backgroundColor='#
             sx={{
                 m: 0,
                 px: 0,
-                color: color,
-                backgroundColor: backgroundColor,
+                color: invert ? backgroundColor : color,
+                border: border,
+                backgroundColor: invert ? color : backgroundColor,
                 fontFamily: 'Verdana',
                 fontWeight: 'bold',
                 minWidth: 0,

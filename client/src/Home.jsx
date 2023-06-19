@@ -16,23 +16,23 @@ export default function Home() {
     }
     async function createToggle() {
         if(busy.current || createJoinState === -1) return
+        setCJState(-1)
         const anims = []
         anims.push(['.createButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.joinButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
         busy.current = true
         await animate(anims)
         busy.current = false
-        setCJState(-1)
     }
     async function joinToggle() {
         if(busy.current || createJoinState === 1) return
+        setCJState(1)
         const anims = []
         anims.push(['.joinButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.createButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
         busy.current = true
         await animate(anims)
         busy.current = false
-        setCJState(1)
     }
     async function back() {
         if(busy.current || createJoinState === 0) return
@@ -90,6 +90,7 @@ export default function Home() {
                         className="createButton"
                         onClick={createToggle}
                         width={0.45}
+                        invert={createJoinState === -1}
                     >
                         Create Room
                     </GBButton>
@@ -97,6 +98,7 @@ export default function Home() {
                         className="joinButton"
                         onClick={joinToggle}
                         width={0.45}
+                        invert={createJoinState === 1}
                     >
                         Join Room
                     </GBButton>
