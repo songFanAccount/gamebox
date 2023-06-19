@@ -26,6 +26,7 @@ export default function Home() {
             direction="column"
             justifyContent="center"
             alignItems="center"
+            rowGap={3}
             sx={{
                 width: '100%',
                 height: 'calc(100% - 100px)',

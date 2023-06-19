@@ -5,7 +5,8 @@ export function GBText({text}) {
         <Typography
             sx={{
                 color: '#FFFFFF',
-                fontFamily: 'Verdana'
+                fontFamily: 'Verdana',
+                fontWeight: 'bold'
             }}
         >
             {text}
@@ -47,7 +48,8 @@ export function GBButton({onClick, children, color='#FFFFFF'}) {
             sx={{
                 m: 0,
                 color: color,
-                fontFamily: 'Verdana'
+                fontFamily: 'Verdana',
+                fontWeight: 'bold'
             }}
         >
             {children}
