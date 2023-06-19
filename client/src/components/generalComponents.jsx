@@ -50,17 +50,26 @@ export function GBTextInput({value, onChange, variant="outlined", width=250, pla
         />
     )
 }
-export function GBButton({onClick, children, color='#FFFFFF', width='fit-content', className}) {
+export function GBButton({onClick, children, color='#121212', backgroundColor='#FFFFFF', width='fit-content', className,
+                          hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
     return (
         <Button
             className={className}
             onClick={onClick}
+            disableRipple
             sx={{
                 m: 0,
+                px: 0,
                 color: color,
+                backgroundColor: backgroundColor,
                 fontFamily: 'Verdana',
                 fontWeight: 'bold',
+                minWidth: 0,
                 width: width,
+                overflowX: 'hidden',
+                whiteSpace: 'nowrap',
+                boxSizing: 'border-box',
+                '&:hover': hoverSx
             }}
         >
             {children}

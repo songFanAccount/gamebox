@@ -1,14 +1,50 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { GBButton, GBText, GBTextInput } from './components/generalComponents'
 import { Box, Stack } from '@mui/material'
+import { useAnimate } from 'framer-motion'
 
 export default function Home() {
     const socket = global.socket
     const [userName, setUserName] = useState('')
     const [joinCode, setJoinCode] = useState('')
+    const [createJoinState, setCJState] = useState(0) // -1 for create, 0 for none selected, 1 for join
+    const busy = useRef(false)
+    const [scope, animate] = useAnimate()
+    
     function handleJoinCodeChange(value) {
         setJoinCode(value)
     }
+    async function createToggle() {
+        if(busy.current || createJoinState === -1) return
+        const anims = []
+        anims.push(['.createButton', {width: ['45%', '100%']}, {duration: 0.5}])
+        anims.push(['.joinButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
+        busy.current = true
+        await animate(anims)
+        busy.current = false
+        setCJState(-1)
+    }
+    async function joinToggle() {
+        if(busy.current || createJoinState === 1) return
+        const anims = []
+        anims.push(['.joinButton', {width: ['45%', '100%']}, {duration: 0.5}])
+        anims.push(['.createButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
+        busy.current = true
+        await animate(anims)
+        busy.current = false
+        setCJState(1)
+    }
+    async function back() {
+        if(busy.current || createJoinState === 0) return
+        const anims = []
+        anims.push([createJoinState === 1 ? '.createButton' : '.joinButton', {width: ['0%', '45%'], opacity: [0, 1]}, {duration: 0.5}])
+        anims.push([createJoinState === -1 ? '.createButton' : '.joinButton', {width: ['100%', '45%'], opacity: [1, 1]}, {at: '<', duration: 0.5}])
+        busy.current = true
+        await animate(anims)
+        busy.current = false
+        setCJState(0)
+    }
+    
     function createAndJoinRoom() {
         socket.emit('create-room', {roomName: 'Test Room', creatorName: userName}, createResponse)
     }
@@ -42,25 +78,25 @@ export default function Home() {
                 rowGap={3}
                 sx={{
                     height: 1,
-                    width: 'fit-content'
+                    width: 'fit-content',
                 }}
             >
                 <Stack direction="row" columnGap={2} alignItems="center">
                     <GBText text="Your display name:"/>
                     <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
                 </Stack>
-                <Stack direction="row" width={1}>
+                <Stack direction="row" justifyContent="space-between" width={1} ref={scope}>
                     <GBButton
                         className="createButton"
-                        onClick={createAndJoinRoom}
-                        width={0.5}
+                        onClick={createToggle}
+                        width={0.45}
                     >
                         Create Room
                     </GBButton>
                     <GBButton
                         className="joinButton"
-                        onClick={joinRoom}
-                        width={0.5}
+                        onClick={joinToggle}
+                        width={0.45}
                     >
                         Join Room
                     </GBButton>
@@ -69,6 +105,7 @@ export default function Home() {
                     <GBTextInput value={joinCode} onChange={handleJoinCodeChange} placeholder="Enter the unique room id"/>
                     
                 </Stack> */}
+                <GBButton onClick={back}>Back</GBButton>
             </Stack>
         </Box>
     )
