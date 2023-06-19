@@ -72,12 +72,11 @@ export default function Home() {
             }}
         >
             <Stack
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                rowGap={3}
+                direction="column" justifyContent="center" alignItems="center" rowGap={3}
+                className="contents"
+                ref={scope}
                 sx={{
-                    height: 1,
+                    height: 'fit-content',
                     width: 'fit-content',
                 }}
             >
@@ -85,7 +84,7 @@ export default function Home() {
                     <GBText text="Your display name:"/>
                     <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
                 </Stack>
-                <Stack direction="row" justifyContent="space-between" width={1} ref={scope}>
+                <Stack direction="row" justifyContent="space-between" width={1}>
                     <GBButton
                         className="createButton"
                         onClick={createToggle}

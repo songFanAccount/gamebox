@@ -5,8 +5,7 @@ export function GBText({text}) {
         <Typography
             sx={{
                 color: '#FFFFFF',
-                fontFamily: 'Verdana',
-                fontWeight: 'bold',
+                fontFamily: 'Orbit', fontSize: 20,
                 '::selection': {
                     color: '#121212',
                     backgroundColor: '#FFFFFF'
@@ -17,7 +16,8 @@ export function GBText({text}) {
         </Typography>
     )
 }
-export function GBTextInput({value, onChange, variant="outlined", width=250, placeholder}) {
+export function GBTextInput({value, onChange, variant="standard", width=250, placeholder,
+                             color='#FFFFFF', backgroundColor='#121212'}) {
     return (
         <TextField
             variant={variant}
@@ -28,22 +28,33 @@ export function GBTextInput({value, onChange, variant="outlined", width=250, pla
             sx={{
                 width: width,
                 "& .MuiInputBase-input": {
-                    color: '#FFFFFF',
-                    fontFamily: 'Verdana',
+                    color: color,
+                    fontFamily: 'Orbit', fontSize: 20,
                     '::selection': {
-                        color: '#121212',
-                        backgroundColor: '#FFFFFF'
+                        color: backgroundColor,
+                        backgroundColor: color
                     }
+                },
+                '& .MuiInput-underline': {
+                    ':hover:not(.Mui-disabled, .Mui-error):before': {
+                        borderColor: color
+                    },
+                    ':before': {
+                        borderColor: color
+                    },
+                    ':after': {
+                        borderColor: color
+                    },
                 },
                 '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                        borderColor: '#FFFFFF'
+                        borderColor: color
                     },
                     '&:hover fieldset': {
-                        borderColor: '#FFFFFF'
+                        borderColor: color
                     },
                     '&.Mui-focused fieldset': {
-                        borderColor: '#FFFFFF'
+                        borderColor: color
                     }
                 }
             }}
@@ -62,17 +73,12 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
             disableRipple
             disabled={disabled}
             sx={{
-                m: 0,
-                px: 0,
-                color: textColor,
-                backgroundColor: bgColor,
+                m: 0, px: 0,
+                color: textColor, backgroundColor: bgColor,
                 border: border,
-                fontFamily: 'Verdana',
-                fontWeight: 'bold',
-                minWidth: 0,
-                width: width,
-                overflowX: 'hidden',
-                whiteSpace: 'nowrap',
+                fontFamily: 'Orbit', fontSize: 20,
+                minWidth: 0, width: width,
+                overflowX: 'hidden', whiteSpace: 'nowrap',
                 boxSizing: 'border-box',
                 textTransform: 'none',
                 '&:hover': hoverSx,
