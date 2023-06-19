@@ -20,15 +20,15 @@ io.on('connection', (socket) => {
     socket.on('hello', (data) => {
         console.log(data)
     })
-    socket.on('join-room', ({code}) => {
+    socket.on('join-room', ({code}, callback) => {
         console.log('Attemping to join room with code: ' + code)
         /* Disallow joining non-existent rooms */
         if(!io.sockets.adapter.rooms[code]) {
-            socket.to(socket.id).emit('join-room-status', {success: false})
+            callback({success: false})
             return
         }
         socket.join(code)
-        socket.to(socket.id).emit('join-room-status', {success: true})
+        callback({success: true})
     })
 })
 

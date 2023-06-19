@@ -13,13 +13,11 @@ export default function Home() {
     }
     function joinRoom() {
         alert("joining room with code: " + joinCode)
-        socket.emit('join-room', {code: joinCode})
+        socket.emit('join-room', {code: joinCode}, joinResponse)
     }
-    useEffect(() => {
-        socket.on('join-room-status', (response) => {
-            console.log(response)
-        })
-    }, [socket])
+    function joinResponse(res) {
+        console.log(res)
+    }
     return (
         <Stack
             direction="column"
