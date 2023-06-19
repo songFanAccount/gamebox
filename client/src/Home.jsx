@@ -30,6 +30,9 @@ export default function Home() {
                 top: 100,
                 left: 0,
                 backgroundColor: '#121212',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
             }}
         >
             <Stack
@@ -38,21 +41,24 @@ export default function Home() {
                 alignItems="center"
                 rowGap={3}
                 sx={{
-                    height: 1
+                    height: 1,
+                    width: 'fit-content'
                 }}
             >
                 <Stack direction="row" columnGap={2} alignItems="center">
                     <GBText text="Your display name:"/>
                     <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
                 </Stack>
-                <Stack direction="row" columnGap={2}>
+                <Stack direction="row" columnGap={2} width={1}>
                     <GBButton
                         onClick={createAndJoinRoom}
+                        width={0.5}
                     >
                         Create Room
                     </GBButton>
                     <GBButton
                         onClick={joinRoom}
+                        width={0.5}
                     >
                         Join Room
                     </GBButton>

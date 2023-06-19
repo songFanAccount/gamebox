@@ -50,7 +50,7 @@ export function GBTextInput({value, onChange, variant="outlined", width=250, pla
         />
     )
 }
-export function GBButton({onClick, children, color='#FFFFFF'}) {
+export function GBButton({onClick, children, color='#FFFFFF', width='fit-content'}) {
     return (
         <Button
             onClick={onClick}
@@ -58,7 +58,8 @@ export function GBButton({onClick, children, color='#FFFFFF'}) {
                 m: 0,
                 color: color,
                 fontFamily: 'Verdana',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                width: width
             }}
         >
             {children}
