@@ -16,25 +16,26 @@ const io = new Server(server, {
     }
 }) // Socket io instance
 
-function roomExists(code) {
-    return io.sockets.adapter.rooms[code]
+function roomInfo(code) {
+    return io.sockets.adapter.rooms.get(code)
 }
 io.on('connection', (socket) => {
     console.log('User connected with id: ' + socket.id)
-    socket.on('create-room', ({roomName}) => {
+    socket.on('create-room', ({roomName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
         /* Generate 6 letter alphanumeric room codes until one is valid (not already existing) */
         let roomCode
         do {
             roomCode = generateAlphanumericCode(6)
-        } while(roomExists(roomCode))
+        } while(roomInfo(roomCode))
         console.log('Generated room with code: ' + roomCode)
         socket.join(roomCode)
+        callback({success: true, code: roomCode})
     })
     socket.on('join-room', ({code}, callback) => {
         console.log('Attemping to join room with code: ' + code)
         /* Disallow joining non-existent rooms */
-        if(!roomExists(code)) {
+        if(!roomInfo(code)) {
             callback({success: false})
             return
         }
