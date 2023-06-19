@@ -17,8 +17,9 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
     console.log('User connected with id: ' + socket.id)
-    socket.on('hello', (data) => {
-        console.log(data)
+    socket.on('create-room', ({roomName}) => {
+        console.log('Attempting to create new room with name: ' + roomName)
+        
     })
     socket.on('join-room', ({code}, callback) => {
         console.log('Attemping to join room with code: ' + code)
