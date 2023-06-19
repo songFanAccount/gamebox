@@ -91,6 +91,7 @@ export default function Home() {
                         onClick={createToggle}
                         width={0.45}
                         invert={createJoinState === -1}
+                        disabled={createJoinState === -1}
                     >
                         Create Room
                     </GBButton>
@@ -99,6 +100,7 @@ export default function Home() {
                         onClick={joinToggle}
                         width={0.45}
                         invert={createJoinState === 1}
+                        disabled={createJoinState === 1}
                     >
                         Join Room
                     </GBButton>

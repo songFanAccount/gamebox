@@ -51,18 +51,22 @@ export function GBTextInput({value, onChange, variant="outlined", width=250, pla
     )
 }
 export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#121212', width='fit-content', className, border=1,
-                          invert=false, hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
+                          invert=false, disabled=false,  noDisableFx=true,
+                          hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
+    const textColor = invert ? backgroundColor : color
+    const bgColor = invert ? color : backgroundColor
     return (
         <Button
             className={className}
             onClick={onClick}
             disableRipple
+            disabled={disabled}
             sx={{
                 m: 0,
                 px: 0,
-                color: invert ? backgroundColor : color,
+                color: textColor,
+                backgroundColor: bgColor,
                 border: border,
-                backgroundColor: invert ? color : backgroundColor,
                 fontFamily: 'Verdana',
                 fontWeight: 'bold',
                 minWidth: 0,
@@ -70,7 +74,9 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
                 overflowX: 'hidden',
                 whiteSpace: 'nowrap',
                 boxSizing: 'border-box',
-                '&:hover': hoverSx
+                textTransform: 'none',
+                '&:hover': hoverSx,
+                ':disabled': noDisableFx ? {color : textColor} : {}
             }}
         >
             {children}
