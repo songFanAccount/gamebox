@@ -9,10 +9,9 @@ export default function Home() {
         setJoinCode(value)
     }
     function createAndJoinRoom() {
-        alert("creating room")
+        socket.emit('create-room', {roomName: 'Test Room'})
     }
     function joinRoom() {
-        alert("joining room with code: " + joinCode)
         socket.emit('join-room', {code: joinCode}, joinResponse)
     }
     function joinResponse(res) {
