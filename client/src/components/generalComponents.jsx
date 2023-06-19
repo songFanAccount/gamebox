@@ -20,11 +20,16 @@ export function GBTextInput({value, onChange, variant="outlined", width=250, pla
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
+            size="small"
             sx={{
                 width: width,
                 "& .MuiInputBase-input": {
                     color: '#FFFFFF',
-                    fontFamily: 'Verdana'
+                    fontFamily: 'Verdana',
+                    '::selection': {
+                        color: '#121212',
+                        backgroundColor: '#FFFFFF'
+                    }
                 },
                 '& .MuiOutlinedInput-root': {
                     '& fieldset': {
