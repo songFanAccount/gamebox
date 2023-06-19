@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { GBButton, GBTextInput } from './components/generalComponents'
+import { GBButton, GBText, GBTextInput } from './components/generalComponents'
 import { Stack } from '@mui/material'
 
 export default function Home() {
     const socket = global.socket
+    const [userName, setUserName] = useState('')
     const [joinCode, setJoinCode] = useState('')
     function handleJoinCodeChange(value) {
         setJoinCode(value)
@@ -34,6 +35,10 @@ export default function Home() {
                 backgroundColor: '#121212',
             }}
         >
+            <Stack direction="row" columnGap={2} alignItems="center">
+                <GBText text="Your display name:"/>
+                <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
+            </Stack>
             <GBButton
                 onClick={createAndJoinRoom}
             >
