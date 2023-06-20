@@ -108,7 +108,7 @@ export default function Home() {
                     sx={{
                         width: 1,
                         height: 200,
-                        border: 10, borderBottomLeftRadius: 10, borderBottomRighRadius: 10,
+                        border: 10, borderBottomLeftRadius: 10, borderBottomRightRadius: 10,
                         borderTop: 0,
                         borderColor: '#FFFFFF',
                         boxSizing: 'border-box'
