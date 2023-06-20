@@ -13,19 +13,26 @@ module.exports = (io, socket) => {
         playerObj[id] = { displayName : displayName }
         return playerObj
     }
-    function createRoom(code, roomName, creatorName, creatorID) {
+    function createRoom(code, roomName, password, creatorName, creatorID) {
         // AVI: rooms does not already contain the code as a key
         const playersObj = createPlayerObj(creatorID, creatorName)
         rooms[code] = {
             roomName: roomName,
+            password: password === '' ? null : password,
             players: playersObj
         }
     }
-    function joinRoom(code, userName) {
+    function joinRoom(code, password, userName, callback) {
         // AVI: there exists a room with the code
+        // Check password matches if exists
+        const roomPassword = rooms[code].password
+        if(roomPassword && password !== roomPassword) {
+            callback({success: false, errorMsg: 'Invalid password!'})
+        }
         rooms[code].players[socket.id] = { displayName : userName }
+        callback({success: true})
     }
-    socket.on('create-room', ({roomName, creatorName}, callback) => {
+    socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
         if(creatorName === '') creatorName = defaultUsername
         /* Generate 6 letter alphanumeric room codes until one is valid (not already existing) */
@@ -35,11 +42,11 @@ module.exports = (io, socket) => {
         } while(roomInfo(roomCode))
         console.log('Generated room with code: ' + roomCode)
         socket.join(roomCode)
-        createRoom(roomCode, roomName, creatorName, socket.id)
+        createRoom(roomCode, roomName, password, creatorName, socket.id)
         console.log(rooms)
         callback({success: true, code: roomCode})
     })
-    socket.on('join-room', ({code, userName}, callback) => {
+    socket.on('join-room', ({code, password, userName}, callback) => {
         console.log('Attemping to join room with code: ' + code)
         if(userName === '') userName = defaultUsername
         let errorMsg = null
@@ -52,8 +59,7 @@ module.exports = (io, socket) => {
             return
         }
         socket.join(code)
-        joinRoom(code, userName)
+        joinRoom(code, password, userName, callback)
         console.log(rooms)
-        callback({success: true})
     })
 }

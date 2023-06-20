@@ -49,9 +49,10 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
         />
     )
 }
-export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#121212', width='fit-content', className, border=1,
+export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#121212', width='fit-content', className, border=1, fs=20,
                           invert=false, disabled=false,  noDisableFx=true,
-                          ml=0,
+                          ml=0, px=2, py=1,
+                          endIcon,
                           hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
     const textColor = invert ? backgroundColor : color
     const bgColor = invert ? color : backgroundColor
@@ -61,17 +62,22 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
             onClick={onClick}
             disableRipple
             disabled={disabled}
+            endIcon={endIcon}
             sx={{
-                m: 0, px: 0, ml: ml,
+                m: 0, px: px, py: py, ml: ml,
                 color: textColor, backgroundColor: bgColor,
                 border: border,
-                fontFamily: 'Orbit', fontSize: 20,
+                fontFamily: 'Orbit', fontSize: fs,
                 minWidth: 0, width: width,
                 overflowX: 'hidden', whiteSpace: 'nowrap',
                 boxSizing: 'border-box',
                 textTransform: 'none',
                 '&:hover': hoverSx,
-                ':disabled': noDisableFx ? {color : textColor} : {}
+                ':disabled': noDisableFx ? {color : textColor} : {},
+                '& .MuiButton-endIcon': {
+                    mt: 0.2,
+                    ml: 2,
+                }
             }}
         >
             {children}
