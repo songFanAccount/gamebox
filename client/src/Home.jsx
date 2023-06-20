@@ -9,6 +9,7 @@ export default function Home() {
     const [joinCode, setJoinCode] = useState('')
     const [createJoinState, setCJState] = useState(0) // -1 for create, 0 for none selected, 1 for join
     const [createOptBorder, setCreateOptBorder] = useState(0)
+    const [roomName, setRoomName] = useState('')
     const busy = useRef(false)
     const [scope, animate] = useAnimate()
     
@@ -23,7 +24,7 @@ export default function Home() {
         anims.push(['.createButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.joinButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
         setCreateOptBorder(10)
-        anims.push(['.createOptions', {height: ['0%', '30%']}, {duration: 0.5}])
+        anims.push(['.options', {height: ['0%', '30%'], opacity: [0, 1]}, {duration: 0.5}])
         await animate(anims)
         busy.current = false
     }
@@ -41,14 +42,23 @@ export default function Home() {
         if(busy.current || createJoinState === 0) return
         busy.current = true
         const anims = []
-        anims.push(['.createOptions', {height: ['30%', '0%']}, {duration: 0.5}])
+        anims.push(['.options', {height: ['30%', '0%'], opacity: [1, 0]}, {duration: 0.5}])
         anims.push([createJoinState === 1 ? '.createButton' : '.joinButton', {width: ['0%', '45%'], opacity: [0, 1]}, {duration: 0.5}])
         anims.push([createJoinState === -1 ? '.createButton' : '.joinButton', {width: ['100%', '45%'], opacity: [1, 1]}, {at: '<', duration: 0.5}])
         await animate(anims)
         busy.current = false
         setCJState(0)
     }
-    
+    const CreateOptions = ({roomName}) => {
+        return (
+            <>
+                <Stack direction="row" columnGap={2}>
+                    <GBText text="Room name: "/>
+                    <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room"/>
+                </Stack>
+            </>
+        )
+    }
     function createAndJoinRoom() {
         socket.emit('create-room', {roomName: 'Test Room', creatorName: userName}, createResponse)
     }
@@ -76,7 +86,7 @@ export default function Home() {
             }}
         >
             <Stack
-                direction="column" justifyContent="center" alignItems="center" rowGap={2}
+                direction="column" justifyContent="center" alignItems="center" rowGap={3}
                 className="contents"
                 ref={scope}
                 sx={{
@@ -114,7 +124,7 @@ export default function Home() {
                     }
                 </Stack>
                 <Box
-                    className="createOptions"
+                    className="options"
                     sx={{
                         width: 1,
                         height: 0,
@@ -125,7 +135,20 @@ export default function Home() {
                         boxSizing: 'border-box'
                     }}
                 >
-
+                    <Stack
+                        direction="column"
+                        rowGap={2}
+                        sx={{
+                            ml: 2
+                        }}
+                    >
+                        {createJoinState === -1 && 
+                            <Stack direction="row" columnGap={2}>
+                                <GBText text="Room name: "/>
+                                <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room"/>
+                            </Stack>
+                        }
+                    </Stack>
                 </Box>
                 {/* <Stack direction="row" columnGap={2}>
                     <GBTextInput value={joinCode} onChange={handleJoinCodeChange} placeholder="Enter the unique room id"/>
