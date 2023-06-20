@@ -9,7 +9,9 @@ export default function Home() {
     const [joinCode, setJoinCode] = useState('')
     const [createJoinState, setCJState] = useState(0) // -1 for create, 0 for none selected, 1 for join
     const [createOptBorder, setCreateOptBorder] = useState(0)
+    /* Room creation data */
     const [roomName, setRoomName] = useState('')
+    const [password, setPassword] = useState('')
     const busy = useRef(false)
     const [scope, animate] = useAnimate()
     
@@ -49,16 +51,6 @@ export default function Home() {
         busy.current = false
         setCJState(0)
     }
-    const CreateOptions = ({roomName}) => {
-        return (
-            <>
-                <Stack direction="row" columnGap={2}>
-                    <GBText text="Room name: "/>
-                    <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room"/>
-                </Stack>
-            </>
-        )
-    }
     function createAndJoinRoom() {
         socket.emit('create-room', {roomName: 'Test Room', creatorName: userName}, createResponse)
     }
@@ -86,7 +78,7 @@ export default function Home() {
             }}
         >
             <Stack
-                direction="column" justifyContent="center" alignItems="center" rowGap={3}
+                direction="column" justifyContent="center" alignItems="center"
                 className="contents"
                 ref={scope}
                 sx={{
@@ -94,11 +86,15 @@ export default function Home() {
                     width: 'fit-content',
                 }}
             >
-                <Stack direction="row" columnGap={2} alignItems="center">
+                <Stack direction="row" columnGap={2} alignItems="center"
+                    sx={{
+                        mb: 3
+                    }}
+                >
                     <GBText text="Your display name:"/>
                     <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
                 </Stack>
-                <Stack direction="row" justifyContent="space-between" width={1}>
+                <Stack direction="row" justifyContent="space-between" width={1} mb={1}>
                     {createJoinState !== 1 &&
                         <GBButton
                             className="createButton"
@@ -126,10 +122,9 @@ export default function Home() {
                 <Box
                     className="options"
                     sx={{
-                        width: 1,
-                        height: 0,
-                        minHeight: 0,
-                        border: createOptBorder, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, borderStyle: 'groove',
+                        width: 1, height: 0, minHeight: 0,
+                        border: createOptBorder, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, 
+                        borderBottomStyle: 'groove', borderLeftStyle: 'dashed', borderRightStyle: 'dashed',
                         borderTop: 0,
                         borderColor: '#FFFFFF',
                         boxSizing: 'border-box'
@@ -138,14 +133,17 @@ export default function Home() {
                     <Stack
                         direction="column"
                         rowGap={2}
-                        sx={{
-                            ml: 2
-                        }}
                     >
                         {createJoinState === -1 && 
-                            <Stack direction="row" columnGap={2}>
-                                <GBText text="Room name: "/>
-                                <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room"/>
+                            <Stack direction="row" mt={3} justifyContent="space-evenly">
+                                <Stack direction="column" rowGap={3}>
+                                    <GBText text="Room name: "/>
+                                    <GBText text="Password: "/>
+                                </Stack>
+                                <Stack direction="column" rowGap={3}>
+                                    <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room"/>
+                                    <GBTextInput value={password} onChange={setPassword} placeholder="-"/>
+                                </Stack>
                             </Stack>
                         }
                     </Stack>
