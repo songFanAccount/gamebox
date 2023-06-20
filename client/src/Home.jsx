@@ -8,6 +8,7 @@ export default function Home() {
     const [userName, setUserName] = useState('')
     const [joinCode, setJoinCode] = useState('')
     const [createJoinState, setCJState] = useState(0) // -1 for create, 0 for none selected, 1 for join
+    const [createOptBorder, setCreateOptBorder] = useState(0)
     const busy = useRef(false)
     const [scope, animate] = useAnimate()
     
@@ -16,30 +17,33 @@ export default function Home() {
     }
     async function createToggle() {
         if(busy.current || createJoinState === -1) return
+        busy.current = true
         setCJState(-1)
         const anims = []
         anims.push(['.createButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.joinButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
-        busy.current = true
+        setCreateOptBorder(10)
+        anims.push(['.createOptions', {height: ['0%', '30%']}, {duration: 0.5}])
         await animate(anims)
         busy.current = false
     }
     async function joinToggle() {
         if(busy.current || createJoinState === 1) return
+        busy.current = true
         setCJState(1)
         const anims = []
         anims.push(['.joinButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.createButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
-        busy.current = true
         await animate(anims)
         busy.current = false
     }
     async function back() {
         if(busy.current || createJoinState === 0) return
+        busy.current = true
         const anims = []
+        anims.push(['.createOptions', {height: ['30%', '0%']}, {duration: 0.5}])
         anims.push([createJoinState === 1 ? '.createButton' : '.joinButton', {width: ['0%', '45%'], opacity: [0, 1]}, {duration: 0.5}])
         anims.push([createJoinState === -1 ? '.createButton' : '.joinButton', {width: ['100%', '45%'], opacity: [1, 1]}, {at: '<', duration: 0.5}])
-        busy.current = true
         await animate(anims)
         busy.current = false
         setCJState(0)
@@ -72,11 +76,11 @@ export default function Home() {
             }}
         >
             <Stack
-                direction="column" justifyContent="center" alignItems="center" rowGap={3}
+                direction="column" justifyContent="center" alignItems="center" rowGap={2}
                 className="contents"
                 ref={scope}
                 sx={{
-                    height: 'fit-content',
+                    height: 1,
                     width: 'fit-content',
                 }}
             >
@@ -85,30 +89,37 @@ export default function Home() {
                     <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between" width={1}>
-                    <GBButton
-                        className="createButton"
-                        onClick={createToggle}
-                        width={0.45}
-                        invert={createJoinState === -1}
-                        disabled={createJoinState === -1}
-                    >
-                        Create Room
-                    </GBButton>
-                    <GBButton
-                        className="joinButton"
-                        onClick={joinToggle}
-                        width={0.45}
-                        invert={createJoinState === 1}
-                        disabled={createJoinState === 1}
-                    >
-                        Join Room
-                    </GBButton>
+                    {createJoinState !== 1 &&
+                        <GBButton
+                            className="createButton"
+                            onClick={createToggle}
+                            width={0.45}
+                            invert={createJoinState === -1}
+                            disabled={createJoinState === -1}
+                        >
+                            Create Room
+                        </GBButton>
+                    }
+                    {createJoinState !== -1 &&
+                        <GBButton
+                            className="joinButton"
+                            onClick={joinToggle}
+                            width={0.45}
+                            ml="auto"
+                            invert={createJoinState === 1}
+                            disabled={createJoinState === 1}
+                        >
+                            Join Room
+                        </GBButton>
+                    }
                 </Stack>
                 <Box
+                    className="createOptions"
                     sx={{
                         width: 1,
-                        height: 200,
-                        border: 10, borderBottomLeftRadius: 10, borderBottomRightRadius: 10,
+                        height: 0,
+                        minHeight: 0,
+                        border: createOptBorder, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, borderStyle: 'groove',
                         borderTop: 0,
                         borderColor: '#FFFFFF',
                         boxSizing: 'border-box'

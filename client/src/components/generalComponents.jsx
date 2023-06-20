@@ -51,6 +51,7 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
 }
 export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#121212', width='fit-content', className, border=1,
                           invert=false, disabled=false,  noDisableFx=true,
+                          ml=0,
                           hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
     const textColor = invert ? backgroundColor : color
     const bgColor = invert ? color : backgroundColor
@@ -61,7 +62,7 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
             disableRipple
             disabled={disabled}
             sx={{
-                m: 0, px: 0,
+                m: 0, px: 0, ml: ml,
                 color: textColor, backgroundColor: bgColor,
                 border: border,
                 fontFamily: 'Orbit', fontSize: 20,
