@@ -16,7 +16,7 @@ export function GBText({text}) {
         </Typography>
     )
 }
-export function GBTextInput({value, onChange, variant="standard", width=250, placeholder,
+export function GBTextInput({value, onChange, variant="standard", width=200, placeholder,
                              color='#FFFFFF', backgroundColor='#121212'}) {
     return (
         <TextField

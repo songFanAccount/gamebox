@@ -104,6 +104,18 @@ export default function Home() {
                         Join Room
                     </GBButton>
                 </Stack>
+                <Box
+                    sx={{
+                        width: 1,
+                        height: 200,
+                        border: 10, borderBottomLeftRadius: 10, borderBottomRighRadius: 10,
+                        borderTop: 0,
+                        borderColor: '#FFFFFF',
+                        boxSizing: 'border-box'
+                    }}
+                >
+
+                </Box>
                 {/* <Stack direction="row" columnGap={2}>
                     <GBTextInput value={joinCode} onChange={handleJoinCodeChange} placeholder="Enter the unique room id"/>
                     
