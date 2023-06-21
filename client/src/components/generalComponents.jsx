@@ -43,6 +43,7 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
             variant={variant}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            autoComplete='off'
             placeholder={placeholder}
             size="small"
             spellCheck={spellCheck}
@@ -77,7 +78,7 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
     )
 }
 export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#121212', width='fit-content', className, border=1, fs=20,
-                          invert=false, disabled=false,  noDisableFx=true,
+                          invert=false, disabled=false,  noDisableFx=false,
                           ml=0, px=2, py=1,
                           endIcon,
                           hoverSx={color:'#121212', backgroundColor:'#FFFFFF'}}) {
@@ -100,7 +101,7 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
                 boxSizing: 'border-box',
                 textTransform: 'none',
                 '&:hover': hoverSx,
-                ':disabled': noDisableFx ? {color : textColor} : {},
+                ':disabled': noDisableFx ? {color : textColor} : {borderColor: color, color: color},
                 '& .MuiButton-endIcon': {
                     mt: 0.2,
                     ml: 2,
