@@ -4,6 +4,9 @@ import { Box, Stack } from '@mui/material'
 import { useAnimate } from 'framer-motion'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DoneIcon from '@mui/icons-material/Done';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { GBToastContainer, toastStyle } from './components/toast';
+import { toast } from 'react-toastify';
 
 export default function Home() {
     const socket = global.socket
@@ -65,13 +68,16 @@ export default function Home() {
         setLoading(true)
         socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, (response) => {
             console.log(response)
+            toast.success('Room created! Redirecting...')
             setLoading(false)
         })
     }
     function joinRoom() {
         setLoading(true)
-        socket.emit('join-room', {code: joinCode, password: password, userName: userName}, (response) => {
-            console.log(response)
+        socket.emit('join-room', {code: joinCode, password: joinPassword, userName: userName}, (response) => {
+            if(!response) toast.error('Unexpected error!')
+            if(response.success) toast.success('Valid details! Redirecting...')
+            else toast.error(response.errorMsg)
             setLoading(false)
         })
     }
@@ -182,13 +188,14 @@ export default function Home() {
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
-                                    <GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<DoneIcon/>}>Join</GBButton>
+                                    <GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>
                                 </Stack>
                             </>
                         }
                     </Stack>
                 </Stack>
             </Stack>
+            <GBToastContainer/>
         </Box>
     )
 }
