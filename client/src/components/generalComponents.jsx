@@ -3,12 +3,12 @@ import { useState } from "react";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-export function GBText({text}) {
+export function GBText({text, fontFamily='Orbit', fs=20}) {
     return (
         <Typography
             sx={{
                 color: '#FFFFFF',
-                fontFamily: 'Orbit', fontSize: 20,
+                fontFamily: fontFamily, fontSize: fs,
                 '::selection': {
                     color: '#121212',
                     backgroundColor: '#FFFFFF'

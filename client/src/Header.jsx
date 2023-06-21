@@ -1,5 +1,6 @@
 import { Stack, Typography } from '@mui/material'
 import React from 'react'
+import { GBText } from './components/generalComponents'
 
 export default function Header() {
     return (
@@ -11,16 +12,7 @@ export default function Header() {
                 borderBottom: 1, borderColor: '#FFFFFF', boxSizing: 'border-box'
             }}
         >
-            <Typography
-                sx={{
-                    fontFamily: "Braah One",
-                    fontSize: 40,
-                    display: 'flex',
-                    alignItems: 'center'
-                }}
-            >
-                GameBox
-            </Typography>
+            <GBText text="GameBox" fontFamily="Braah One" fs={40}/>
         </Stack>
     )
 }
