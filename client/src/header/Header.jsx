@@ -1,6 +1,8 @@
-import { Stack, Typography } from '@mui/material'
+import { Stack } from '@mui/material'
 import React from 'react'
-import { GBText } from './components/generalComponents'
+import GBLinkWrapper from '../components/GBLinkWrapper'
+import { GBText } from '../components/generalComponents'
+import HeaderNav from './HeaderNav'
 
 export default function Header() {
     return (
@@ -12,7 +14,10 @@ export default function Header() {
                 borderBottom: 1, borderColor: '#FFFFFF', boxSizing: 'border-box'
             }}
         >
-            <GBText text="GameBox" fontFamily="Braah One" fs={40}/>
+            <GBLinkWrapper to="/" underline={false}>
+                <GBText text="GameBox" fontFamily="Braah One" fs={40} ml={4}/>
+            </GBLinkWrapper>
+            <HeaderNav/>
         </Stack>
     )
 }
