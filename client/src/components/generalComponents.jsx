@@ -57,7 +57,8 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
                 width: width,
                 "& .MuiInputBase-input": {
                     color: color,
-                    fontFamily: 'Orbit', fontSize: 20,
+                    letterSpacing: type==='password' ? 3 : 'normal',
+                    fontFamily: type==='password' ? 'Verdana' : 'Orbit', fontSize: 20,
                     '::selection': {
                         color: backgroundColor,
                         backgroundColor: color
