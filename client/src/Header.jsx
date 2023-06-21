@@ -1,9 +1,9 @@
-import { Stack } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
 import React from 'react'
 
 export default function Header() {
     return (
-        <Stack direction="row"
+        <Stack direction="row" justifyContent="space-between" alignItems="center"
             sx={{
                 height: 100, width: '100%',
                 position: 'fixed', top:0, left:0,
@@ -11,7 +11,16 @@ export default function Header() {
                 borderBottom: 1, borderColor: '#FFFFFF', boxSizing: 'border-box'
             }}
         >
-            <h1>GameBox</h1>
+            <Typography
+                sx={{
+                    fontFamily: "Braah One",
+                    fontSize: 40,
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+            >
+                GameBox
+            </Typography>
         </Stack>
     )
 }
