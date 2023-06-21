@@ -17,18 +17,13 @@ module.exports = (io, socket) => {
         // AVI: rooms does not already contain the code as a key
         const playersObj = createPlayerObj(creatorID, creatorName)
         rooms[code] = {
-            roomName: roomName,
+            roomName: roomName === '' ? 'Game Room' : roomName,
             password: password === '' ? null : password,
             players: playersObj
         }
     }
     function joinRoom(code, password, userName, callback) {
         // AVI: there exists a room with the code
-        // Check password matches if exists
-        const roomPassword = rooms[code].password
-        if(roomPassword && password !== roomPassword) {
-            callback({success: false, errorMsg: 'Invalid password!'})
-        }
         rooms[code].players[socket.id] = { displayName : userName }
         callback({success: true})
     }
@@ -47,13 +42,18 @@ module.exports = (io, socket) => {
         callback({success: true, code: roomCode})
     })
     socket.on('join-room', ({code, password, userName}, callback) => {
-        console.log('Attemping to join room with code: ' + code)
+        console.log('Attemping to join room with code: ' + code + ', password: ' + password)
         if(userName === '') userName = defaultUsername
         let errorMsg = null
         /* Code validation */
         if(code.length !== codeLen) errorMsg = "Please enter a 6 letter code to an existing room!"
         /* Disallow joining non-existent rooms */
         else if(!roomInfo(code)) errorMsg = "No room exists with this code!"
+        if(!errorMsg) {
+            // Room exists, now check password matches if exists
+            const roomPassword = rooms[code].password
+            if(roomPassword && password !== roomPassword) errorMsg = 'Invalid password!'
+        }
         if(errorMsg) {
             callback({success: false, errorMsg: errorMsg})
             return
