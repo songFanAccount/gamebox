@@ -5,7 +5,7 @@ import { useAnimate } from 'framer-motion'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DoneIcon from '@mui/icons-material/Done';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { GBToastContainer, toastStyle } from './components/toast';
+import { GBToastContainer } from './components/toast';
 import { toast } from 'react-toastify';
 
 export default function Home() {
