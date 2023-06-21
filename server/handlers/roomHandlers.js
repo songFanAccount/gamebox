@@ -17,7 +17,7 @@ module.exports = (io, socket) => {
         // AVI: rooms does not already contain the code as a key
         const playersObj = createPlayerObj(creatorID, creatorName)
         rooms[code] = {
-            roomName: roomName,
+            roomName: roomName === '' ? 'Game Room' : roomName,
             password: password === '' ? null : password,
             players: playersObj
         }
@@ -28,6 +28,7 @@ module.exports = (io, socket) => {
         const roomPassword = rooms[code].password
         if(roomPassword && password !== roomPassword) {
             callback({success: false, errorMsg: 'Invalid password!'})
+            return
         }
         rooms[code].players[socket.id] = { displayName : userName }
         callback({success: true})

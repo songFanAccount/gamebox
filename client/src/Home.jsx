@@ -146,13 +146,13 @@ export default function Home() {
                         {createJoinState === -1 && 
                             <>
                                 <Stack direction="row" mt={3} justifyContent="space-between">
-                                    <Stack direction="column" rowGap={3}>
+                                    <Stack direction="column" rowGap={3.5}>
                                         <GBText text="Room name: "/>
                                         <GBText text="Password: "/>
                                     </Stack>
                                     <Stack direction="column" rowGap={3}>
-                                        <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room"/>
-                                        <GBTextInput value={password} onChange={setPassword} placeholder="-"/>
+                                        <GBTextInput value={roomName} onChange={setRoomName} placeholder="Game Room" maxLength={25}/>
+                                        <GBTextInput value={password} onChange={setPassword} placeholder="-" maxLength={25} type="password"/>
                                     </Stack>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
@@ -164,13 +164,13 @@ export default function Home() {
                         {createJoinState === 1 && 
                             <>
                                 <Stack direction="row" mt={3} justifyContent="space-between">
-                                    <Stack direction="column" rowGap={3}>
+                                    <Stack direction="column" rowGap={3.5}>
                                         <GBText text="Room code: "/>
                                         <GBText text="Password: "/>
                                     </Stack>
                                     <Stack direction="column" rowGap={3}>
-                                        <GBTextInput value={joinCode} onChange={handleJoinCodeChange} placeholder="6 digit code"/>
-                                        <GBTextInput value={joinPassword} onChange={setJoinPassword} placeholder="-"/>
+                                        <GBTextInput value={joinCode} onChange={handleJoinCodeChange} placeholder="6 digit code" maxLength={6}/>
+                                        <GBTextInput value={joinPassword} onChange={setJoinPassword} placeholder="-" maxLength={25} type="password"/>
                                     </Stack>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>

@@ -1,4 +1,7 @@
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export function GBText({text}) {
     return (
@@ -16,15 +19,39 @@ export function GBText({text}) {
         </Typography>
     )
 }
-export function GBTextInput({value, onChange, variant="standard", width=200, placeholder,
-                             color='#FFFFFF', backgroundColor='#121212'}) {
+export function GBTextInput({value, onChange, variant="standard", width=200, placeholder, maxLength=50, type="text",
+                             color='#FFFFFF', backgroundColor='#121212',
+                             spellCheck=false}) {
+    const [pwVisible, setPwVisible] = useState(false)
+    let endAdornment = null
+    if(type === 'password') {
+        if(pwVisible) type = 'text'
+        endAdornment = (
+            <IconButton 
+                onClick={() => setPwVisible(!pwVisible)}
+                disableRipple
+                aria-label={pwVisible ? "Hide password" : "Show password"} 
+                sx={{color: color}}
+            >
+                {pwVisible ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+            </IconButton>
+        )
+    }
     return (
         <TextField
+            type={type}
             variant={variant}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             size="small"
+            spellCheck={spellCheck}
+            inputProps={{
+                maxLength: maxLength
+            }}
+            InputProps={{
+                endAdornment: <InputAdornment position="end">{endAdornment}</InputAdornment>
+            }}
             sx={{
                 width: width,
                 "& .MuiInputBase-input": {
