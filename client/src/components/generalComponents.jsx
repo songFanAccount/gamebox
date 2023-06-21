@@ -43,7 +43,7 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
             variant={variant}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            autoComplete='off'
+            autoComplete='new-password'
             placeholder={placeholder}
             size="small"
             spellCheck={spellCheck}
