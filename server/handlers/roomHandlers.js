@@ -52,7 +52,7 @@ module.exports = (io, socket) => {
         if(!errorMsg) {
             // Room exists, now check password matches if exists
             const roomPassword = rooms[code].password
-            if(roomPassword && password !== roomPassword) errorMsg = 'Invalid password!'
+            if(roomPassword && password !== roomPassword) errorMsg = 'Incorrect password!'
         }
         if(errorMsg) {
             callback({success: false, errorMsg: errorMsg})
