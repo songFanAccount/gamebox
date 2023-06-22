@@ -7,9 +7,11 @@ export default function GameWindow() {
     return (
         <Box
             sx={{
-                color: "white",
-                backgroundColor: "grey",
-                width: 1000
+                width: "100%",
+                border: 1,
+                borderRadius: 1,
+                m: 1,
+                ml: 0
             }}
         >
             <GameStat />

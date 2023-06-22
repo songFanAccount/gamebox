@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 export default function UserList() {
     return (
         <Box
-            sx={{color: "white"}}
+            sx={{}}
         >
             UserList
         </Box>

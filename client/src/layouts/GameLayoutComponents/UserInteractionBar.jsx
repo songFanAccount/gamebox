@@ -8,7 +8,13 @@ import Messenger from "./Messenger"
 export default function UserInteractionBar() {
     return (
         <Box
-            sx={{color: "white"}}
+            sx={{
+                border: 1,
+                borderRadius: 1,
+                m: 1,
+                ml: 0,
+                minWidth: 250
+            }}
         >
             <UserList/>
             <Messenger/>

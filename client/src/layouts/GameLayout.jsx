@@ -18,7 +18,7 @@ export default function GameLayout() {
                 left: 0,
                 backgroundColor: '#121212',
                 display: 'flex',
-                justifyContent: 'space-around'
+                color: "white"
             }}
         >
             <GameSearchBar/>

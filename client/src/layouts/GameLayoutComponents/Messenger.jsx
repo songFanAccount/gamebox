@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 export default function Messenger() {
     return (
         <Box
-            sx={{color: "white"}}
+            sx={{}}
         >
             Messenger
         </Box>
