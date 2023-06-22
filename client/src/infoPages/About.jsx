@@ -1,7 +1,8 @@
 import React from 'react'
+import { GBText } from '../components/generalComponents'
 
 export default function About() {
     return (
-        <div>About</div>
+        <GBText text="Under construction..." fontFamily='Montserrat'/> 
     )
 }

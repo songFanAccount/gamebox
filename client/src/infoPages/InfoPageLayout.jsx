@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { GBText } from '../components/generalComponents'
@@ -6,7 +6,7 @@ import { getLinear } from '../helpers/mathHelpers'
 
 const Banner = ({screenWidth, pathname}) => {
     const titleFS = getLinear(32, 60, 400, 1100, screenWidth)
-    const miniTitleFS = getLinear(14, 26, 400, 1100, screenWidth)
+    const miniTitleFS = getLinear(12, 26, 400, 1100, screenWidth)
     const bannerHeight = getLinear(120, 300, 400, 1100, screenWidth)
     let title, miniTitle
     switch(pathname) {
@@ -54,12 +54,16 @@ export default function InfoPageLayout() {
     }, [])
     return (
         <Stack
+            direction="column"
+            alignItems="center"
             sx={{
                 width: 1
             }}
         >
             <Banner screenWidth={screenWidth} pathname={pathname}/>
-            <Outlet/>
+            <Box width={0.7} mt={5}>
+                <Outlet/>
+            </Box>
         </Stack>
     )
 }
