@@ -14,7 +14,7 @@ function App() {
 			<Routes>
 				<Route path="/" element={<DefaultLayout/>}>
 					<Route index element={<Home/>}/>
-					<Route path="/" element={<GameLayout/>}>
+					<Route path="/game" element={<GameLayout/>}>
 						<Route path="tictactoe" element={<TicTacToe/>}/>
 					</Route>
 				</Route>
