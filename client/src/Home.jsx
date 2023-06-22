@@ -90,6 +90,7 @@ export default function Home() {
                 sx={{
                     height: 1,
                     width: 'fit-content',
+                    mx: 'auto'
                 }}
             >
                 <Stack direction="row" columnGap={2} alignItems="center"

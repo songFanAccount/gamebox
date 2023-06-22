@@ -17,9 +17,6 @@ export default function DefaultLayout() {
                     top: 100,
                     left: 0,
                     backgroundColor: '#121212',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
                 }}
             >
                 <Outlet/>
