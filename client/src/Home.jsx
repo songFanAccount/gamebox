@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { GBButton, GBText, GBTextInput } from './components/generalComponents'
-import { Box, Stack } from '@mui/material'
+import { Stack } from '@mui/material'
 import { useAnimate } from 'framer-motion'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DoneIcon from '@mui/icons-material/Done';
@@ -82,19 +82,7 @@ export default function Home() {
         })
     }
     return (
-        <Box
-            sx={{
-                width: '100%',
-                height: 'calc(100% - 100px)',
-                position: 'fixed',
-                top: 100,
-                left: 0,
-                backgroundColor: '#121212',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}
-        >
+        <>
             <Stack
                 direction="column" justifyContent="center" alignItems="center"
                 className="contents"
@@ -102,6 +90,7 @@ export default function Home() {
                 sx={{
                     height: 1,
                     width: 'fit-content',
+                    mx: 'auto'
                 }}
             >
                 <Stack direction="row" columnGap={2} alignItems="center"
@@ -196,6 +185,6 @@ export default function Home() {
                 </Stack>
             </Stack>
             <GBToastContainer/>
-        </Box>
+        </>
     )
 }
