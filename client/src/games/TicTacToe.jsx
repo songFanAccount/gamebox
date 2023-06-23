@@ -1,4 +1,4 @@
-import { Box, Stack } from '@mui/material'
+import { Box, Button, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
@@ -6,16 +6,27 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 export default function TicTacToe() {
     const socket = global.socket
-    // const [board, setBoard] = useState([
-    //     [0, 0, 0],
-    //     [0, 0, 0],
-    //     [0, 0, 0]
-    // ])
     const [board, setBoard] = useState([
-        [0, 1, -1],
-        [1, 0, 1],
-        [0, -1, 0]
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
     ])
+    const [turn, setTurn] = useState(-1) // -1 for X, 1 for O
+    // const [board, setBoard] = useState([
+    //     [0, 1, -1],
+    //     [1, 0, 1],
+    //     [0, -1, 0]
+    // ])
+    function clickSquare(rowIndex, colIndex) {
+        setBoard(
+            board.map((row, rIndex) => (
+                rIndex === rowIndex 
+                ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
+                : row
+            ))
+        )
+        setTurn(-turn)
+    }
     const squareWidth = 100
     const Element = ({el}) => {
         /* el can be -1 (X), 0 (None), or 1 (O) */
@@ -47,18 +58,27 @@ export default function TicTacToe() {
                     border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box'
                 }}
             >
-                {board.map((row)=> (
+                {board.map((row, rowIndex)=> (
                     <Stack direction="row">
-                        {row.map((el) => (
-                            <Box
+                        {row.map((el, colIndex) => (
+                            <Button
+                                className={`tictactoe-${rowIndex}-${colIndex}`}
+                                disableRipple
+                                disabled={el !== 0}
+                                onClick={() => clickSquare(rowIndex, colIndex)}
                                 sx={{
-                                    width: squareWidth, height: squareWidth, 
-                                    border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
-                                    display: 'flex', justifyContent: 'center', alignItems: 'center'
+                                    p:0, m:0, 
+                                    width: squareWidth, height: squareWidth,
+                                    backgroundColor: '#121212',
+                                    border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 0,
+                                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                    '&:hover': {
+                                        backgroundColor: '#121212',
+                                    }
                                 }}
                             >
                                 <Element el={el}/>
-                            </Box>
+                            </Button>
                         ))}
                     </Stack>
                 ))}
