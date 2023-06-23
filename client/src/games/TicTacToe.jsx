@@ -118,8 +118,7 @@ export default function TicTacToe() {
                     initial="hidden"
                     animate="visible"
                     sx={{
-                        width: 300, minHeight: 300,
-                        border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
+                        width: 300, height: 300,
                         position: 'absolute',
                     }}
                 >
