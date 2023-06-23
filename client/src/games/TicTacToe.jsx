@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion";
 import { GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,45 +19,32 @@ export default function TicTacToe() {
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
-    function clickSquare(rowIndex, colIndex) {
-        const newBoardState = 
+    useEffect(() => {
+        socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
+            console.log(rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin)
+            const newBoardState = 
             board.map((row, rIndex) => (
                 rIndex === rowIndex 
                 ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
                 : row
             ))
-        setBoard(
-            newBoardState
-        )
-        const numEmptySpaces = emptySpaces - 1
-        setEmptySpaces(numEmptySpaces)
-        /* 
-        Should determine game status after each move, either:
-        - Player wins: A row/column/diagonal of X or Os. From the clicked square, span out to check its row/column and diagonal if applicable
-        - Draw: Previous case has not occurred, and board is now full. Detect fullness when 'emptySpaces' === 0
-        - Otherwise just continue playing!
-        */
-        // NOTE: Storing every win condition for animation purposes
-        const rowWin = newBoardState[rowIndex].every((el) => el === turn) // Check row
-        const colWin = newBoardState.every((row) => row[colIndex] === turn) // Then check column
-        // Now check diagonals
-        const leftDiagWin = 
-            newBoardState[0][0] === turn &&
-            newBoardState[1][1] === turn &&
-            newBoardState[2][2] === turn 
-        const rightDiagWin = 
-            newBoardState[0][2] === turn &&
-            newBoardState[1][1] === turn &&
-            newBoardState[2][0] === turn
-        // Determine if won
-        const win = rowWin || colWin || leftDiagWin || rightDiagWin
-        /* Update win condition states */
-        if(rowWin) setRowWin(rowIndex)
-        if(colWin) setColWin(colIndex)
-        setLeftDiagWin(leftDiagWin)
-        setRightDiagWin(rightDiagWin)
-        if(win) setWinner(turn)
-        else setTurn(-turn)
+            console.log(newBoardState)
+            setBoard(
+                newBoardState
+            )
+            const numEmptySpaces = emptySpaces - 1
+            setEmptySpaces(numEmptySpaces)
+            /* Update win condition states */
+            if(rowWin) setRowWin(rowIndex)
+            if(colWin) setColWin(colIndex)
+            setLeftDiagWin(leftDiagWin)
+            setRightDiagWin(rightDiagWin)
+            if(win) setWinner(turn)
+            else setTurn(-turn)
+        })
+    }, [socket])
+    function clickSquare(rowIndex, colIndex) {
+        socket.emit('tictactoe-click', {rowIndex, colIndex})
     }
     const squareWidth = 100
     const Element = ({el}) => {
@@ -163,7 +150,6 @@ export default function TicTacToe() {
                     <Stack direction="row">
                         {row.map((el, colIndex) => (
                             <Button
-                                zIndex={0}
                                 className={`tictactoe-${rowIndex}-${colIndex}`}
                                 disableRipple
                                 disabled={el !== 0 || winner !== 0}
