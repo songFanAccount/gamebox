@@ -133,9 +133,9 @@ export default function TicTacToe() {
                     }
                     {colWin !== -1 && 
                         <motion.line
-                            x1={49 + colWin * 100}
+                            x1={50 + colWin * 100}
                             y1="18"
-                            x2={49 + colWin * 100}
+                            x2={50 + colWin * 100}
                             y2="282"
                             variants={draw}
                         />
@@ -151,9 +151,9 @@ export default function TicTacToe() {
                     }
                     {rightDiagWin && 
                         <motion.line
-                            x1="278"
+                            x1="280"
                             y1="20"
-                            x2="18"
+                            x2="20"
                             y2="280"
                             variants={draw}
                         />
