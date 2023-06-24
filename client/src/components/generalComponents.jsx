@@ -25,7 +25,7 @@ export function GBText({text, fontFamily='Orbit', fs=20, ml=0,
 }
 export function GBFormalText(props) {
     return (
-        <GBText fontFamily="Montserrat" {...props}/>
+        <GBText fontFamily="Montserrat"{...props}/>
     )
 }
 export function GBTextInput({value, onChange, variant="standard", width=200, placeholder, maxLength=50, type="text",

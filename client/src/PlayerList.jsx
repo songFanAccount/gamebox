@@ -4,23 +4,38 @@ import { Box, Stack } from '@mui/material'
 
 export default function PlayerList({host, players}) {
     const Host = () => {
-        return <GBFormalText text={host}/>
+        return <GBFormalText fs={16} text={host}/>
     }
     const Players = () => {
         return (
             <>
                 {players?.map((player) => {
-                    return <GBFormalText text={player}/>
+                    return <GBFormalText fs={16} text={player}/>
                 })}
             </>
         )
     }
     return (
-        <Box>
-            <GBFormalText text="Player list:"/>
+        <Box
+            sx={{
+                width: 250,
+                border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 3
+            }}
+        >
+            <Box
+                sx={{
+                    mb: 1.5,
+                    width: 1, height: 50,
+                    backgroundColor: '#FFFFFF',
+                    borderTopLeftRadius: 10, borderTopRightRadius: 10,
+                    display: 'flex', justifyContent: 'center', alignItems: 'center'
+                }}
+            >
+                <GBFormalText color='#121212' text="Players" center/>
+            </Box>
             <Stack direction="column"
                 sx={{
-                    border: 1, borderColor: '#FFFFFF'
+                    mx: 2, my: 1,
                 }}
             >
                 <Host/>
