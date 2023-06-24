@@ -1,6 +1,6 @@
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import React, { useState } from 'react'
-import { GBNakedInput } from './components/generalComponents'
+import { GBNakedInput, GBText } from './components/generalComponents'
 
 export default function Chat() {
     const socket = global.socket
@@ -13,6 +13,16 @@ export default function Chat() {
     function handleKey(e) {
         if(e.keyCode === 13) sendMessage(message)
     }
+    const Message = ({msg}) => {
+        return (
+            <GBText fs={16} text={msg}/>
+        )
+    }
+    socket.on('gameroom_newChatMsg', ({message, playerName}) => {
+        console.log(message, playerName)
+        const newMsg = `${playerName}: ${message}`
+        setChatMessages([...chatMessages, newMsg])
+    })
     return (
         <Box
             sx={{
@@ -21,6 +31,9 @@ export default function Chat() {
                 position: 'relative'
             }}
         >
+            <Stack direction="column" mx={1}>
+                {chatMessages.map((msg) => <Message msg={msg}/>)}
+            </Stack>
             <Box
                 sx={{
                     borderTop: 1, borderColor: '#FFFFFF',

@@ -2,6 +2,7 @@ const { generateAlphanumericCode, isEmptyStr } = require('../generalHelpers')
 
 const codeLen = 6
 const rooms = {}
+const socketidToRoom = {}
 const defaultUsername = 'Anon Andy'
 
 module.exports = (io, socket) => {
@@ -21,10 +22,14 @@ module.exports = (io, socket) => {
             password: password === '' ? null : password,
             players: playersObj
         }
+        socketidToRoom[creatorID] = code
+        console.log(socketidToRoom)
     }
-    function joinRoom(code, userName, callback) {
+    function joinRoom(code, userName, callback, userID) {
         // AVI: there exists a room with the code
         rooms[code].players[socket.id] = { displayName : userName }
+        socketidToRoom[userID] = code
+        console.log(socketidToRoom)
         callback({success: true})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
@@ -59,7 +64,13 @@ module.exports = (io, socket) => {
             return
         }
         socket.join(code)
-        joinRoom(code, userName, callback)
+        joinRoom(code, userName, callback, socket.id)
         console.log(rooms)
+    })
+    socket.on('gameroom_sendMsgToChat', ({message}) => {
+        const roomCode = socketidToRoom[socket.id]
+        const playerName = 'random'
+        console.log(`Message: ${message} from socketid: ${socket.id} from room with code: ${roomCode}`)
+        io.to('testRoom').emit('gameroom_newChatMsg', {message, playerName})
     })
 }
