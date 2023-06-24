@@ -1,10 +1,22 @@
 let turn = -1
-const board = [
+let board = [
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0]
 ]
-module.exports = (io, socket) => {
+let stats = {}
+function resetBoard() {
+    board = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+    ]
+}
+function resetGame() {
+    resetBoard()
+    turn = -1
+}
+module.exports = (io, socket, room) => {
     socket.on('tictactoe-click', ({rowIndex, colIndex}) => {
         board[rowIndex][colIndex] = turn
         /* 
@@ -27,10 +39,16 @@ module.exports = (io, socket) => {
             board[2][0] === turn
         // Determine if won
         const win = rowWin || colWin || leftDiagWin || rightDiagWin
+        /* Update game statistics if won */
+        if(win) {
+            stats[turn] ? stats[turn]++ : stats[turn] = 1
+            console.log(stats)
+        }
+        /* Send response to each client in room */
         const response = win 
         ? {rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}
         : {rowIndex, colIndex, win: false}
-        io.to('testRoom').emit('tictactoe-clickResponse', response)
+        io.to(room).emit('tictactoe-clickResponse', response)
         turn *= -1
     })
 }

@@ -21,7 +21,7 @@ const registerTictactoeHandlers = require('./handlers/gameHandlers/tictactoe')
 io.on('connection', (socket) => {
     socket.join('testRoom')
     registerRoomHandlers(io, socket)
-    registerTictactoeHandlers(io, socket)
+    registerTictactoeHandlers(io, socket, 'testRoom')
 })
 
 server.listen(3001, () => {
