@@ -42,6 +42,17 @@ export default function TicTacToe() {
     function clickSquare(rowIndex, colIndex) {
         socket.emit('tictactoe-click', {rowIndex, colIndex})
     }
+    function newGame() {
+        socket.emit('tictactoe-newGame')
+        setBoard([
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ])
+        setTurn(-1)
+        setWinner(0)
+        setRowWin(-1)
+    }
     const squareWidth = 100
     const Element = ({el}) => {
         /* el can be -1 (X), 0 (None), or 1 (O) */
@@ -165,7 +176,7 @@ export default function TicTacToe() {
                         ))}
                     </Stack>
                 ))}
-                <GBButton>
+                <GBButton py={3} onClick={newGame}>
                     Restart
                 </GBButton>
             </Stack>
