@@ -19,7 +19,6 @@ export default function Chat() {
         )
     }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
-        console.log(message, playerName)
         const newMsg = `${playerName}: ${message}`
         setChatMessages([...chatMessages, newMsg])
     })
@@ -31,7 +30,13 @@ export default function Chat() {
                 position: 'relative'
             }}
         >
-            <Stack direction="column" mx={1}>
+            <Stack direction="column"
+                sx={{
+                    mx: 1,
+                    height: 340,
+                    overflowY: 'auto'
+                }}
+            >
                 {chatMessages.map((msg) => <Message msg={msg}/>)}
             </Stack>
             <Box
