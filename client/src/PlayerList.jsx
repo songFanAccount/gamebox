@@ -1,13 +1,11 @@
 import React from 'react'
 import { GBText } from './components/generalComponents'
 import { Box } from '@mui/material'
-import PlayerList from './PlayerList'
 
-export default function Temp() {
+export default function PlayerList({host, }) {
     return (
         <Box>
-            <GBText text="EVERYTHING TEMPORARY DISPLAYED HERE."/>
-            <PlayerList/>
+            <GBText text="Player list:"/>
         </Box>
     )
 }
