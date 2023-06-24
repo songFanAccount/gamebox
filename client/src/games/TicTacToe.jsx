@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { motion } from "framer-motion";
 import { GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,30 +19,28 @@ export default function TicTacToe() {
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
-    useEffect(() => {
-        socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
-            console.log(rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin)
-            const newBoardState = 
-            board.map((row, rIndex) => (
-                rIndex === rowIndex 
-                ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
-                : row
-            ))
-            console.log(newBoardState)
-            setBoard(
-                newBoardState
-            )
-            const numEmptySpaces = emptySpaces - 1
-            setEmptySpaces(numEmptySpaces)
-            /* Update win condition states */
-            if(rowWin) setRowWin(rowIndex)
-            if(colWin) setColWin(colIndex)
-            setLeftDiagWin(leftDiagWin)
-            setRightDiagWin(rightDiagWin)
-            if(win) setWinner(turn)
-            else setTurn(-turn)
-        })
-    }, [socket])
+    socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
+        console.log(rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin)
+        const newBoardState = 
+        board.map((row, rIndex) => (
+            rIndex === rowIndex 
+            ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
+            : row
+        ))
+        console.log(newBoardState)
+        setBoard(
+            newBoardState
+        )
+        const numEmptySpaces = emptySpaces - 1
+        setEmptySpaces(numEmptySpaces)
+        /* Update win condition states */
+        if(rowWin) setRowWin(rowIndex)
+        if(colWin) setColWin(colIndex)
+        setLeftDiagWin(leftDiagWin)
+        setRightDiagWin(rightDiagWin)
+        if(win) setWinner(turn)
+        else setTurn(-turn)
+    })
     function clickSquare(rowIndex, colIndex) {
         socket.emit('tictactoe-click', {rowIndex, colIndex})
     }
