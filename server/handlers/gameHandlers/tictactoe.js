@@ -17,8 +17,9 @@ function resetGame() {
     turn = -1
 }
 module.exports = (io, socket, room) => {
-    socket.on('tictactoe-newGame', () => {
+    socket.on('tictactoe-newGameReq', () => {
         resetGame()
+        io.to(room).emit('tictactoe-newGame')
     })
     socket.on('tictactoe-click', ({rowIndex, colIndex}) => {
         board[rowIndex][colIndex] = turn

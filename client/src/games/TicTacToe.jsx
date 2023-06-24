@@ -19,6 +19,20 @@ export default function TicTacToe() {
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
+    socket.on('tictactoe-newGame', () => {
+        setBoard([
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ])
+        setEmptySpaces(9)
+        setTurn(-1)
+        setWinner(0)
+        setRowWin(-1)
+        setColWin(-1)
+        setLeftDiagWin(false)
+        setRightDiagWin(false)
+    })
     socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
         board.map((row, rIndex) => (
@@ -42,16 +56,8 @@ export default function TicTacToe() {
     function clickSquare(rowIndex, colIndex) {
         socket.emit('tictactoe-click', {rowIndex, colIndex})
     }
-    function newGame() {
-        socket.emit('tictactoe-newGame')
-        setBoard([
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0]
-        ])
-        setTurn(-1)
-        setWinner(0)
-        setRowWin(-1)
+    function requestNewGame() {
+        socket.emit('tictactoe-newGameReq')
     }
     const squareWidth = 100
     const Element = ({el}) => {
@@ -176,7 +182,7 @@ export default function TicTacToe() {
                         ))}
                     </Stack>
                 ))}
-                <GBButton py={3} onClick={newGame}>
+                <GBButton py={3} onClick={requestNewGame}>
                     Restart
                 </GBButton>
             </Stack>
