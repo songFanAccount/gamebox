@@ -12,9 +12,9 @@ export default function TicTacToe() {
         [0, 0, 0],
         [0, 0, 0]
     ])
-    const [emptySpaces, setEmptySpaces] = useState(9)
     const [turn, setTurn] = useState(-1) // -1 for X, 1 for O
     const [winner, setWinner] = useState(0) // -1 for X, 1 for O, 0 for undetermined
+    const [draw, setDraw] = useState(false)
     const [rowWin, setRowWin] = useState(-1) // -1 for no row win, otherwise 0,1,2 for which row won
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
@@ -25,15 +25,15 @@ export default function TicTacToe() {
             [0, 0, 0],
             [0, 0, 0]
         ])
-        setEmptySpaces(9)
         setTurn(-1)
         setWinner(0)
+        setDraw(false)
         setRowWin(-1)
         setColWin(-1)
         setLeftDiagWin(false)
         setRightDiagWin(false)
     })
-    socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
+    socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
         board.map((row, rIndex) => (
             rIndex === rowIndex 
@@ -43,15 +43,16 @@ export default function TicTacToe() {
         setBoard(
             newBoardState
         )
-        const numEmptySpaces = emptySpaces - 1
-        setEmptySpaces(numEmptySpaces)
-        /* Update win condition states */
-        if(rowWin) setRowWin(rowIndex)
-        if(colWin) setColWin(colIndex)
-        setLeftDiagWin(leftDiagWin)
-        setRightDiagWin(rightDiagWin)
-        if(win) setWinner(turn)
-        else setTurn(-turn)
+        /* Update win condition states if won */
+        if(winner !== 0) {
+            if(rowWin) setRowWin(rowIndex)
+            if(colWin) setColWin(colIndex)
+            setLeftDiagWin(leftDiagWin)
+            setRightDiagWin(rightDiagWin)
+            setWinner(winner)
+        /* Process draw if applicable */
+        } else if(draw) setDraw(true)
+        setTurn(-turn)
     })
     function clickSquare(rowIndex, colIndex) {
         socket.emit('tictactoe-click', {rowIndex, colIndex})
@@ -83,7 +84,11 @@ export default function TicTacToe() {
     }
     const GameStatus = () => {
         if(winner === 0) {
-            return (
+            return draw 
+            ? (
+                <GBText text='Draw!'/>
+            )
+            : (
                 <GBText text={`${turn}'s turn!`}/>
             )
         } else {
@@ -92,7 +97,7 @@ export default function TicTacToe() {
             )
         }
     }
-    const draw = {
+    const drawAnim = {
         hidden: { pathLength: 0, opacity: 0, stroke: "#FFFFFF", strokeWidth: 5 },
         visible: {
             pathLength: 1,
@@ -128,7 +133,7 @@ export default function TicTacToe() {
                             y1={50 + rowWin * 100}
                             x2="282"
                             y2={50 + rowWin * 100}
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                     {colWin !== -1 && 
@@ -137,7 +142,7 @@ export default function TicTacToe() {
                             y1="18"
                             x2={50 + colWin * 100}
                             y2="282"
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                     {leftDiagWin && 
@@ -146,7 +151,7 @@ export default function TicTacToe() {
                             y1="20"
                             x2="280"
                             y2="280"
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                     {rightDiagWin && 
@@ -155,7 +160,7 @@ export default function TicTacToe() {
                             y1="20"
                             x2="20"
                             y2="280"
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                 </Box>
