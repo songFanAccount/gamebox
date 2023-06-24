@@ -29,11 +29,13 @@ export function GBFormalText(props) {
     )
 }
 export function GBNakedInput({value, onChange, width=200, placeholder, maxLength=50, color='#FFFFFF', backgroundColor='#121212', fs=20,
+                              onKeyDown,
                               spellCheck=false}) {
     return (
         <InputBase
             value={value}
             onChange={onChange}
+            onKeyDown={onKeyDown}
             placeholder={placeholder}
             spellCheck={spellCheck}
             inputProps={{
@@ -54,7 +56,6 @@ export function GBNakedInput({value, onChange, width=200, placeholder, maxLength
 }
 export function GBTextInput({value, onChange, variant="standard", width=200, placeholder, maxLength=50, type="text", fs=20,
                              color='#FFFFFF', backgroundColor='#121212',
-                             noBorderHori=false,
                              spellCheck=false}) {
     const [pwVisible, setPwVisible] = useState(false)
     let endAdornment = null

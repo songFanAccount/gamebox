@@ -12,4 +12,7 @@ function generateAlphanumericCode(len) {
     }
     return ret
 }
-module.exports = { generateAlphanumericCode }
+function isEmptyStr(str) {
+    return str.trimStart() === ''
+}
+module.exports = { generateAlphanumericCode, isEmptyStr }

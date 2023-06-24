@@ -1,4 +1,4 @@
-const { generateAlphanumericCode } = require('../generalHelpers')
+const { generateAlphanumericCode, isEmptyStr } = require('../generalHelpers')
 
 const codeLen = 6
 const rooms = {}
@@ -17,19 +17,19 @@ module.exports = (io, socket) => {
         // AVI: rooms does not already contain the code as a key
         const playersObj = createPlayerObj(creatorID, creatorName)
         rooms[code] = {
-            roomName: roomName === '' ? 'Game Room' : roomName,
+            roomName: isEmptyStr(roomName) ? 'Game Room' : roomName,
             password: password === '' ? null : password,
             players: playersObj
         }
     }
-    function joinRoom(code, password, userName, callback) {
+    function joinRoom(code, userName, callback) {
         // AVI: there exists a room with the code
         rooms[code].players[socket.id] = { displayName : userName }
         callback({success: true})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
-        if(creatorName === '') creatorName = defaultUsername
+        if(isEmptyStr(creatorName)) creatorName = defaultUsername
         /* Generate 6 letter alphanumeric room codes until one is valid (not already existing) */
         let roomCode
         do {
@@ -43,7 +43,7 @@ module.exports = (io, socket) => {
     })
     socket.on('join-room', ({code, password, userName}, callback) => {
         console.log('Attemping to join room with code: ' + code + ', password: ' + password)
-        if(userName === '') userName = defaultUsername
+        if(isEmptyStr(userName)) userName = defaultUsername
         let errorMsg = null
         /* Code validation */
         if(code.length !== codeLen) errorMsg = "Please enter a 6 letter code to an existing room!"
@@ -59,7 +59,7 @@ module.exports = (io, socket) => {
             return
         }
         socket.join(code)
-        joinRoom(code, password, userName, callback)
+        joinRoom(code, userName, callback)
         console.log(rooms)
     })
 }
