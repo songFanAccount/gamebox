@@ -1,13 +1,17 @@
 import React from 'react'
 import { GBText } from './components/generalComponents'
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import PlayerList from './PlayerList'
+import Chat from './Chat'
 
 export default function Temp() {
     return (
         <Box>
             <GBText text="EVERYTHING TEMPORARY DISPLAYED HERE."/>
-            <PlayerList host="Host" players={['Ben', 'Jerry']}/>
+            <Stack direction="row" columnGap={3}>
+                <PlayerList host="Host" players={['Ben', 'Jerry']}/>
+                <Chat/>
+            </Stack>
         </Box>
     )
 }

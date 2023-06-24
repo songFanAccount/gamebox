@@ -7,10 +7,10 @@ export default function PlayerList({host, players}) {
     const Host = () => {
         return (
             <Stack direction="row" alignItems="center" columnGap={1} flexWrap="nowrap">
-                <GBFormalText fs={16} text={host}/>
+                <GBFormalText fs={18} text={host}/>
                 <StarSharpIcon 
                     sx={{
-                        fontSize: 16,
+                        fontSize: 18,
                         color: '#FFFFFF'
                     }}
                 />
@@ -21,7 +21,7 @@ export default function PlayerList({host, players}) {
         return (
             <>
                 {players?.map((player) => {
-                    return <GBFormalText fs={16} text={player}/>
+                    return <GBFormalText fs={18} text={player}/>
                 })}
             </>
         )
@@ -42,7 +42,7 @@ export default function PlayerList({host, players}) {
                     display: 'flex', justifyContent: 'center', alignItems: 'center'
                 }}
             >
-                <GBFormalText color='#121212' text="Players" center/>
+                <GBFormalText color='#121212' text="Players" fs={22}/>
             </Box>
             <Stack direction="column"
                 sx={{

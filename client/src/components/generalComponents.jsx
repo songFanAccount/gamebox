@@ -1,4 +1,4 @@
-import { Button, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { Button, IconButton, InputAdornment, InputBase, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -28,8 +28,33 @@ export function GBFormalText(props) {
         <GBText fontFamily="Montserrat"{...props}/>
     )
 }
-export function GBTextInput({value, onChange, variant="standard", width=200, placeholder, maxLength=50, type="text",
+export function GBNakedInput({value, onChange, width=200, placeholder, maxLength=50, color='#FFFFFF', backgroundColor='#121212', fs=20,
+                              spellCheck=false}) {
+    return (
+        <InputBase
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder}
+            spellCheck={spellCheck}
+            inputProps={{
+                maxLength: maxLength,
+                sx: {
+                    py: 1, mx: '10px',
+                    width: width - 20,
+                    color: color, backgroundColor: backgroundColor,
+                    fontFamily: 'Montserrat', fontSize: fs,
+                    '::selection': {
+                        color: backgroundColor,
+                        backgroundColor: color
+                    }
+                }
+            }}
+        />
+    )
+}
+export function GBTextInput({value, onChange, variant="standard", width=200, placeholder, maxLength=50, type="text", fs=20,
                              color='#FFFFFF', backgroundColor='#121212',
+                             noBorderHori=false,
                              spellCheck=false}) {
     const [pwVisible, setPwVisible] = useState(false)
     let endAdornment = null
@@ -57,22 +82,22 @@ export function GBTextInput({value, onChange, variant="standard", width=200, pla
             size="small"
             spellCheck={spellCheck}
             inputProps={{
-                maxLength: maxLength
+                maxLength: maxLength,
+                sx: {
+                    color: color,
+                    letterSpacing: type==='password' ? 3 : 'normal',
+                    fontFamily: type==='password' ? 'Verdana' : 'Orbit', fontSize: fs,
+                    '::selection': {
+                        color: backgroundColor,
+                        backgroundColor: color
+                    }
+                }
             }}
             InputProps={{
                 endAdornment: <InputAdornment position="end">{endAdornment}</InputAdornment>
             }}
             sx={{
                 width: width,
-                "& .MuiInputBase-input": {
-                    color: color,
-                    letterSpacing: type==='password' ? 3 : 'normal',
-                    fontFamily: type==='password' ? 'Verdana' : 'Orbit', fontSize: 20,
-                    '::selection': {
-                        color: backgroundColor,
-                        backgroundColor: color
-                    }
-                },
                 '& .MuiInput-underline': {
                     ':hover:not(.Mui-disabled, .Mui-error):before': { borderColor: color },
                     ':before': { borderColor: color },
