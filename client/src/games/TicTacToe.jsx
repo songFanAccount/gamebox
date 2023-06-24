@@ -1,7 +1,7 @@
 import { Box, Button, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { motion } from "framer-motion";
-import { GBText } from '../components/generalComponents'
+import { GBButton, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
@@ -165,6 +165,9 @@ export default function TicTacToe() {
                         ))}
                     </Stack>
                 ))}
+                <GBButton>
+                    Restart
+                </GBButton>
             </Stack>
         </Box>
     )
