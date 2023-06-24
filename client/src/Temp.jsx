@@ -7,7 +7,7 @@ export default function Temp() {
     return (
         <Box>
             <GBText text="EVERYTHING TEMPORARY DISPLAYED HERE."/>
-            <PlayerList/>
+            <PlayerList host="Host" players={['Ben', 'Jerry']}/>
         </Box>
     )
 }
