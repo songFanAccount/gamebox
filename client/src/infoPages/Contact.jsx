@@ -1,8 +1,8 @@
 import React from 'react'
-import { GBText } from '../components/generalComponents'
+import { GBFormalText } from '../components/generalComponents'
 
 export default function Contact() {
     return (
-        <GBText text="Under construction..." fontFamily='Montserrat'/> 
+        <GBFormalText text="Under construction..."/> 
     )
 }
