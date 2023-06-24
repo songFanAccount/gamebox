@@ -1,10 +1,21 @@
 import React from 'react'
 import { GBFormalText } from './components/generalComponents'
 import { Box, Stack } from '@mui/material'
+import StarSharpIcon from '@mui/icons-material/StarSharp';
 
 export default function PlayerList({host, players}) {
     const Host = () => {
-        return <GBFormalText fs={16} text={host}/>
+        return (
+            <Stack direction="row" alignItems="center" columnGap={1} flexWrap="nowrap">
+                <GBFormalText fs={16} text={host}/>
+                <StarSharpIcon 
+                    sx={{
+                        fontSize: 16,
+                        color: '#FFFFFF'
+                    }}
+                />
+            </Stack>
+        )
     }
     const Players = () => {
         return (
