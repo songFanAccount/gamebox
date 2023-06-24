@@ -1,7 +1,7 @@
 import { Box, Button, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { motion } from "framer-motion";
-import { GBText } from '../components/generalComponents'
+import { GBButton, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
@@ -12,52 +12,53 @@ export default function TicTacToe() {
         [0, 0, 0],
         [0, 0, 0]
     ])
-    const [emptySpaces, setEmptySpaces] = useState(9)
     const [turn, setTurn] = useState(-1) // -1 for X, 1 for O
     const [winner, setWinner] = useState(0) // -1 for X, 1 for O, 0 for undetermined
+    const [draw, setDraw] = useState(false)
     const [rowWin, setRowWin] = useState(-1) // -1 for no row win, otherwise 0,1,2 for which row won
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
-    function clickSquare(rowIndex, colIndex) {
+    socket.on('tictactoe-newGame', () => {
+        setBoard([
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ])
+        setTurn(-1)
+        setWinner(0)
+        setDraw(false)
+        setRowWin(-1)
+        setColWin(-1)
+        setLeftDiagWin(false)
+        setRightDiagWin(false)
+    })
+    socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
-            board.map((row, rIndex) => (
-                rIndex === rowIndex 
-                ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
-                : row
-            ))
+        board.map((row, rIndex) => (
+            rIndex === rowIndex 
+            ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
+            : row
+        ))
         setBoard(
             newBoardState
         )
-        const numEmptySpaces = emptySpaces - 1
-        setEmptySpaces(numEmptySpaces)
-        /* 
-        Should determine game status after each move, either:
-        - Player wins: A row/column/diagonal of X or Os. From the clicked square, span out to check its row/column and diagonal if applicable
-        - Draw: Previous case has not occurred, and board is now full. Detect fullness when 'emptySpaces' === 0
-        - Otherwise just continue playing!
-        */
-        // NOTE: Storing every win condition for animation purposes
-        const rowWin = newBoardState[rowIndex].every((el) => el === turn) // Check row
-        const colWin = newBoardState.every((row) => row[colIndex] === turn) // Then check column
-        // Now check diagonals
-        const leftDiagWin = 
-            newBoardState[0][0] === turn &&
-            newBoardState[1][1] === turn &&
-            newBoardState[2][2] === turn 
-        const rightDiagWin = 
-            newBoardState[0][2] === turn &&
-            newBoardState[1][1] === turn &&
-            newBoardState[2][0] === turn
-        // Determine if won
-        const win = rowWin || colWin || leftDiagWin || rightDiagWin
-        /* Update win condition states */
-        if(rowWin) setRowWin(rowIndex)
-        if(colWin) setColWin(colIndex)
-        setLeftDiagWin(leftDiagWin)
-        setRightDiagWin(rightDiagWin)
-        if(win) setWinner(turn)
-        else setTurn(-turn)
+        /* Update win condition states if won */
+        if(winner !== 0) {
+            if(rowWin) setRowWin(rowIndex)
+            if(colWin) setColWin(colIndex)
+            setLeftDiagWin(leftDiagWin)
+            setRightDiagWin(rightDiagWin)
+            setWinner(winner)
+        /* Process draw if applicable */
+        } else if(draw) setDraw(true)
+        setTurn(-turn)
+    })
+    function clickSquare(rowIndex, colIndex) {
+        socket.emit('tictactoe-click', {rowIndex, colIndex})
+    }
+    function requestNewGame() {
+        socket.emit('tictactoe-newGameReq')
     }
     const squareWidth = 100
     const Element = ({el}) => {
@@ -83,7 +84,11 @@ export default function TicTacToe() {
     }
     const GameStatus = () => {
         if(winner === 0) {
-            return (
+            return draw 
+            ? (
+                <GBText text='Draw!'/>
+            )
+            : (
                 <GBText text={`${turn}'s turn!`}/>
             )
         } else {
@@ -92,7 +97,7 @@ export default function TicTacToe() {
             )
         }
     }
-    const draw = {
+    const drawAnim = {
         hidden: { pathLength: 0, opacity: 0, stroke: "#FFFFFF", strokeWidth: 5 },
         visible: {
             pathLength: 1,
@@ -118,8 +123,7 @@ export default function TicTacToe() {
                     initial="hidden"
                     animate="visible"
                     sx={{
-                        width: 300, minHeight: 300,
-                        border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
+                        width: 300, height: 300,
                         position: 'absolute',
                     }}
                 >
@@ -129,16 +133,16 @@ export default function TicTacToe() {
                             y1={50 + rowWin * 100}
                             x2="282"
                             y2={50 + rowWin * 100}
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                     {colWin !== -1 && 
                         <motion.line
-                            x1={49 + colWin * 100}
+                            x1={50 + colWin * 100}
                             y1="18"
-                            x2={49 + colWin * 100}
+                            x2={50 + colWin * 100}
                             y2="282"
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                     {leftDiagWin && 
@@ -147,16 +151,16 @@ export default function TicTacToe() {
                             y1="20"
                             x2="280"
                             y2="280"
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                     {rightDiagWin && 
                         <motion.line
-                            x1="278"
+                            x1="280"
                             y1="20"
-                            x2="18"
+                            x2="20"
                             y2="280"
-                            variants={draw}
+                            variants={drawAnim}
                         />
                     }
                 </Box>
@@ -164,7 +168,6 @@ export default function TicTacToe() {
                     <Stack direction="row">
                         {row.map((el, colIndex) => (
                             <Button
-                                zIndex={0}
                                 className={`tictactoe-${rowIndex}-${colIndex}`}
                                 disableRipple
                                 disabled={el !== 0 || winner !== 0}
@@ -184,6 +187,9 @@ export default function TicTacToe() {
                         ))}
                     </Stack>
                 ))}
+                <GBButton py={3} onClick={requestNewGame}>
+                    Restart
+                </GBButton>
             </Stack>
         </Box>
     )
