@@ -20,14 +20,12 @@ export default function TicTacToe() {
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
     socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
-        console.log(rowIndex, colIndex, win, rowWin, colWin, leftDiagWin, rightDiagWin)
         const newBoardState = 
         board.map((row, rIndex) => (
             rIndex === rowIndex 
             ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
             : row
         ))
-        console.log(newBoardState)
         setBoard(
             newBoardState
         )

@@ -67,7 +67,6 @@ export default function Home() {
     function createAndJoinRoom() {
         setLoading(true)
         socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, (response) => {
-            console.log(response)
             toast.success('Room created! Redirecting...')
             setLoading(false)
         })

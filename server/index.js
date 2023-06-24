@@ -19,9 +19,7 @@ const registerRoomHandlers = require('./handlers/roomHandlers')
 const registerTictactoeHandlers = require('./handlers/gameHandlers/tictactoe')
 
 io.on('connection', (socket) => {
-    console.log('User connected with id: ' + socket.id)
     socket.join('testRoom')
-    console.log(io.sockets.adapter.rooms.get('testRoom'))
     registerRoomHandlers(io, socket)
     registerTictactoeHandlers(io, socket)
 })
