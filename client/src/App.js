@@ -8,6 +8,7 @@ import DefaultLayout from './DefaultLayout';
 import InfoPageLayout from './infoPages/InfoPageLayout';
 import About from './infoPages/About';
 import Contact from './infoPages/Contact';
+import Temp from './Temp';
 const socket = io.connect('http://localhost:3001')
 global.socket = socket
 
@@ -17,6 +18,7 @@ function App() {
 			<Routes>
 				<Route path="/" element={<DefaultLayout/>}>
 					<Route index element={<Home/>}/>
+					<Route path="temp" element={<Temp/>}/>
 					<Route path="/" element={<InfoPageLayout/>}>
 						<Route path="about" element={<About/>}/>
 						<Route path="contact" element={<Contact/>}/>

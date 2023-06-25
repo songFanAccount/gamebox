@@ -15,12 +15,17 @@ const io = new Server(server, {
 }) // Socket io instance
 
 const registerRoomHandlers = require('./handlers/roomHandlers')
+/* Game handlers */
+const registerTictactoeHandlers = require('./handlers/gameHandlers/tictactoe')
 
 io.on('connection', (socket) => {
-    console.log('User connected with id: ' + socket.id)
+    socket.join('testRoom')
     registerRoomHandlers(io, socket)
+    registerTictactoeHandlers(io, socket, 'testRoom')
 })
 
 server.listen(3001, () => {
     console.log("server is running")
 })
+
+// https://stackoverflow.com/questions/32674391/io-emit-vs-socket-emit
