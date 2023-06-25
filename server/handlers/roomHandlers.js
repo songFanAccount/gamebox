@@ -30,12 +30,23 @@ module.exports = (io, socket) => {
         // AVI: there exists a room with the code
         rooms[code].players[socket.id] = { displayName : userName }
         socketidToRoom[userID] = code
-        console.log(socketidToRoom)
+
         callback({success: true})
     }
     function getPlayerInfoFromRoom(roomCode, playerID) {
         // AVI: room exists for the given room code, and the room has a player with the given player id
         return rooms[roomCode].players[playerID]
+    }
+    function updatePlayerList(roomCode) {
+        const room = rooms[roomCode]
+        const hostID = room.hostID
+        let hostName
+        const playersNames = []
+        Object.entries(room.players).forEach((entry) => {
+            if(entry[0] === hostID) hostName = entry[1].displayName
+            else playersNames.push(entry[1].displayName)
+        })
+        io.to(roomCode).emit('gameroom_getPlayerNames', {hostName, playersNames})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
@@ -73,16 +84,7 @@ module.exports = (io, socket) => {
         console.log(rooms)
     })
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
-        console.log(`${socket.id} requested player names for room ${roomCode}`)
-        const room = rooms[roomCode]
-        const hostID = room.hostID
-        let hostName
-        const playersNames = []
-        Object.entries(room.players).forEach((entry) => {
-            if(entry[0] === hostID) hostName = entry[1].displayName
-            else playersNames.push(entry[1].displayName)
-        })
-        io.to(socket.id).emit('gameroom_getPlayerNames', {hostName, playersNames})
+        updatePlayerList(roomCode)
     })
     socket.on('gameroom_sendMsgToChat', ({message}) => {
         const roomCode = socketidToRoom[socket.id]
