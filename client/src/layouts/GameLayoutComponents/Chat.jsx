@@ -2,13 +2,13 @@ import { Box, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { GBNakedInput, GBText } from '../../components/generalComponents'
 
-export default function Chat() {
+export default function Chat({roomCode}) {
     const socket = global.socket
     const [message, setMessage] = useState('')
     const [chatMessages, setChatMessages] = useState([])
     function sendMessage(message) {
         if(message.trimStart() === '') return // Don't send empty messages
-        socket.emit('gameroom_sendMsgToChat', {message})
+        socket.emit('gameroom_sendMsgToChat', {roomCode, message})
     }
     function handleKey(e) {
         if(e.keyCode === 13) sendMessage(message)

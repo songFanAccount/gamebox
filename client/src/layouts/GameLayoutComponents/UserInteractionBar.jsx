@@ -17,7 +17,7 @@ export default function UserInteractionBar({roomCode}) {
             }}
         >
             <PlayerList roomCode={roomCode}/>
-            <Chat/>
+            <Chat roomCode={roomCode}/>
         </Box>
     )
 }

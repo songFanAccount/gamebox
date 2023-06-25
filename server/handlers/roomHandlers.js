@@ -84,10 +84,9 @@ module.exports = (io, socket) => {
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
         updatePlayerList(roomCode)
     })
-    socket.on('gameroom_sendMsgToChat', ({message}) => {
-        const roomCode = socketidToRoom[socket.id]
-        const playerName = getPlayerInfoFromRoom(roomCode, socket.id)
+    socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
+        const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
         console.log(`Message: ${message} from socketid: ${socket.id} from room with code: ${roomCode}`)
-        io.to('testRoom').emit('gameroom_newChatMsg', {message, playerName})
+        io.to(roomCode).emit('gameroom_newChatMsg', {message, playerName})
     })
 }
