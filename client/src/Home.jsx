@@ -7,6 +7,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { GBToastContainer } from './components/toast';
 import { toast } from 'react-toastify';
+import GBLinkWrapper from './components/GBLinkWrapper'
 
 export default function Home() {
     const socket = global.socket
@@ -24,6 +25,7 @@ export default function Home() {
     const [optBorder, setOptBorder] = useState(0)
 
     const [loading, setLoading] = useState(false)
+    const [roomPath, setRoomPath] = useState('')
     
     function handleJoinCodeChange(value) {
         setJoinCode(value)
@@ -66,8 +68,8 @@ export default function Home() {
     }
     function createAndJoinRoom() {
         setLoading(true)
-        socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, (response) => {
-            console.log(response)
+        socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, ({code}) => {
+            setRoomPath(`/game/?code=${code}`)
             toast.success('Room created! Redirecting...')
             setLoading(false)
         })
@@ -159,7 +161,7 @@ export default function Home() {
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
-                                    <GBButton disabled={loading} px={1.5} fs={16} onClick={createAndJoinRoom} endIcon={<DoneIcon/>}>Create</GBButton>
+                                    <GBLinkWrapper to={roomPath} children={<GBButton disabled={loading} px={1.5} fs={16} onClick={createAndJoinRoom} endIcon={<DoneIcon/>}>Create</GBButton>}/>
                                 </Stack>
                             </>
                         }
@@ -177,7 +179,7 @@ export default function Home() {
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
-                                    <GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>
+                                    <GBLinkWrapper to={`/game/?code=${joinCode}`} children={<GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>}/>
                                 </Stack>
                             </>
                         }

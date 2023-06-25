@@ -3,7 +3,7 @@ import React from "react"
 import { Box } from '@mui/material'
 import GameStat from "./GameStat"
 
-export default function GameWindow() {
+export default function GameWindow({roomCode}) {
     return (
         <Box
             sx={{
@@ -14,7 +14,7 @@ export default function GameWindow() {
                 ml: 0
             }}
         >
-            <GameStat />
+            <GameStat roomCode={roomCode}/>
             GameWindow
         </Box>
     )

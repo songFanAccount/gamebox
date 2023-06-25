@@ -1,13 +1,13 @@
 import { Box } from '@mui/material'
-import { color } from 'framer-motion'
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
 import GameWindow from './GameLayoutComponents/GameWindow'
 import UserInteractionBar from './GameLayoutComponents/UserInteractionBar'
 
 export default function GameLayout() {
+    const roomCode = useQuery().get("code")
     return (
         <Box 
             sx={{
@@ -22,9 +22,13 @@ export default function GameLayout() {
             }}
         >
             <GameSearchBar/>
-            <GameWindow/>
+            <GameWindow roomCode={roomCode}/>
             <UserInteractionBar/>
             <Outlet/> {/* Should be replaced by GameWindow when it's completed */}
         </Box>
     )
+}
+
+function useQuery() {
+    return new URLSearchParams(useLocation().search)
 }
