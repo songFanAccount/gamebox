@@ -6,6 +6,7 @@ export default function Chat({roomCode}) {
     const socket = global.socket
     const [message, setMessage] = useState('')
     const [chatMessages, setChatMessages] = useState([])
+    const msgFS = 14
     function sendMessage(message) {
         if(message.trimStart() === '') return // Don't send empty messages
         socket.emit('gameroom_sendMsgToChat', {roomCode, message})
@@ -16,8 +17,8 @@ export default function Chat({roomCode}) {
     function addMessage(msg) {
         setChatMessages([...chatMessages, msg])
     }
-    const Message = ({msg}) => { return <GBText fs={16} text={msg}/> }
-    const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={16} text={msg}/> }
+    const Message = ({msg}) => { return <GBText fs={msgFS} text={msg}/> }
+    const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={msgFS} text={msg}/> }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
         const newMsg = `${playerName}: ${message}`
         addMessage(<Message msg={newMsg}/>)
@@ -49,7 +50,7 @@ export default function Chat({roomCode}) {
                     bottom: 0
                 }}
             >
-                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={248} fs={18} onKeyDown={handleKey}/>
+                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={248} fs={msgFS} onKeyDown={handleKey}/>
             </Box>
         </Box>
     )
