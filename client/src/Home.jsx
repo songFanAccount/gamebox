@@ -7,12 +7,15 @@ import DoneIcon from '@mui/icons-material/Done';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { GBToastContainer } from './components/toast';
 import { toast } from 'react-toastify';
+import GBLinkWrapper from './components/GBLinkWrapper'
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
     const socket = global.socket
     const [userName, setUserName] = useState('')
     const [createJoinState, setCJState] = useState(0) // -1 for create, 0 for none selected, 1 for join
     /* Room creation data */
+    const navigate = useNavigate()
     const [roomName, setRoomName] = useState('')
     const [password, setPassword] = useState('')
     /* Room joining data */
@@ -66,9 +69,9 @@ export default function Home() {
     }
     function createAndJoinRoom() {
         setLoading(true)
-        socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, (response) => {
+        socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, ({code}) => {
             toast.success('Room created! Redirecting...')
-            setLoading(false)
+            setTimeout(() => {setLoading(false); navigate(`/game/?code=${code}`)}, 2000)
         })
     }
     function joinRoom() {
@@ -176,7 +179,7 @@ export default function Home() {
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
-                                    <GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>
+                                    <GBLinkWrapper to={`/game/?code=${joinCode}`} children={<GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>}/>
                                 </Stack>
                             </>
                         }

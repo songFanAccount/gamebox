@@ -23,7 +23,7 @@ function App() {
 						<Route path="about" element={<About/>}/>
 						<Route path="contact" element={<Contact/>}/>
 					</Route>
-					<Route path="/" element={<GameLayout/>}>
+					<Route path="game" element={<GameLayout/>}>
 						<Route path="tictactoe" element={<TicTacToe/>}/>
 					</Route>
 				</Route>
