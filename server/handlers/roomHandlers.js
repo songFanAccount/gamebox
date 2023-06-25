@@ -20,6 +20,7 @@ module.exports = (io, socket) => {
         rooms[code] = {
             roomName: isEmptyStr(roomName) ? 'Game Room' : roomName,
             password: password === '' ? null : password,
+            hostID: creatorID, 
             players: playersObj
         }
         socketidToRoom[creatorID] = code
@@ -70,6 +71,18 @@ module.exports = (io, socket) => {
         socket.join(code)
         joinRoom(code, userName, callback, socket.id)
         console.log(rooms)
+    })
+    socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
+        console.log(`${socket.id} requested player names for room ${roomCode}`)
+        const room = rooms[roomCode]
+        const hostID = room.hostID
+        let hostName
+        const playersNames = []
+        Object.entries(room.players).forEach((entry) => {
+            if(entry[0] === hostID) hostName = entry[1].displayName
+            else playersNames.push(entry[1].displayName)
+        })
+        io.to(socket.id).emit('gameroom_getPlayerNames', {hostName, playersNames})
     })
     socket.on('gameroom_sendMsgToChat', ({message}) => {
         const roomCode = socketidToRoom[socket.id]

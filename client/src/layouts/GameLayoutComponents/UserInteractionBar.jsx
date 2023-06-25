@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 import Chat from "./Chat"
 import PlayerList from "./PlayerList"
 
-export default function UserInteractionBar() {
+export default function UserInteractionBar({roomCode}) {
     return (
         <Box
             sx={{
@@ -16,7 +16,7 @@ export default function UserInteractionBar() {
                 minWidth: 250
             }}
         >
-            <PlayerList/>
+            <PlayerList roomCode={roomCode}/>
             <Chat/>
         </Box>
     )

@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { GBFormalText } from '../../components/generalComponents'
 import { Box, Stack } from '@mui/material'
 import StarSharpIcon from '@mui/icons-material/StarSharp';
 
-export default function PlayerList({host, players}) {
+export default function PlayerList({roomCode}) {
+    const socket = global.socket
+    const [host, setHost] = useState(null)
+    const [players, setPlayers] = useState(null)
+    /* Using the room code, retrieve the host and the list of players from server */
+    useEffect(() => {
+        socket.emit('gameroom_requestPlayerNames', {roomCode})
+    }, [])
+    socket.on('gameroom_getPlayerNames', ({hostName, playersNames}) => {
+        console.log(hostName, playersNames)
+        setHost(hostName)
+        setPlayers(playersNames)
+    })
     const Host = () => {
         return (
             <Stack direction="row" alignItems="center" columnGap={1} flexWrap="nowrap">
