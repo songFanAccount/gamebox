@@ -1,5 +1,5 @@
 import React from 'react'
-import { GBFormalText } from './components/generalComponents'
+import { GBFormalText } from '../../components/generalComponents'
 import { Box, Stack } from '@mui/material'
 import StarSharpIcon from '@mui/icons-material/StarSharp';
 

@@ -2,8 +2,8 @@ import React from "react"
 
 import { Box } from '@mui/material'
 
-import UserList from "./UserList"
 import Chat from "./Chat"
+import PlayerList from "./PlayerList"
 
 export default function UserInteractionBar() {
     return (
@@ -16,7 +16,7 @@ export default function UserInteractionBar() {
                 minWidth: 250
             }}
         >
-            <UserList/>
+            <PlayerList/>
             <Chat/>
         </Box>
     )

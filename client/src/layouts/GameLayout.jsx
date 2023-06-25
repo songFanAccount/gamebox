@@ -23,7 +23,7 @@ export default function GameLayout() {
         >
             <GameSearchBar/>
             <GameWindow roomCode={roomCode}/>
-            <UserInteractionBar/>
+            <UserInteractionBar roomCode={roomCode}/>
             <Outlet/> {/* Should be replaced by GameWindow when it's completed */}
         </Box>
     )
