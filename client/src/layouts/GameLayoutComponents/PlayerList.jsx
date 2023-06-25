@@ -42,7 +42,7 @@ export default function PlayerList({roomCode}) {
     return (
         <Box
             sx={{
-                width: 250, height: 0.5,
+                width: 1, height: 0.5,
                 border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderTopLeftRadius: 15, borderTopRightRadius: 15
             }}
         >

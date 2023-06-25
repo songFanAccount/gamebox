@@ -35,7 +35,7 @@ export default function Chat({roomCode}) {
     return (
         <Box
             sx={{
-                width: 250, height: 0.5,
+                width: 1, height: 0.5,
                 border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
                 position: 'absolute', bottom: 0
             }}
@@ -56,7 +56,7 @@ export default function Chat({roomCode}) {
                     bottom: 0
                 }}
             >
-                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={248} fs={msgFS} onKeyDown={handleKey}/>
+                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={348} fs={msgFS} onKeyDown={handleKey}/>
             </Box>
         </Box>
     )
