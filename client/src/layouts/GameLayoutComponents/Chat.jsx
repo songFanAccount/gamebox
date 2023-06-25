@@ -13,14 +13,14 @@ export default function Chat({roomCode}) {
     function handleKey(e) {
         if(e.keyCode === 13) sendMessage(message)
     }
-    const Message = ({msg}) => {
-        return (
-            <GBText fs={16} text={msg}/>
-        )
-    }
+    const Message = ({msg}) => { return <GBText fs={16} text={msg}/> }
+    const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={16} text={msg}/> }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
         const newMsg = `${playerName}: ${message}`
-        setChatMessages([...chatMessages, newMsg])
+        setChatMessages([...chatMessages, <Message msg={newMsg}/>])
+    })
+    socket.on('gameroom_newChatAnnouncement', ({message}) => {
+        setChatMessages([...chatMessages, <Announcement msg={message}/>])
     })
     return (
         <Box
@@ -37,7 +37,7 @@ export default function Chat({roomCode}) {
                     overflowY: 'auto'
                 }}
             >
-                {chatMessages.map((msg) => <Message msg={msg}/>)}
+                {chatMessages.map((msg) => msg)}
             </Stack>
             <Box
                 sx={{
