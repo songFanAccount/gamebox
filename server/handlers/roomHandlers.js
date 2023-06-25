@@ -32,6 +32,10 @@ module.exports = (io, socket) => {
         console.log(socketidToRoom)
         callback({success: true})
     }
+    function getPlayerInfoFromRoom(roomCode, playerID) {
+        // AVI: room exists for the given room code, and the room has a player with the given player id
+        return rooms[roomCode].players[playerID]
+    }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
@@ -69,7 +73,7 @@ module.exports = (io, socket) => {
     })
     socket.on('gameroom_sendMsgToChat', ({message}) => {
         const roomCode = socketidToRoom[socket.id]
-        const playerName = 'random'
+        const playerName = getPlayerInfoFromRoom(roomCode, socket.id)
         console.log(`Message: ${message} from socketid: ${socket.id} from room with code: ${roomCode}`)
         io.to('testRoom').emit('gameroom_newChatMsg', {message, playerName})
     })

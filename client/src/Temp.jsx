@@ -2,7 +2,7 @@ import React from 'react'
 import { GBText } from './components/generalComponents'
 import { Box, Stack } from '@mui/material'
 import PlayerList from './PlayerList'
-import Chat from './Chat'
+import Chat from './layouts/GameLayoutComponents/Chat'
 
 export default function Temp() {
     return (

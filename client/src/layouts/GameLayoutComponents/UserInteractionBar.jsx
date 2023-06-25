@@ -3,7 +3,7 @@ import React from "react"
 import { Box } from '@mui/material'
 
 import UserList from "./UserList"
-import Messenger from "./Messenger"
+import Chat from "./Chat"
 
 export default function UserInteractionBar() {
     return (
@@ -17,7 +17,7 @@ export default function UserInteractionBar() {
             }}
         >
             <UserList/>
-            <Messenger/>
+            <Chat/>
         </Box>
     )
 }

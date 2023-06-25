@@ -1,6 +1,6 @@
 import { Box, Stack } from '@mui/material'
 import React, { useState } from 'react'
-import { GBNakedInput, GBText } from './components/generalComponents'
+import { GBNakedInput, GBText } from '../../components/generalComponents'
 
 export default function Chat() {
     const socket = global.socket
