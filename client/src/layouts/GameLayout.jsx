@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
@@ -8,7 +8,7 @@ import UserInteractionBar from './GameLayoutComponents/UserInteractionBar'
 import { GBText } from '../components/generalComponents'
 
 export default function GameLayout() {
-    const initTime = useMemo(Date().toLocaleString(), [])
+    const initTime = useMemo(() => Date().toLocaleString(), [])
     console.log(initTime)
     const socket = global.socket
     const roomCode = useQuery().get("code")
