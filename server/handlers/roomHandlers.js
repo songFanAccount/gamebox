@@ -90,4 +90,8 @@ module.exports = (io, socket) => {
         console.log(`Message: ${message} from socketid: ${socket.id} from room with code: ${roomCode}`)
         io.to('testRoom').emit('gameroom_newChatMsg', {message, playerName})
     })
+    socket.on('check_room_code', ({code}, callback) => {
+        if (rooms[code] === undefined) callback({valid: false})
+        else callback({valid: true})
+    })
 }
