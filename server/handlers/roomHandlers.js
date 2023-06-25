@@ -24,13 +24,11 @@ module.exports = (io, socket) => {
             players: playersObj
         }
         socketidToRoom[creatorID] = code
-        console.log(socketidToRoom)
     }
     function joinRoom(code, userName, callback, userID) {
         // AVI: there exists a room with the code
         rooms[code].players[socket.id] = { displayName : userName }
         socketidToRoom[userID] = code
-
         callback({success: true})
     }
     function getPlayerInfoFromRoom(roomCode, playerID) {

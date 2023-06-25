@@ -10,6 +10,7 @@ export default function PlayerList({roomCode}) {
     /* Using the room code, retrieve the host and the list of players from server */
     useEffect(() => {
         socket.emit('gameroom_requestPlayerNames', {roomCode})
+    // eslint-disable-next-line
     }, [])
     socket.on('gameroom_getPlayerNames', ({hostName, playersNames}) => {
         console.log(hostName, playersNames)
