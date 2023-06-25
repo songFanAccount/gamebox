@@ -18,9 +18,10 @@ export default function Chat({roomCode}) {
         setChatMessages([...chatMessages, msg])
     }
     const Message = ({playerName, msg}) => { 
+        // FOR SOME REASON BOLD DOESNT DO ANYTHING TO OUR FONT SO W.E
         return (
-            <Stack direction="row" flexWrap="nowrap">
-                <GBText bold fs={msgFS} text={playerName + ': '}/>
+            <Stack direction="row" flexWrap="nowrap" columnGap={1}>
+                <GBText bold fs={msgFS} text={playerName + ':'}/>
                 <GBText fs={msgFS} text={msg}/> 
             </Stack>
         )

@@ -23,11 +23,6 @@ export function GBText({text, fontFamily='Orbit', fs=20, ml=0,
         </Typography>
     )
 }
-export function GBFormalText(props) {
-    return (
-        <GBText fontFamily="Montserrat"{...props}/>
-    )
-}
 export function GBNakedInput({value, onChange, width=200, placeholder, maxLength=50, color='#FFFFFF', backgroundColor='#121212', fs=20,
                               onKeyDown,
                               spellCheck=false}) {
@@ -44,7 +39,7 @@ export function GBNakedInput({value, onChange, width=200, placeholder, maxLength
                     py: 1, mx: '10px',
                     width: width - 20,
                     color: color, backgroundColor: backgroundColor,
-                    fontFamily: 'Montserrat', fontSize: fs,
+                    fontFamily: 'Orbit', fontSize: fs,
                     '::selection': {
                         color: backgroundColor,
                         backgroundColor: color
