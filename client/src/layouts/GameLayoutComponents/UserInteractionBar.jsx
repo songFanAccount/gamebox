@@ -9,11 +9,10 @@ export default function UserInteractionBar({roomCode}) {
     return (
         <Box
             sx={{
-                border: 1,
-                borderRadius: 1,
                 m: 1,
                 ml: 0,
-                minWidth: 250
+                minWidth: 250,
+                position: 'relative'
             }}
         >
             <PlayerList roomCode={roomCode}/>

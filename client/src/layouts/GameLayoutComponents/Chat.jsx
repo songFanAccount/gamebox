@@ -35,9 +35,9 @@ export default function Chat({roomCode}) {
     return (
         <Box
             sx={{
-                width: 250, height: 400,
+                width: 250, height: 0.5,
                 border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
-                position: 'relative'
+                position: 'absolute', bottom: 0
             }}
         >
             <Stack direction="column"
