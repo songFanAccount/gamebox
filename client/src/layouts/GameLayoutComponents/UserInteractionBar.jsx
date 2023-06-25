@@ -2,10 +2,10 @@ import React from "react"
 
 import { Box } from '@mui/material'
 
-import UserList from "./UserList"
-import Messenger from "./Messenger"
+import Chat from "./Chat"
+import PlayerList from "./PlayerList"
 
-export default function UserInteractionBar() {
+export default function UserInteractionBar({roomCode}) {
     return (
         <Box
             sx={{
@@ -16,8 +16,8 @@ export default function UserInteractionBar() {
                 minWidth: 250
             }}
         >
-            <UserList/>
-            <Messenger/>
+            <PlayerList roomCode={roomCode}/>
+            <Chat/>
         </Box>
     )
 }

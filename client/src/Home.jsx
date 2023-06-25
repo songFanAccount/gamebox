@@ -7,7 +7,6 @@ import DoneIcon from '@mui/icons-material/Done';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { GBToastContainer } from './components/toast';
 import { toast } from 'react-toastify';
-import GBLinkWrapper from './components/GBLinkWrapper'
 import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
@@ -78,7 +77,10 @@ export default function Home() {
         setLoading(true)
         socket.emit('join-room', {code: joinCode, password: joinPassword, userName: userName}, (response) => {
             if(!response) toast.error('Unexpected error!')
-            if(response.success) toast.success('Valid details! Redirecting...')
+            if(response.success) {
+                toast.success('Valid details! Redirecting...')
+                setTimeout(() => {setLoading(false); navigate(`/game/?code=${joinCode}`)}, 2000)
+            }
             else toast.error(response.errorMsg)
             setLoading(false)
         })
@@ -179,7 +181,7 @@ export default function Home() {
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
-                                    <GBLinkWrapper to={`/game/?code=${joinCode}`} children={<GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>}/>
+                                    <GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>
                                 </Stack>
                             </>
                         }

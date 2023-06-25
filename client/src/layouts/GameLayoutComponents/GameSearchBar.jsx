@@ -6,7 +6,6 @@ export default function GameSearchBar() {
     return (
         <Box
             sx={{
-                border: 1,
                 minWidth: 250,
                 m: 1,
                 border: 1,

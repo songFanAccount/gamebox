@@ -8,6 +8,7 @@ import UserInteractionBar from './GameLayoutComponents/UserInteractionBar'
 
 export default function GameLayout() {
     const roomCode = useQuery().get("code")
+    // TODO: Need to check with server whether this code links to a valid/existing room, if not, need to render some error element
     return (
         <Box 
             sx={{
@@ -23,7 +24,7 @@ export default function GameLayout() {
         >
             <GameSearchBar/>
             <GameWindow roomCode={roomCode}/>
-            <UserInteractionBar/>
+            <UserInteractionBar roomCode={roomCode}/>
             <Outlet/> {/* Should be replaced by GameWindow when it's completed */}
         </Box>
     )
