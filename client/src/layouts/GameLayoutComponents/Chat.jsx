@@ -17,11 +17,17 @@ export default function Chat({roomCode}) {
     function addMessage(msg) {
         setChatMessages([...chatMessages, msg])
     }
-    const Message = ({msg}) => { return <GBText fs={msgFS} text={msg}/> }
+    const Message = ({playerName, msg}) => { 
+        return (
+            <Stack direction="row" flexWrap="nowrap">
+                <GBText bold fs={msgFS} text={playerName + ': '}/>
+                <GBText fs={msgFS} text={msg}/> 
+            </Stack>
+        )
+    }
     const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={msgFS} text={msg}/> }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
-        const newMsg = `${playerName}: ${message}`
-        addMessage(<Message msg={newMsg}/>)
+        addMessage(<Message playerName={playerName} msg={message}/>)
     })
     socket.on('gameroom_newChatAnnouncement', ({message}) => {
         addMessage(<Announcement msg={message}/>)
