@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
@@ -8,6 +8,10 @@ import UserInteractionBar from './GameLayoutComponents/UserInteractionBar'
 
 export default function GameLayout() {
     const roomCode = useQuery().get("code")
+    const [currGame, setCurrGame] = useState('')
+    function selectGame(gameName) {
+        setCurrGame(gameName)
+    }
     // TODO: Need to check with server whether this code links to a valid/existing room, if not, need to render some error element
     return (
         <Box 
@@ -22,8 +26,8 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar/>
-            <GameWindow roomCode={roomCode}/>
+            <GameSearchBar onClick={selectGame}/>
+            <GameWindow roomCode={roomCode} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
             <Outlet/> {/* Should be replaced by GameWindow when it's completed */}
         </Box>
