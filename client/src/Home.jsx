@@ -70,7 +70,7 @@ export default function Home() {
         setLoading(true)
         socket.emit('create-room', {roomName: roomName, password: password, creatorName: userName}, ({code}) => {
             toast.success('Room created! Redirecting...')
-            setTimeout(() => {setLoading(false); navigate(`/game/?code=${code}`,{state: {fromHome: true}})}, 2000)
+            setTimeout(() => {setLoading(false); navigate(`/game/?code=${code}`,{state: {passwordChecked: true}})}, 2000)
         })
     }
     function joinRoom() {
@@ -79,7 +79,7 @@ export default function Home() {
             if(!response) toast.error('Unexpected error!')
             if(response.success) {
                 toast.success('Valid details! Redirecting...')
-                setTimeout(() => {setLoading(false); navigate(`/game/?code=${joinCode}`,{state: {fromHome: true}})}, 2000)
+                setTimeout(() => {setLoading(false); navigate(`/game/?code=${joinCode}`,{state: {passwordChecked: true}})}, 2000)
             }
             else toast.error(response.errorMsg)
             setLoading(false)
