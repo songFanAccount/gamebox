@@ -1,8 +1,17 @@
 import React from "react"
-
 import { Box } from '@mui/material'
+import { Button } from "@mui/material"
 
-export default function GameSearchBar() {
+import { gamelist } from '../../games/gamelist'
+import GameButton from "./GameButton"
+
+export default function GameSearchBar({onClick}) {
+    console.log(gamelist)
+    let gameButton = []
+    gameButton = gamelist?.map(game => (
+        <GameButton key={game} gameName={game} onClick={onClick}/>
+    ))
+    console.log(gameButton)
     return (
         <Box
             sx={{
@@ -12,7 +21,7 @@ export default function GameSearchBar() {
                 borderRadius: 1
             }}
         >
-            SideBar
+            {gameButton}
         </Box>
     )
 }
