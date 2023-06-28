@@ -30,7 +30,7 @@ export default function Chat({roomCode}) {
     return (
         <Box
             sx={{
-                width: 1, height: 0.5,
+                width: 1, maxWidth: 1, height: 0.5,
                 border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
                 position: 'absolute', bottom: 0
             }}
@@ -39,7 +39,8 @@ export default function Chat({roomCode}) {
                 sx={{
                     mx: 1, mt: 1,
                     height: 340,
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    wordBreak: 'break-all'
                 }}
             >
                 {chatMessages.map((msg) => msg)}

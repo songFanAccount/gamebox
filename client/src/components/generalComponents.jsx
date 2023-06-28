@@ -4,13 +4,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export function GBText({text, fontFamily='Orbit', fs=20, ml=0,
-                        color='#FFFFFF', bold, underline}) {
+                        color='#FFFFFF', bold, underline,
+                        width='fit-content', maxWidth=1}) {
     return (
         <Typography
             sx={{
                 color: color,
                 fontFamily: fontFamily, fontSize: fs, fontWeight: bold ? 'bold' : 'auto',
-                width: 'fit-content',
+                width: width, maxWidth: maxWidth,
                 ml: ml,
                 borderBottom: underline ? 2 : 0, borderBottomStyle: underline, borderColor: color,
                 '::selection': {

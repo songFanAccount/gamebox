@@ -11,7 +11,7 @@ export default function UserInteractionBar({roomCode}) {
             sx={{
                 m: 1,
                 ml: 0,
-                minWidth: 350,
+                minWidth: 350, width: 350, maxWidth: 350,
                 position: 'relative'
             }}
         >
