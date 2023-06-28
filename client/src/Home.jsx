@@ -103,7 +103,7 @@ export default function Home() {
                     }}
                 >
                     <GBText text="Your display name:"/>
-                    <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy"/>
+                    <GBTextInput value={userName} onChange={setUserName} placeholder="Anon Andy" maxLength={20}/>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between" width={1} mb={1}>
                     {createJoinState !== 1 &&

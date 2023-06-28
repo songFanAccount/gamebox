@@ -4,13 +4,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export function GBText({text, fontFamily='Orbit', fs=20, ml=0,
-                        color='#FFFFFF', underline}) {
+                        color='#FFFFFF', bold, underline,
+                        width='fit-content', maxWidth=1}) {
     return (
         <Typography
             sx={{
                 color: color,
-                fontFamily: fontFamily, fontSize: fs,
-                width: 'fit-content',
+                fontFamily: fontFamily, fontSize: fs, fontWeight: bold ? 'bold' : 'auto',
+                width: width, maxWidth: maxWidth,
                 ml: ml,
                 borderBottom: underline ? 2 : 0, borderBottomStyle: underline, borderColor: color,
                 '::selection': {
@@ -21,11 +22,6 @@ export function GBText({text, fontFamily='Orbit', fs=20, ml=0,
         >
             {text}
         </Typography>
-    )
-}
-export function GBFormalText(props) {
-    return (
-        <GBText fontFamily="Montserrat"{...props}/>
     )
 }
 export function GBNakedInput({value, onChange, width=200, placeholder, maxLength=50, color='#FFFFFF', backgroundColor='#121212', fs=20,
@@ -44,7 +40,7 @@ export function GBNakedInput({value, onChange, width=200, placeholder, maxLength
                     py: 1, mx: '10px',
                     width: width - 20,
                     color: color, backgroundColor: backgroundColor,
-                    fontFamily: 'Montserrat', fontSize: fs,
+                    fontFamily: 'Orbit', fontSize: fs,
                     '::selection': {
                         color: backgroundColor,
                         backgroundColor: color
@@ -133,7 +129,7 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
                 border: border,
                 fontFamily: 'Orbit', fontSize: fs,
                 minWidth: 0, width: width,
-                overflowX: 'hidden', whiteSpace: 'nowrap',
+                overflowX: 'hidden', whiteSpace: 'nowrap', overflowY: 'hidden',
                 boxSizing: 'border-box',
                 textTransform: 'none',
                 '&:hover': hoverSx,

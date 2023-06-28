@@ -2,42 +2,48 @@ import { Box, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { GBNakedInput, GBText } from '../../components/generalComponents'
 
-export default function Chat() {
+export default function Chat({roomCode}) {
     const socket = global.socket
     const [message, setMessage] = useState('')
     const [chatMessages, setChatMessages] = useState([])
+    const msgFS = 14
     function sendMessage(message) {
         if(message.trimStart() === '') return // Don't send empty messages
-        socket.emit('gameroom_sendMsgToChat', {message})
+        socket.emit('gameroom_sendMsgToChat', {roomCode, message})
     }
     function handleKey(e) {
         if(e.keyCode === 13) sendMessage(message)
     }
-    const Message = ({msg}) => {
-        return (
-            <GBText fs={16} text={msg}/>
-        )
+    function addMessage(msg) {
+        setChatMessages([...chatMessages, msg])
     }
+    const Message = ({playerName, msg}) => { 
+        return <GBText fs={msgFS} text={`${playerName}: ${msg}`}/>
+    }
+    const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={msgFS} text={msg}/> }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
-        const newMsg = `${playerName}: ${message}`
-        setChatMessages([...chatMessages, newMsg])
+        addMessage(<Message playerName={playerName} msg={message}/>)
+    })
+    socket.on('gameroom_newChatAnnouncement', ({message}) => {
+        addMessage(<Announcement msg={message}/>)
     })
     return (
         <Box
             sx={{
-                width: 250, height: 400,
+                width: 1, maxWidth: 1, height: 0.5,
                 border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
-                position: 'relative'
+                position: 'absolute', bottom: 0
             }}
         >
             <Stack direction="column"
                 sx={{
-                    mx: 1,
+                    mx: 1, mt: 1,
                     height: 340,
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    wordBreak: 'break-all'
                 }}
             >
-                {chatMessages.map((msg) => <Message msg={msg}/>)}
+                {chatMessages.map((msg) => msg)}
             </Stack>
             <Box
                 sx={{
@@ -46,7 +52,7 @@ export default function Chat() {
                     bottom: 0
                 }}
             >
-                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={248} fs={18} onKeyDown={handleKey}/>
+                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={348} maxLength={null} fs={msgFS} placeholder="Say something..." onKeyDown={handleKey}/>
             </Box>
         </Box>
     )

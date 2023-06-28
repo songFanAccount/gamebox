@@ -29,6 +29,8 @@ module.exports = (io, socket) => {
         // AVI: there exists a room with the code
         rooms[code].players[socket.id] = { displayName : userName }
         socketidToRoom[userID] = code
+        const playerJoinMsg = `${userName} has joined!`
+        sendAnnouncementToRoom(code, playerJoinMsg)
         callback({success: true})
     }
     function getPlayerInfoFromRoom(roomCode, playerID) {
@@ -37,6 +39,7 @@ module.exports = (io, socket) => {
     }
     function updatePlayerList(roomCode) {
         const room = rooms[roomCode]
+        if(!room) {console.log('updatePlayerList: no room exist with this room code!'); return}
         const hostID = room.hostID
         let hostName
         const playersNames = []
@@ -45,6 +48,12 @@ module.exports = (io, socket) => {
             else playersNames.push(entry[1].displayName)
         })
         io.to(roomCode).emit('gameroom_getPlayerNames', {hostName, playersNames})
+    }
+    function sendMsgToRoom(roomCode, playerName, message) {
+        io.to(roomCode).emit('gameroom_newChatMsg', {message, playerName})
+    }
+    function sendAnnouncementToRoom(roomCode, message) {
+        io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
@@ -57,7 +66,6 @@ module.exports = (io, socket) => {
         console.log('Generated room with code: ' + roomCode)
         socket.join(roomCode)
         createRoom(roomCode, roomName, password, creatorName, socket.id)
-        console.log(rooms)
         callback({success: true, code: roomCode})
     })
     socket.on('join-room', ({code, password, userName}, callback) => {
@@ -79,16 +87,14 @@ module.exports = (io, socket) => {
         }
         socket.join(code)
         joinRoom(code, userName, callback, socket.id)
-        console.log(rooms)
     })
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
+        console.log('player list requested for room ' + roomCode)
         updatePlayerList(roomCode)
     })
-    socket.on('gameroom_sendMsgToChat', ({message}) => {
-        const roomCode = socketidToRoom[socket.id]
-        const playerName = getPlayerInfoFromRoom(roomCode, socket.id)
-        console.log(`Message: ${message} from socketid: ${socket.id} from room with code: ${roomCode}`)
-        io.to('testRoom').emit('gameroom_newChatMsg', {message, playerName})
+    socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
+        const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
+        sendMsgToRoom(roomCode, playerName, message)
     })
     socket.on('check_room_code', ({code}, callback) => {
         if (rooms[code] === undefined) callback({valid: false})

@@ -1,7 +1,7 @@
-import { Box, Stack } from '@mui/material'
+import { Box } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, { useState, useMemo, useEffect } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import React, { useState, useMemo } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
@@ -19,6 +19,11 @@ export default function GameLayout() {
     const socket = global.socket
     const navigate = useNavigate()
     const roomCode = useQuery().get("code")
+
+    const [currGame, setCurrGame] = useState('')
+    function selectGame(gameName) {
+        setCurrGame(gameName)
+    }
     const [codeValidity, setCodeValidity] = useState(false)
     const [userName, setUserName] = useState('')
     const [joinPassword, setJoinPassword] = useState('')
@@ -73,10 +78,9 @@ export default function GameLayout() {
                     color: "white"
                 }}
             >
-                <GameSearchBar/>
-                <GameWindow roomCode={roomCode}/>
+                <GameSearchBar onClick={selectGame}/>
+                <GameWindow roomCode={roomCode} gameName={currGame}/>
                 <UserInteractionBar roomCode={roomCode}/>
-                <Outlet/> {/* Should be replaced by GameWindow when it's completed */}
             </Box>}
         </Box>
     )
