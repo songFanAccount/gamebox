@@ -18,12 +18,7 @@ export default function Chat({roomCode}) {
         setChatMessages([...chatMessages, msg])
     }
     const Message = ({playerName, msg}) => { 
-        return (
-            <Stack direction="row" flexWrap="nowrap" columnGap={1}>
-                <GBText fs={msgFS} text={playerName + ':'}/>
-                <GBText fs={msgFS} text={msg}/> 
-            </Stack>
-        )
+        return <GBText fs={msgFS} text={`${playerName}: ${msg}`}/>
     }
     const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={msgFS} text={msg}/> }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
@@ -42,7 +37,7 @@ export default function Chat({roomCode}) {
         >
             <Stack direction="column"
                 sx={{
-                    mx: 1,
+                    mx: 1, mt: 1,
                     height: 340,
                     overflowY: 'auto'
                 }}
