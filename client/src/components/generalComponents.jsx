@@ -129,7 +129,7 @@ export function GBButton({onClick, children, color='#FFFFFF', backgroundColor='#
                 border: border,
                 fontFamily: 'Orbit', fontSize: fs,
                 minWidth: 0, width: width,
-                overflowX: 'hidden', whiteSpace: 'nowrap',
+                overflowX: 'hidden', whiteSpace: 'nowrap', overflowY: 'hidden',
                 boxSizing: 'border-box',
                 textTransform: 'none',
                 '&:hover': hoverSx,

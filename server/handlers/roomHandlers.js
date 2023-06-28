@@ -39,6 +39,7 @@ module.exports = (io, socket) => {
     }
     function updatePlayerList(roomCode) {
         const room = rooms[roomCode]
+        if(!room) {console.log('updatePlayerList: no room exist with this room code!'); return}
         const hostID = room.hostID
         let hostName
         const playersNames = []
@@ -88,6 +89,7 @@ module.exports = (io, socket) => {
         joinRoom(code, userName, callback, socket.id)
     })
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
+        console.log('player list requested for room ' + roomCode)
         updatePlayerList(roomCode)
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
