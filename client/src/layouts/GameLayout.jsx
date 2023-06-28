@@ -35,7 +35,7 @@ export default function GameLayout() {
             if(!response) toast.error('Unexpected error!')
             if(response.success) {
                 toast.success('Valid details! Redirecting...')
-                setTimeout(() => {navigate(`/game/?code=${roomCode}`, {state: {passwordChecked: true}})}, 2000)
+                navigate(`/game/?code=${roomCode}`, {state: {passwordChecked: true}})
             }
             else toast.error(response.errorMsg)
         })
