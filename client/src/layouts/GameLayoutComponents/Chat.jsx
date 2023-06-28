@@ -52,7 +52,7 @@ export default function Chat({roomCode}) {
                     bottom: 0
                 }}
             >
-                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={348} maxLength={null} fs={msgFS} onKeyDown={handleKey}/>
+                <GBNakedInput value={message} onChange={(e) => setMessage(e.target.value)} width={348} maxLength={null} fs={msgFS} placeholder="Say something..." onKeyDown={handleKey}/>
             </Box>
         </Box>
     )
