@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { GBFormalText } from '../../components/generalComponents'
+import { GBText } from '../../components/generalComponents'
 import { Box, Stack } from '@mui/material'
 import StarSharpIcon from '@mui/icons-material/StarSharp';
 
@@ -20,7 +20,7 @@ export default function PlayerList({roomCode}) {
     const Host = () => {
         return (
             <Stack direction="row" alignItems="center" columnGap={1} flexWrap="nowrap">
-                <GBFormalText fs={18} text={host}/>
+                <GBText fs={18} text={host}/>
                 <StarSharpIcon 
                     sx={{
                         fontSize: 18,
@@ -34,7 +34,7 @@ export default function PlayerList({roomCode}) {
         return (
             <>
                 {players?.map((player) => {
-                    return <GBFormalText fs={18} text={player}/>
+                    return <GBText fs={18} text={player}/>
                 })}
             </>
         )
@@ -42,8 +42,8 @@ export default function PlayerList({roomCode}) {
     return (
         <Box
             sx={{
-                width: 250,
-                border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 3
+                width: 1, maxWidth: 1, height: 0.5,
+                border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderTopLeftRadius: 15, borderTopRightRadius: 15
             }}
         >
             <Box
@@ -55,11 +55,12 @@ export default function PlayerList({roomCode}) {
                     display: 'flex', justifyContent: 'center', alignItems: 'center'
                 }}
             >
-                <GBFormalText color='#121212' text="Players" fs={22}/>
+                <GBText color='#121212' text="Players" fs={22}/>
             </Box>
             <Stack direction="column"
                 sx={{
-                    mx: 2, my: 1,
+                    mx: 2, my: 1, maxWidth: 1,
+                    wordBreak: 'break-word'
                 }}
             >
                 <Host/>
