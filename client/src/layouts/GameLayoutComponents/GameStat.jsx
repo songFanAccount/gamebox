@@ -4,6 +4,7 @@ import { Box, Button, Typography } from '@mui/material'
 import { GBText } from "../../components/generalComponents"
 import { GBToastContainer } from '../../components/toast';
 import { toast } from "react-toastify"
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 export default function GameStat({roomCode, roomName}) {
     function CopyLinkAndNotify() {
@@ -31,9 +32,12 @@ export default function GameStat({roomCode, roomName}) {
                     backgroundColor: "purple",
                     minWidth: 100,
                     borderRadius: 1,
-                    m: 0.5
+                    m: 0.5,
+                    px: 2
                 }}
+                disableRipple
                 onClick={CopyLinkAndNotify}
+                endIcon={<ContentCopyIcon/>}
             >
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Code</Typography>
                 <GBText text={roomCode} fs={17} ml={1.5}/>
@@ -43,11 +47,11 @@ export default function GameStat({roomCode, roomName}) {
                     backgroundColor: "purple",
                     minWidth: 100,
                     borderRadius: 1,
-                    m: 0.5
+                    m: 0.5, px: 2
                 }}
             >
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Name</Typography>
-                <GBText text={roomName} fs={17} ml={1.5}/>
+                <GBText text={roomName} fs={17}/>
             </Box>
             <Box
                 sx={{
@@ -58,18 +62,19 @@ export default function GameStat({roomCode, roomName}) {
                 }}
             >
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Round</Typography>
-                <GBText text="q12hrj1" fs={17} ml={1.5}/>
+                <GBText text="0" fs={17}/>
             </Box>
             <Box
                 sx={{
                     backgroundColor: "purple",
                     minWidth: 100,
                     borderRadius: 1,
-                    m: 0.5
+                    m: 0.5,
+                    px: 2
                 }}
             >
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Ranking</Typography>
-                <GBText text="q12hrj1" fs={17} ml={1.5}/>
+                <GBText text="1. Anon Andy" fs={17}/>
             </Box>
             <GBToastContainer/>
         </Box>
