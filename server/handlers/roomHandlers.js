@@ -113,6 +113,7 @@ module.exports = (io, socket) => {
             return
         }
         /* Remove the user from this room */
+        const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
         delete room.players[socket.id]
         socket.leave(roomCode)
         /* 
@@ -124,7 +125,10 @@ module.exports = (io, socket) => {
             const potentialHost = Object.keys(room.players)[0]
             potentialHost ? room.hostID = potentialHost : delete rooms[roomCode]
         }
-        /* Notify players in the room to update player list */
-        if(rooms.hasOwnProperty(roomCode)) updatePlayerList(roomCode)
+        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
+        if(rooms.hasOwnProperty(roomCode)) {
+            updatePlayerList(roomCode)
+            sendAnnouncementToRoom(roomCode, `${userName} has left.`)
+        }
     })
 }
