@@ -89,11 +89,9 @@ module.exports = (io, socket) => {
         joinRoom(code, userName, callback, socket.id)
     })
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
-        console.log('player list requested for room ' + roomCode)
         updatePlayerList(roomCode)
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
-        console.log(`Message: ${message} to room: ${roomCode}`)
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
         sendMsgToRoom(roomCode, playerName, message)
     })
