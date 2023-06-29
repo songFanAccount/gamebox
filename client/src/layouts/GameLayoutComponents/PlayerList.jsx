@@ -44,7 +44,7 @@ export default function PlayerList({roomCode}) {
         <Box
             sx={{
                 width: 1, maxWidth: 1, height: 0.5,
-                border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderTopLeftRadius: 15, borderTopRightRadius: 15
+                border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderTopLeftRadius: 15, borderTopRightRadius: 15,
             }}
         >
             <Box
@@ -60,7 +60,9 @@ export default function PlayerList({roomCode}) {
             </Box>
             <Stack direction="column"
                 sx={{
-                    mx: 2, my: 1, maxWidth: 1,
+                    mx: 2, my: 1, 
+                    maxWidth: 1, height: 'calc(100% - 80px)',
+                    overflowY: 'auto',
                     wordBreak: 'break-word'
                 }}
             >
