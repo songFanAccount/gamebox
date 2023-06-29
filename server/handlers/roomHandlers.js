@@ -100,13 +100,19 @@ module.exports = (io, socket) => {
     socket.on('check_room_code', ({code}, callback) => {
         callback({valid: rooms[code] !== undefined})
     })
-    socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}) => {
+    socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
         console.log('Attempting to reconnect with details:')
         console.log(roomCode, password, userID)
         /* Assumes room code belongs to an existing room */
         const room = rooms[roomCode]
-        
-        
+        /* Check whether the user is in the recent disconnects list */
+        const cachedInfo = room.recentDisconnects[userID]
+        if(!cachedInfo) {
+            callback({success: false})
+            return
+        }
+        /* Now check password matches, if room doesn't have a password, just let them in */
+        callback({success: password === room.password || room.password === null})
     })
     socket.on('disconnecting', () => {
         console.log(`${socket.id} disconnected.`)

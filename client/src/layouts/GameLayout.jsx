@@ -29,7 +29,9 @@ export default function GameLayout() {
             if(roomCode) { // Only do something if we have a roomCode stored in the local storage
                 const password = localStorage.getItem('password')
                 const userID = localStorage.getItem('userID')
-                socket.emit('gameroom_attempt_reconnect', {roomCode, password, userID})
+                socket.emit('gameroom_attempt_reconnect', {roomCode, password, userID}, ({success}) => {
+                    console.log(success)
+                })
             }
         }
     })
