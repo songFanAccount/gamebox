@@ -3,7 +3,7 @@ import React from "react"
 import { Box, Typography } from '@mui/material'
 import { GBText } from "../../components/generalComponents"
 
-export default function GameStat({roomCode}) {
+export default function GameStat({roomCode, roomName}) {
     return (
         <Box
             sx={{
@@ -32,8 +32,8 @@ export default function GameStat({roomCode}) {
                     m: 0.5
                 }}
             >
-                <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Play Time</Typography>
-                <GBText text="q12hrj1" fs={17} ml={1.5}/>
+                <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Name</Typography>
+                <GBText text={roomName} fs={17} ml={1.5}/>
             </Box>
             <Box
                 sx={{

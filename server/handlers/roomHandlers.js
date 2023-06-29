@@ -96,8 +96,8 @@ module.exports = (io, socket) => {
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
         sendMsgToRoom(roomCode, playerName, message)
     })
-    socket.on('check_room_code', ({code}, callback) => {
+    socket.on('check_room_code_get_info', ({code}, callback) => {
         if (rooms[code] === undefined) callback({valid: false})
-        else callback({valid: true})
+        else callback({valid: true, roomName: rooms[code].roomName})
     })
 }

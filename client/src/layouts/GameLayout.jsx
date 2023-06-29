@@ -10,9 +10,6 @@ import UserInteractionBar from './GameLayoutComponents/UserInteractionBar'
 import { GBText, GBTextInput, GBButton } from '../components/generalComponents'
 
 export default function GameLayout() {
-    const initTime = useMemo(() => Date().toLocaleString(), [])
-    console.log(initTime)
-
     const location = useLocation();
     const fromHome = location.state ? true : false
 
@@ -26,9 +23,11 @@ export default function GameLayout() {
     }
     const [codeValidity, setCodeValidity] = useState(false)
     const [userName, setUserName] = useState('')
+    const [roomName, setRoomName] = useState('')
     const [joinPassword, setJoinPassword] = useState('')
-    socket.emit("check_room_code", {code: roomCode}, ({valid}) => {
+    socket.emit("check_room_code_get_info", {code: roomCode}, ({valid, roomName}) => {
         setCodeValidity(valid)
+        setRoomName(roomName)
     })
     function joinRoom() {
         socket.emit('join-room', {code: roomCode, password: joinPassword, userName: userName}, (response) => {
@@ -79,7 +78,7 @@ export default function GameLayout() {
                 }}
             >
                 <GameSearchBar onClick={selectGame}/>
-                <GameWindow roomCode={roomCode} gameName={currGame}/>
+                <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
                 <UserInteractionBar roomCode={roomCode}/>
             </Box>}
         </Box>
