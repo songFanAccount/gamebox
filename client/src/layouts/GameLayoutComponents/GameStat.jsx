@@ -1,7 +1,7 @@
 import React from "react"
 
 import { Box, Typography } from '@mui/material'
-import { GBText } from "../../components/generalComponents"
+import { GBButton, GBText } from "../../components/generalComponents"
 
 export default function GameStat({roomCode, roomName}) {
     return (
@@ -22,7 +22,7 @@ export default function GameStat({roomCode, roomName}) {
                 }}
             >
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Code</Typography>
-                <GBText text={roomCode} fs={17} ml={1.5}/>
+                <GBButton onClick={() => {navigator.clipboard.writeText(window.location.href)}} children={roomCode} fs={17} ml={1.5}/>
             </Box>
             <Box
                 sx={{
