@@ -93,11 +93,42 @@ module.exports = (io, socket) => {
         updatePlayerList(roomCode)
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
+        console.log(`Message: ${message} to room: ${roomCode}`)
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
         sendMsgToRoom(roomCode, playerName, message)
     })
     socket.on('check_room_code', ({code}, callback) => {
         if (rooms[code] === undefined) callback({valid: false})
         else callback({valid: true})
+    })
+    socket.on('disconnecting', () => {
+        console.log(`${socket.id} disconnected.`)
+        /* Get the room the user belongs to, if none, do nothing */
+        const roomCode = socketidToRoom[socket.id]
+        const room = rooms?.[roomCode]
+        if(!room) return
+        /* Check that the user actually is in our rooms object */
+        if(!room.players.hasOwnProperty(socket.id)) {
+            console.log("Specified room already doesn't have this player!")
+            return
+        }
+        /* Remove the user from this room */
+        const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
+        delete room.players[socket.id]
+        socket.leave(roomCode)
+        /* 
+        If the user is the host, then: 
+        - If there are still players in the room, reassign one of them to be host
+        - Otherwise, all players have left the room, close the room
+        */
+        if(room.hostID === socket.id) {
+            const potentialHost = Object.keys(room.players)[0]
+            potentialHost ? room.hostID = potentialHost : delete rooms[roomCode]
+        }
+        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
+        if(rooms.hasOwnProperty(roomCode)) {
+            updatePlayerList(roomCode)
+            sendAnnouncementToRoom(roomCode, `${userName} has left.`)
+        }
     })
 }

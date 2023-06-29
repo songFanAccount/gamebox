@@ -37,7 +37,7 @@ export default function Chat({roomCode}) {
         >
             <Stack direction="column"
                 sx={{
-                    mx: 1, mt: 1,
+                    mx: 2, mt: 1,
                     height: 340,
                     overflowY: 'auto',
                     wordBreak: 'break-all'
