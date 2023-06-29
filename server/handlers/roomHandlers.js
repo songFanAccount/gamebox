@@ -24,6 +24,7 @@ module.exports = (io, socket) => {
             players: playersObj
         }
         socketidToRoom[creatorID] = code
+        io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: password === '' ? null : password, userID: creatorID})
     }
     function joinRoom(code, userName, callback, userID) {
         // AVI: there exists a room with the code

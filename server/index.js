@@ -20,7 +20,6 @@ const registerTictactoeHandlers = require('./handlers/gameHandlers/tictactoe')
 
 io.on('connection', (socket) => {
     socket.join('testRoom')
-    io.to(socket.id).emit('update_localStorage', {userID: socket.id})
     registerRoomHandlers(io, socket)
     registerTictactoeHandlers(io, socket, 'testRoom')
 })
