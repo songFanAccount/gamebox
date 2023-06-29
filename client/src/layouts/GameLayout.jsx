@@ -1,8 +1,9 @@
 import { Box } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
+import { GBToastContainer } from '../components/toast';
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
 import GameWindow from './GameLayoutComponents/GameWindow'
@@ -34,7 +35,7 @@ export default function GameLayout() {
             if(!response) toast.error('Unexpected error!')
             if(response.success) {
                 toast.success('Valid details! Redirecting...')
-                navigate(`/game/?code=${roomCode}`, {state: {passwordChecked: true}})
+                setTimeout(() => {navigate(`/game/?code=${roomCode}`,{state: {passwordChecked: true}})}, 2000)
             }
             else toast.error(response.errorMsg)
         })
@@ -61,7 +62,7 @@ export default function GameLayout() {
                     <GBText text="Password: "/>
                     <GBTextInput value={joinPassword} onChange={setJoinPassword} placeholder="-" maxLength={25} type="password"/>
                     <GBButton onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>
-
+                    <GBToastContainer/>
             </Box>
             }
             {(codeValidity && fromHome) &&
