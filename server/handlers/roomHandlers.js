@@ -19,12 +19,12 @@ module.exports = (io, socket) => {
         const playersObj = createPlayerObj(creatorID, creatorName)
         rooms[code] = {
             roomName: isEmptyStr(roomName) ? 'Game Room' : roomName,
-            password: password === '' ? null : password,
+            password: isEmptyStr(password) ? null : password,
             hostID: creatorID, 
             players: playersObj
         }
         socketidToRoom[creatorID] = code
-        io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: password === '' ? null : password, userID: creatorID})
+        io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
     }
     function joinRoom(code, userName, callback, userID) {
         // AVI: there exists a room with the code
@@ -97,8 +97,19 @@ module.exports = (io, socket) => {
         sendMsgToRoom(roomCode, playerName, message)
     })
     socket.on('check_room_code', ({code}, callback) => {
-        if (rooms[code] === undefined) callback({valid: false})
-        else callback({valid: true})
+        callback({valid: rooms[code] !== undefined})
+    })
+    socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}) => {
+        console.log('Attempting to reconnect with details:')
+        console.log(roomCode, password, userID)
+        /* Assumes room code belongs to an existing room */
+        const room = rooms[roomCode]
+        /* If this room does not require a password, just let them in */
+        if(room.password) {
+
+        } else {
+            
+        }
     })
     socket.on('disconnecting', () => {
         console.log(`${socket.id} disconnected.`)
