@@ -1,9 +1,22 @@
 import React from "react"
 
-import { Box, Typography } from '@mui/material'
-import { GBButton, GBText } from "../../components/generalComponents"
+import { Box, Button, Typography } from '@mui/material'
+import { GBText } from "../../components/generalComponents"
+import { GBToastContainer } from '../../components/toast';
+import { toast } from "react-toastify"
 
 export default function GameStat({roomCode, roomName}) {
+    function CopyLinkAndNotify() {
+        // toast.success('Copied link to the clipboard!')
+        navigator.clipboard.writeText(window.location.href).then(
+            () => {
+                toast.success('Copied link to the clipboard!')
+            },
+            () => {
+                toast.error('something went wrong :(')
+            }
+          );
+    }
     return (
         <Box
             sx={{
@@ -13,17 +26,18 @@ export default function GameStat({roomCode, roomName}) {
                 display: "flex"
             }}
         >
-            <Box
+            <Button
                 sx={{
                     backgroundColor: "purple",
                     minWidth: 100,
                     borderRadius: 1,
                     m: 0.5
                 }}
+                onClick={CopyLinkAndNotify}
             >
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Code</Typography>
-                <GBButton onClick={() => {navigator.clipboard.writeText(window.location.href)}} children={roomCode} fs={17} ml={1.5}/>
-            </Box>
+                <GBText text={roomCode} fs={17} ml={1.5}/>
+            </Button>
             <Box
                 sx={{
                     backgroundColor: "purple",
@@ -57,6 +71,7 @@ export default function GameStat({roomCode, roomName}) {
                 <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Ranking</Typography>
                 <GBText text="q12hrj1" fs={17} ml={1.5}/>
             </Box>
+            <GBToastContainer/>
         </Box>
     )
 }
