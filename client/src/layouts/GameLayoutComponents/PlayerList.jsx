@@ -24,7 +24,8 @@ export default function PlayerList({roomCode}) {
                 <StarSharpIcon 
                     sx={{
                         fontSize: 18,
-                        color: '#FFFFFF'
+                        color: '#FFFFFF',
+                        mt: 0.5
                     }}
                 />
             </Stack>
