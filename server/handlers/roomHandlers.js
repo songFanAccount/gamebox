@@ -21,7 +21,8 @@ module.exports = (io, socket) => {
             roomName: isEmptyStr(roomName) ? 'Game Room' : roomName,
             password: isEmptyStr(password) ? null : password,
             hostID: creatorID, 
-            players: playersObj
+            players: playersObj,
+            recentDisconnects: {}
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -104,12 +105,8 @@ module.exports = (io, socket) => {
         console.log(roomCode, password, userID)
         /* Assumes room code belongs to an existing room */
         const room = rooms[roomCode]
-        /* If this room does not require a password, just let them in */
-        if(room.password) {
-
-        } else {
-            
-        }
+        
+        
     })
     socket.on('disconnecting', () => {
         console.log(`${socket.id} disconnected.`)
@@ -122,6 +119,8 @@ module.exports = (io, socket) => {
             console.log("Specified room already doesn't have this player!")
             return
         }
+        /* Cache this player info in the recent disconnects */
+        room.recentDisconnects[socket.id] = room.players[socket.id]
         /* Remove the user from this room */
         const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
         delete room.players[socket.id]
@@ -138,7 +137,6 @@ module.exports = (io, socket) => {
         /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
         if(rooms.hasOwnProperty(roomCode)) {
             updatePlayerList(roomCode)
-            sendAnnouncementToRoom(roomCode, `${userName} has left.`)
-        }
+            sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
     })
 }
