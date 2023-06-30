@@ -89,6 +89,8 @@ module.exports = (io, socket) => {
         }
         socket.join(code)
         joinRoom(code, userName, callback, socket.id)
+        io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
+
     })
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
         updatePlayerList(roomCode)
@@ -97,22 +99,30 @@ module.exports = (io, socket) => {
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
         sendMsgToRoom(roomCode, playerName, message)
     })
-    socket.on('check_room_code', ({code}, callback) => {
-        callback({valid: rooms[code] !== undefined})
+    socket.on('gameroom_validation', ({roomCode}, callback) => {
+        const room = rooms[roomCode]
+        const validCode = room !== undefined
+        const hasThisUser = room.players.hasOwnProperty(socket.id)
+        callback({validCode, hasThisUser})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
-        console.log('Attempting to reconnect with details:')
-        console.log(roomCode, password, userID)
         /* Assumes room code belongs to an existing room */
         const room = rooms[roomCode]
-        /* Check whether the user is in the recent disconnects list */
-        const cachedInfo = room.recentDisconnects[userID]
-        if(!cachedInfo) {
-            callback({success: false})
-            return
-        }
-        /* Now check password matches, if room doesn't have a password, just let them in */
-        callback({success: password === room.password || room.password === null})
+        /* If room has a password, first check the password */
+        if(room.password !== null && password !== room.password) { callback({success: false}); return }
+        /* Then attempt to fetch disconnected user info */
+        const cachedData = room.recentDisconnects[userID]
+        if(!cachedData) { callback({success: false}); return }
+        /* Successful reconnect, rejoin the user to room */
+        room.players[socket.id] = cachedData
+        socketidToRoom[socket.id] = roomCode
+        const playerReconnectMsg = `${cachedData.displayName} has reconnected!`
+        sendAnnouncementToRoom(roomCode, playerReconnectMsg)
+        socket.join(roomCode)
+        /* Remove this data from cache */
+        delete room.recentDisconnects[userID]
+        callback({success: true})
+        io.to(socket.id).emit('update_localStorage_room', {roomCode, password, userID: socket.id})
     })
     socket.on('disconnecting', () => {
         console.log(`${socket.id} disconnected.`)

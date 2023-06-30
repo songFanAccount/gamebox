@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
@@ -10,9 +10,6 @@ export default function GameLayout() {
     const initTime = useMemo(() => Date().toLocaleString(), [])
     console.log(initTime)
 
-    const location = useLocation();
-    const fromHome = location.state ? true : false
-
     const socket = global.socket
     const navigate = useNavigate()
     const roomCode = useQuery().get("code")
@@ -21,20 +18,21 @@ export default function GameLayout() {
     function selectGame(gameName) {
         setCurrGame(gameName)
     }
-    socket.emit("check_room_code", {code: roomCode}, ({valid}) => {
-        if(!valid) navigate('/') // If code isn't valid, just go back home
-        /* If valid and not from home page, then we can attempt to reconnect to the last room we were in via local storage data */
-        if(valid && !fromHome) {
-            const roomCode = localStorage.getItem('roomCode')
-            if(roomCode) { // Only do something if we have a roomCode stored in the local storage
-                const password = localStorage.getItem('password')
-                const userID = localStorage.getItem('userID')
-                socket.emit('gameroom_attempt_reconnect', {roomCode, password, userID}, ({success}) => {
-                    console.log(success)
+    useEffect(() => {
+        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser}) => {
+            if(!validCode) navigate('/') // If room code isn't valid, just go back home
+            if(!hasThisUser) { // If game room doesn't recognise this user, attempt reconnect via localstorage data
+                const storedRoomCode = localStorage.getItem('roomCode')
+                if(!storedRoomCode || storedRoomCode !== roomCode) navigate('/') // No cached data to try || Cached room code different from code in url
+                const storedPassword = localStorage.getItem('password')
+                const storedUserID = localStorage.getItem('userID')
+                socket.emit("gameroom_attempt_reconnect", {roomCode: storedRoomCode, password: storedPassword, userID: storedUserID}, ({success}) => {
+                    if(success) socket.emit("gameroom_requestPlayerNames", {roomCode})
+                    else navigate('/')
                 })
             }
-        }
-    })
+        })
+    }, [])
     return (
         <Box 
             sx={{
