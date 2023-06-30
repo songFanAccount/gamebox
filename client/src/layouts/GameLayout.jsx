@@ -32,6 +32,7 @@ export default function GameLayout() {
                 })
             }
         })
+    // eslint-disable-next-line
     }, [])
     return (
         <Box 
