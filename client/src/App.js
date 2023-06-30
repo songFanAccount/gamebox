@@ -11,7 +11,11 @@ import Contact from './infoPages/Contact';
 import Temp from './Temp';
 const socket = io.connect('http://localhost:3001')
 global.socket = socket
-
+socket.on('update_localStorage_room', ({roomCode, password, userID}) => {
+	localStorage.setItem('roomCode', roomCode)
+	localStorage.setItem('password', password)
+	localStorage.setItem('userID', userID)
+})
 function App() {
 	return (
 		<BrowserRouter>
