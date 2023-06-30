@@ -31,14 +31,14 @@ export default function Chat({roomCode}) {
         <Box
             sx={{
                 width: 1, maxWidth: 1, height: 0.5,
-                border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box',
+                border: 1, borderTop: 0, borderColor: '#FFFFFF', boxSizing: 'border-box',
                 position: 'absolute', bottom: 0
             }}
         >
             <Stack direction="column"
                 sx={{
                     mx: 2, mt: 1,
-                    height: 340,
+                    height: 'calc(100% - 50px)',
                     overflowY: 'auto',
                     wordBreak: 'break-all'
                 }}
