@@ -4,7 +4,7 @@ import { Box } from '@mui/material'
 import GameStat from './GameStat'
 import { Name2Game } from '../../games/gamelist'
 
-export default function GameWindow({roomCode, gameName}) {
+export default function GameWindow({roomCode, roomName, gameName}) {
     const game = Name2Game(gameName)
     return (
         <Box
@@ -16,7 +16,7 @@ export default function GameWindow({roomCode, gameName}) {
                 ml: 0
             }}
         >
-            <GameStat roomCode={roomCode}/>
+            <GameStat roomCode={roomCode} roomName={roomName}/>
             {game}
         </Box>
     )

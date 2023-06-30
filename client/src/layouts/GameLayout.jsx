@@ -49,6 +49,7 @@ export default function GameLayout() {
             <GameSearchBar onClick={selectGame}/>
             <GameWindow roomCode={roomCode} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
+
         </Box>
     )
 }
