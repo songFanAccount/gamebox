@@ -1,11 +1,12 @@
 import { Box, Stack } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { GBNakedInput, GBText } from '../../components/generalComponents'
 
 export default function Chat({roomCode}) {
     const socket = global.socket
     const [message, setMessage] = useState('')
     const [chatMessages, setChatMessages] = useState([])
+    const chatEnd = useRef(null)
     const msgFS = 14
     function sendMessage(message) {
         if(message.trimStart() === '') return // Don't send empty messages
@@ -27,6 +28,9 @@ export default function Chat({roomCode}) {
     socket.on('gameroom_newChatAnnouncement', ({message}) => {
         addMessage(<Announcement msg={message}/>)
     })
+    useEffect(() => {
+        chatEnd.current?.scrollIntoView()
+    }, [chatMessages])
     return (
         <Box
             sx={{
@@ -44,6 +48,7 @@ export default function Chat({roomCode}) {
                 }}
             >
                 {chatMessages.map((msg) => msg)}
+                <div ref={chatEnd}/>
             </Stack>
             <Box
                 sx={{
