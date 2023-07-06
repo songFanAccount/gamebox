@@ -44,7 +44,10 @@ export default function Chat({roomCode}) {
                     mx: 2, mt: 1,
                     height: 'calc(100% - 50px)',
                     overflowY: 'auto',
-                    wordBreak: 'break-all'
+                    wordBreak: 'break-all',
+                    '&::-webkit-scrollbar':{
+                        width:0,
+                    }
                 }}
             >
                 {chatMessages.map((msg) => msg)}
