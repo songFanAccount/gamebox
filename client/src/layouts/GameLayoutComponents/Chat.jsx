@@ -1,6 +1,8 @@
 import { Box, Stack } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import { GBNakedInput, GBText } from '../../components/generalComponents'
+import messageAudio from '../../assets/message.mp3'
+import useSound from 'use-sound'
 
 export default function Chat({roomCode}) {
     const socket = global.socket
@@ -8,6 +10,8 @@ export default function Chat({roomCode}) {
     const [chatMessages, setChatMessages] = useState([])
     const chatEnd = useRef(null)
     const msgFS = 14
+    /* Sounds */
+    const [playMsgSound] = useSound(messageAudio, {volume: 0.2, interrupt: true})
     function sendMessage(message) {
         if(message.trimStart() === '') return // Don't send empty messages
         socket.emit('gameroom_sendMsgToChat', {roomCode, message})
@@ -17,6 +21,7 @@ export default function Chat({roomCode}) {
     }
     function addMessage(msg) {
         setChatMessages([...chatMessages, msg])
+        playMsgSound()
     }
     const Message = ({playerName, msg}) => { 
         return <GBText fs={msgFS} text={`${playerName}: ${msg}`}/>
