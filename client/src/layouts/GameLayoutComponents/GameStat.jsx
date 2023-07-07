@@ -21,7 +21,7 @@ export default function GameStat({roomCode, roomName}) {
     return (
         <Box
             sx={{
-                borderBottom: 1,
+                // borderBottom: 1,
                 backgroundColor: '#121212',
                 height: 50,
                 display: "flex"
@@ -29,52 +29,30 @@ export default function GameStat({roomCode, roomName}) {
         >
             <Button
                 sx={{
-                    backgroundColor: "purple",
+                    backgroundColor: "white", color: "black",
                     minWidth: 100,
                     borderRadius: 1,
-                    m: 0.5,
-                    px: 2
+                    m: 0.3, mb: 0, px: 2,
+                    display: 'flex', flexWrap: 'no-wrap', justifyContent: 'center'
                 }}
                 disableRipple
                 onClick={CopyLinkAndNotify}
                 endIcon={<ContentCopyIcon/>}
             >
-                <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Code</Typography>
-                <GBText text={roomCode} fs={17} ml={1.5}/>
+                <Typography sx={{fontSize: 10}}>CODE</Typography>
+                <GBText text={roomCode} color={"black"} fs={17} ml={1.5}/>
             </Button>
             <Box
                 sx={{
-                    backgroundColor: "purple",
+                    backgroundColor: "white", color: "black",
                     minWidth: 100,
                     borderRadius: 1,
-                    m: 0.5, px: 2
+                    m: 0.3, mb: 0, px: 2,
+                    display: 'flex', flexWrap: 'no-wrap', alignItems: 'center'
                 }}
             >
-                <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Room Name</Typography>
-                <GBText text={roomName} fs={17}/>
-            </Box>
-            <Box
-                sx={{
-                    backgroundColor: "purple",
-                    minWidth: 100,
-                    borderRadius: 1,
-                    m: 0.5
-                }}
-            >
-                <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Round</Typography>
-                <GBText text="0" fs={17}/>
-            </Box>
-            <Box
-                sx={{
-                    backgroundColor: "purple",
-                    minWidth: 100,
-                    borderRadius: 1,
-                    m: 0.5,
-                    px: 2
-                }}
-            >
-                <Typography sx={{display: "flex", justifyContent: "center"}} variant="caption">Ranking</Typography>
-                <GBText text="1. Anon Andy" fs={17}/>
+                <Typography sx={{fontSize: 10}}>ROOM NAME</Typography>
+                <GBText text={roomName} color={"black"} fs={17} ml={1.5}/>
             </Box>
             <GBToastContainer/>
         </Box>
