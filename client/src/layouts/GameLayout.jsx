@@ -17,6 +17,11 @@ export default function GameLayout() {
     const [currGame, setCurrGame] = useState('')
     function selectGame(gameName) {
         setCurrGame(gameName)
+        /* If clicking on the same game, do nothing */
+        if(gameName === currGame) return
+        /* Only the host should be able to call this, should open up a modal to confirm changing game, as all current game progress will be deleted. */
+
+        /* If successful, should terminate current game properly before switching to new game. */
     }
     useEffect(() => {
         socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser}) => {

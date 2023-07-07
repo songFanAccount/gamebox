@@ -6,12 +6,10 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 
 export default function GameSearchBar({onClick}) {
-    console.log(gamelist)
     let gameButton = []
     gameButton = gamelist?.map(game => (
         <GameButton key={game} gameName={game} onClick={onClick}/>
     ))
-    console.log(gameButton)
     return (
         <Box
             sx={{
