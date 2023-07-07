@@ -13,6 +13,7 @@ export default function TicTacToe() {
         [0, 0, 0]
     ])
     const [turn, setTurn] = useState(-1) // -1 for X, 1 for O
+    let numEmptySpaces = 9
     const [winner, setWinner] = useState(0) // -1 for X, 1 for O, 0 for undetermined
     const [draw, setDraw] = useState(false)
     const [rowWin, setRowWin] = useState(-1) // -1 for no row win, otherwise 0,1,2 for which row won
@@ -26,6 +27,7 @@ export default function TicTacToe() {
             [0, 0, 0]
         ])
         setTurn(-1)
+        numEmptySpaces = 9
         setWinner(0)
         setDraw(false)
         setRowWin(-1)
@@ -40,9 +42,8 @@ export default function TicTacToe() {
             ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
             : row
         ))
-        setBoard(
-            newBoardState
-        )
+        setBoard(newBoardState)
+        numEmptySpaces--
         /* Update win condition states if won */
         if(winner !== 0) {
             if(rowWin) setRowWin(rowIndex)
@@ -55,7 +56,37 @@ export default function TicTacToe() {
         setTurn(-turn)
     })
     function clickSquare(rowIndex, colIndex) {
-        socket.emit('tictactoe-click', {rowIndex, colIndex})
+        if(numEmptySpaces === 0) throw new Error('TicTacToe: Unexpected error, numEmptySpaces === 0!')
+        const newBoard = board.map((row) => [...row])
+        newBoard[rowIndex][colIndex] = turn
+        setBoard(newBoard)
+        numEmptySpaces--
+        /* 
+        Should determine game status after each move, either:
+        - Player wins: A row/column/diagonal of X or Os. From the clicked square, span out to check its row/column and diagonal if applicable
+        - Draw: Previous case has not occurred, and board is now full. Detect fullness when 'emptySpaces' === 0
+        - Otherwise just continue playing!
+        */
+        // NOTE: Storing every win condition for animation purposes
+        const rowWin = newBoard[rowIndex].every((el) => el === turn) // Check row
+        const colWin = newBoard.every((row) => row[colIndex] === turn) // Then check column
+        // Now check diagonals
+        const leftDiagWin = 
+            newBoard[0][0] === turn &&
+            newBoard[1][1] === turn &&
+            newBoard[2][2] === turn 
+        const rightDiagWin = 
+            newBoard[0][2] === turn &&
+            newBoard[1][1] === turn &&
+            newBoard[2][0] === turn
+        // Determine if won
+        const win = rowWin || colWin || leftDiagWin || rightDiagWin
+        const draw = !win && numEmptySpaces === 0
+        /* Send new game state to server */
+        const gameState = win 
+        ? {rowIndex, colIndex, winner: turn, rowWin, colWin, leftDiagWin, rightDiagWin}
+        : {rowIndex, colIndex, winner: 0, draw}
+        socket.emit('tictactoe-click', {gameState})
     }
     function requestNewGame() {
         socket.emit('tictactoe-newGameReq')

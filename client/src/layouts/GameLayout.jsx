@@ -22,6 +22,9 @@ export default function GameLayout() {
         /* Only the host should be able to call this, should open up a modal to confirm changing game, as all current game progress will be deleted. */
 
         /* If successful, should terminate current game properly before switching to new game. */
+        socket.emit(`${gameName}-terminate`)
+        /* Switching to new game involves registering this room to the new game's event listeners */
+        socket.emit('registerGameHandlers', {roomCode, gameName})
     }
     useEffect(() => {
         socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser}) => {
