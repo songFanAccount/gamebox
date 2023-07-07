@@ -16,8 +16,9 @@ export default function Chat({roomCode}) {
         if(message.trimStart() === '') return // Don't send empty messages
         socket.emit('gameroom_sendMsgToChat', {roomCode, message})
     }
+    function clearChatInput() { setMessage('') }
     function handleKey(e) {
-        if(e.keyCode === 13) sendMessage(message)
+        if(e.keyCode === 13) { sendMessage(message); clearChatInput() }
     }
     function addMessage(msg) {
         setChatMessages([...chatMessages, msg])
