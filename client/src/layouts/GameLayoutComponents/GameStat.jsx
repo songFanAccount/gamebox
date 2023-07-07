@@ -9,7 +9,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 export default function GameStat({roomCode, roomName}) {
     function CopyLinkAndNotify() {
         // toast.success('Copied link to the clipboard!')
-        navigator.clipboard.writeText(window.location.href).then(
+        navigator.clipboard.writeText(roomCode).then(
             () => {
                 toast.success('Copied link to the clipboard!')
             },
