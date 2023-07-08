@@ -13,24 +13,35 @@ export default function GameLayout() {
     const socket = global.socket
     const navigate = useNavigate()
     const roomCode = useQuery().get("code")
+    const [roomName, setRoomName] = useState('')
 
     const [currGame, setCurrGame] = useState('')
     function selectGame(gameName) {
         setCurrGame(gameName)
     }
     useEffect(() => {
-        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser}) => {
-            if(!validCode) navigate('/') // If room code isn't valid, just go back home
+        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
+            if(!validCode) {
+                navigate('/') // If room code isn't valid, just go back home
+                return
+            }
             if(!hasThisUser) { // If game room doesn't recognise this user, attempt reconnect via localstorage data
                 const storedRoomCode = localStorage.getItem('roomCode')
-                if(!storedRoomCode || storedRoomCode !== roomCode) navigate('/') // No cached data to try || Cached room code different from code in url
+                if(!storedRoomCode || storedRoomCode !== roomCode) {
+                    navigate('/') // No cached data to try || Cached room code different from code in url
+                    return
+                }
                 const storedPassword = localStorage.getItem('password')
                 const storedUserID = localStorage.getItem('userID')
                 socket.emit("gameroom_attempt_reconnect", {roomCode: storedRoomCode, password: storedPassword, userID: storedUserID}, ({success}) => {
                     if(success) socket.emit("gameroom_requestPlayerNames", {roomCode})
-                    else navigate('/')
+                    else {
+                        navigate('/')
+                        return
+                    }
                 })
             }
+            setRoomName(roomName)
         })
     // eslint-disable-next-line
     }, [])
@@ -48,7 +59,7 @@ export default function GameLayout() {
             }}
         >
             <GameSearchBar onClick={selectGame}/>
-            <GameWindow roomCode={roomCode} gameName={currGame}/>
+            <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
 
         </Box>

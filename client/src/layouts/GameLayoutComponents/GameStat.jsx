@@ -21,7 +21,6 @@ export default function GameStat({roomCode, roomName}) {
     return (
         <Box
             sx={{
-                // borderBottom: 1,
                 backgroundColor: '#121212',
                 height: 50,
                 display: "flex"
@@ -33,14 +32,15 @@ export default function GameStat({roomCode, roomName}) {
                     minWidth: 100,
                     borderRadius: 1,
                     m: 0.3, mb: 0, px: 2,
-                    display: 'flex', flexWrap: 'no-wrap', justifyContent: 'center'
+                    display: 'flex', flexWrap: 'no-wrap', justifyContent: 'center',
+                    '&:hover': {color:'#FFFFFF', backgroundColor: '#121212'},
+                    fontFamily: 'Orbit'
                 }}
                 disableRipple
                 onClick={CopyLinkAndNotify}
                 endIcon={<ContentCopyIcon/>}
             >
-                <Typography sx={{fontSize: 10}}>CODE</Typography>
-                <GBText text={roomCode} color={"black"} fs={17} ml={1.5}/>
+                CODE: {roomCode}
             </Button>
             <Box
                 sx={{
@@ -48,11 +48,10 @@ export default function GameStat({roomCode, roomName}) {
                     minWidth: 100,
                     borderRadius: 1,
                     m: 0.3, mb: 0, px: 2,
-                    display: 'flex', flexWrap: 'no-wrap', alignItems: 'center'
+                    display: 'flex', flexWrap: 'no-wrap', alignItems: 'center',
                 }}
             >
-                <Typography sx={{fontSize: 10}}>ROOM NAME</Typography>
-                <GBText text={roomName} color={"black"} fs={17} ml={1.5}/>
+                <GBText text={'ROOM NAME: '+roomName} color={"black"} fs={14}/>
             </Box>
             <GBToastContainer/>
         </Box>

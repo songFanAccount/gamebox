@@ -102,8 +102,13 @@ module.exports = (io, socket) => {
     socket.on('gameroom_validation', ({roomCode}, callback) => {
         const room = rooms[roomCode]
         const validCode = room !== undefined
+        if (!validCode) {
+            callback({validCode: false, hasThisUser: false, roomName: null})
+            return
+        }
         const hasThisUser = room.players.hasOwnProperty(socket.id)
-        callback({validCode, hasThisUser})
+        const roomName = room.roomName
+        callback({validCode, hasThisUser, roomName})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
         /* Assumes room code belongs to an existing room */
