@@ -11,7 +11,7 @@ export default function GameStat({roomCode, roomName}) {
         // toast.success('Copied link to the clipboard!')
         navigator.clipboard.writeText(roomCode).then(
             () => {
-                toast.success('Copied link to the clipboard!')
+                toast.success('Copied code to the clipboard!')
             },
             () => {
                 toast.error('something went wrong :(')
