@@ -10,14 +10,20 @@ export default function GameWindow({roomCode, roomName, gameName}) {
         <Box
             sx={{
                 width: "100%",
-                border: 1,
-                borderRadius: 1,
-                m: 1,
-                ml: 0
+                display: "flex", flexDirection: "column",
+                m: 1, ml: 0
             }}
         >
             <GameStat roomCode={roomCode} roomName={roomName}/>
-            {game}
+            <Box
+                sx={{
+                    height: "100%",
+                    border: 1, borderRadius: 1,
+                    mt: 1
+                }}
+            >
+                {game}
+            </Box>
         </Box>
     )
 }
