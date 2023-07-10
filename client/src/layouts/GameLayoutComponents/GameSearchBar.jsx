@@ -36,6 +36,7 @@ export default function GameSearchBar({onClick, currGame}) {
                 }}
             >
                 <Typography fontFamily='orbit'>Search bar</Typography>
+                {gameButton}
             </Box>
             <Box
                 sx={{
@@ -43,7 +44,6 @@ export default function GameSearchBar({onClick, currGame}) {
                 }}
             >
                 <Typography fontFamily='orbit'>To play next</Typography>
-                {gameButton}
             </Box>
         </Box>
     )
