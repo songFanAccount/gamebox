@@ -1,3 +1,20 @@
+/* Need to store multiple game instances so that many rooms can play their own game */
+let games = {}
+function initNewGameObj(roomCode) {
+    if(games.hasOwnProperty(roomCode)) throw new Error('initGameObj: This room already has a game instance running!')
+    console.log(`Initiating new game instance for room ${roomCode}`)
+    games[roomCode] = {
+        turn: -1,
+        numEmptySpaces: 9,
+        board: [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ],
+        stats: {}
+    }
+    console.log(games)
+}
 let turn = -1
 let numEmptySpaces = 9
 let board = [
@@ -20,14 +37,16 @@ function resetGame() {
     turn = -1
 }
 module.exports = (io, socket, room) => {
+    initNewGameObj(room)
     socket.on('tictactoe-newGameReq', () => {
         resetGame()
         io.to(room).emit('tictactoe-newGame')
     })
     socket.on('tictactoe-click', ({rowIndex, colIndex}) => {
         if(numEmptySpaces === 0) throw new Error('TicTacToe: Unexpected error, numEmptySpaces === 0!')
-        board[rowIndex][colIndex] = turn
-        numEmptySpaces--
+        const game = games[room]
+        game.board[rowIndex][colIndex] = turn
+        game.numEmptySpaces--
         /* 
         Should determine game status after each move, either:
         - Player wins: A row/column/diagonal of X or Os. From the clicked square, span out to check its row/column and diagonal if applicable
@@ -35,24 +54,22 @@ module.exports = (io, socket, room) => {
         - Otherwise just continue playing!
         */
         // NOTE: Storing every win condition for animation purposes
-        const rowWin = board[rowIndex].every((el) => el === turn) // Check row
-        const colWin = board.every((row) => row[colIndex] === turn) // Then check column
+        const rowWin = game.board[rowIndex].every((el) => el === turn) // Check row
+        const colWin = game.board.every((row) => row[colIndex] === turn) // Then check column
         // Now check diagonals
         const leftDiagWin = 
-            board[0][0] === turn &&
-            board[1][1] === turn &&
-            board[2][2] === turn 
+            game.board[0][0] === turn &&
+            game.board[1][1] === turn &&
+            game.board[2][2] === turn 
         const rightDiagWin = 
-            board[0][2] === turn &&
-            board[1][1] === turn &&
-            board[2][0] === turn
+            game.board[0][2] === turn &&
+            game.board[1][1] === turn &&
+            game.board[2][0] === turn
         // Determine if won
         const win = rowWin || colWin || leftDiagWin || rightDiagWin
-        const draw = !win && numEmptySpaces === 0
+        const draw = !win && game.numEmptySpaces === 0
         /* Update game statistics if won */
         if(win) {
-            stats[turn] ? stats[turn]++ : stats[turn] = 1
-            console.log(stats)
         }
         /* If not, check if a draw has occurred (no more empty spaces) */
         else if(draw) numDraws++
@@ -61,6 +78,7 @@ module.exports = (io, socket, room) => {
         ? {rowIndex, colIndex, winner: turn, rowWin, colWin, leftDiagWin, rightDiagWin}
         : {rowIndex, colIndex, winner: 0, draw}
         io.to(room).emit('tictactoe-clickResponse', response)
-        turn *= -1
+        game.turn *= -1
+        console.log(game)
     })
 }
