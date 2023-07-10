@@ -17,8 +17,8 @@ export default function GameSearchBar({onClick, currGame}) {
     // Whenever user input is changed, search gamelist with modified input.
     const [searchedContent, setSearchedContent] = useState('')
     useEffect(() => {
-        let games = searchGame(searchedContent)
-        changeGameList(games)
+        let matchingGames = gamelist.filter(game => (game.toLowerCase().includes(searchedContent.toLowerCase())))
+        changeGameList(matchingGames)
     }, [searchedContent, changeGameList])
 
     return (
@@ -66,8 +66,4 @@ export default function GameSearchBar({onClick, currGame}) {
             </Box>
         </Box>
     )
-}
-
-function searchGame(gameName) {
-    return gamelist.filter(game => (game.toLowerCase().includes(gameName.toLowerCase())))
 }
