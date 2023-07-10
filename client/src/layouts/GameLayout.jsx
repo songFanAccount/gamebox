@@ -19,6 +19,7 @@ export default function GameLayout() {
     function selectGame(gameName) {
         setCurrGame(gameName)
     }
+
     useEffect(() => {
         socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
             if(!validCode) {
@@ -58,10 +59,9 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClick={selectGame}/>
+            <GameSearchBar onClick={selectGame} currGame={currGame}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
-
         </Box>
     )
 }
