@@ -15,20 +15,36 @@ export default function GameSearchBar({onClick, currGame}) {
                 minWidth: 250,
                 m: 1,
                 border: 1, borderTop: 0,
-                borderRadius: 1, borderTopRightRadius: 20, borderTopLeftRadius: 20
+                borderRadius: 1, borderTopRightRadius: 20, borderTopLeftRadius: 20,
+                display: 'flex', flexDirection: 'column'
             }}
         >
             <Box
                 sx={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     borderBottom: 1, borderTopLeftRadius: 15, borderTopRightRadius: 15,
-                    backgroundColor: '#FFF', color: '#121212'
+                    backgroundColor: '#FFF', color: '#121212',
                 }}
             >
                 <Typography fontFamily='orbit' fontSize={18}> Currently Playing</Typography>
                 <Typography fontFamily='orbit'>{currGame}</Typography>
             </Box>
-            {gameButton}
+            <Box
+                sx={{
+                    borderBottom: 1,
+                    height: '50%'
+                }}
+            >
+                <Typography fontFamily='orbit'>Search bar</Typography>
+            </Box>
+            <Box
+                sx={{
+                    height: '50%'
+                }}
+            >
+                <Typography fontFamily='orbit'>To play next</Typography>
+                {gameButton}
+            </Box>
         </Box>
     )
 }
