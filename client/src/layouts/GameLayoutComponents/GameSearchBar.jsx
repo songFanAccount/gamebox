@@ -1,14 +1,26 @@
-import React from "react"
+import React, {useState, useEffect, useCallback } from "react"
 import { Box, Typography } from '@mui/material'
 
 import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
+import { GBNakedInput } from "../../components/generalComponents"
 
 export default function GameSearchBar({onClick, currGame}) {
-    let gameButton = []
-    gameButton = gamelist?.map(game => (
-        <GameButton key={game} gameName={game} onClick={onClick}/>
-    ))
+    // With a given list of games searched, create game buttons.
+    let [gameButton, setGameButton] = useState([])
+    const changeGameList = useCallback((games) => {
+        setGameButton(games?.map(game => (
+            <GameButton key={game} gameName={game} onClick={onClick}/>
+        )))
+    }, [onClick])
+
+    // Whenever user input is changed, search gamelist with modified input.
+    const [searchedContent, setSearchedContent] = useState('')
+    useEffect(() => {
+        let games = searchGame(searchedContent)
+        changeGameList(games)
+    }, [searchedContent, changeGameList])
+
     return (
         <Box
             sx={{
@@ -28,6 +40,7 @@ export default function GameSearchBar({onClick, currGame}) {
             >
                 <Typography fontFamily='orbit' fontSize={18}> Currently Playing</Typography>
                 <Typography fontFamily='orbit'>{currGame}</Typography>
+                {!currGame && <Typography fontFamily='orbit'>-</Typography>}
             </Box>
             <Box
                 sx={{
@@ -35,7 +48,13 @@ export default function GameSearchBar({onClick, currGame}) {
                     height: '50%'
                 }}
             >
-                <Typography fontFamily='orbit'>Search bar</Typography>
+                <Box
+                    sx={{
+                        borderBottom: 1, borderColor: '#494d52'
+                    }}
+                >
+                    <GBNakedInput value={searchedContent} onChange={(e => setSearchedContent(e.target.value))} placeholder={'search'}/>
+                </Box>
                 {gameButton}
             </Box>
             <Box
@@ -47,4 +66,8 @@ export default function GameSearchBar({onClick, currGame}) {
             </Box>
         </Box>
     )
+}
+
+function searchGame(gameName) {
+    return gamelist.filter(game => (game.toLowerCase().includes(gameName.toLowerCase())))
 }
