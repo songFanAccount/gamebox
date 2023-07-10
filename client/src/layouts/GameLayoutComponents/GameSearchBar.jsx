@@ -25,7 +25,7 @@ export default function GameSearchBar({onClick, currGame}) {
                     backgroundColor: '#FFF', color: '#121212'
                 }}
             >
-                <Typography fontFamily='orbit' fontSize={18}> Current Playing</Typography>
+                <Typography fontFamily='orbit' fontSize={18}> Currently Playing</Typography>
                 <Typography fontFamily='orbit'>{currGame}</Typography>
             </Box>
             {gameButton}
