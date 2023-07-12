@@ -13,13 +13,23 @@ export default function GameLayout() {
     const socket = global.socket
     const navigate = useNavigate()
     const roomCode = useQuery().get("code")
+    const [isHost, setIsHost] = useState(false)
     const [roomName, setRoomName] = useState('')
-
     const [currGame, setCurrGame] = useState('')
     function selectGame(gameName) {
         setCurrGame(gameName)
-    }
+        /* If clicking on the same game, do nothing */
+        if(gameName === currGame) return
+        /* Only the host should be able to call this, should open up a modal to confirm changing game, as all current game progress will be deleted. */
 
+        /* If successful, should terminate current game properly before switching to new game. */
+        socket.emit(`${gameName}-terminate`)
+        /* Switching to new game involves registering this room to the new game's event listeners */
+        socket.emit('registerGameHandlers', {roomCode, gameName})
+    }
+    socket.on('gameroom_newHost', () => {
+        setIsHost(true)
+    })
     useEffect(() => {
         socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
             if(!validCode) {
@@ -35,13 +45,20 @@ export default function GameLayout() {
                 const storedPassword = localStorage.getItem('password')
                 const storedUserID = localStorage.getItem('userID')
                 socket.emit("gameroom_attempt_reconnect", {roomCode: storedRoomCode, password: storedPassword, userID: storedUserID}, ({success}) => {
-                    if(success) socket.emit("gameroom_requestPlayerNames", {roomCode})
-                    else {
+                    if(!success) {
                         navigate('/')
                         return
                     }
                 })
             }
+            /* If everything is successful, we have successfully joined the room. Now acquire the current room info */
+            socket.emit("gameroom_isHost", {roomCode}, ({host}) => {
+                setIsHost(host)
+            })
+            socket.emit("gameroom_requestPlayerNames", {roomCode})
+            socket.emit("gameroom_requestCurrentGameInfo", {roomCode}, ({gameName}) => {
+                setCurrGame(gameName)
+            })
             setRoomName(roomName)
         })
     // eslint-disable-next-line
@@ -59,7 +76,7 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClick={selectGame} currGame={currGame}/>
+            <GameSearchBar onClick={selectGame} currGame={currGame} isHost={isHost}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
         </Box>
