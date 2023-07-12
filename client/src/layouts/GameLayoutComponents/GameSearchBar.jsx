@@ -5,12 +5,12 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClick, currGame}) {
+export default function GameSearchBar({onClick, currGame, isHost}) {
     // With a given list of games searched, create game buttons.
     let [gameButton, setGameButton] = useState([])
     const changeGameList = useCallback((games) => {
         setGameButton(games?.map(game => (
-            <GameButton key={game} gameName={game} onClick={onClick}/>
+            <GameButton key={game} gameName={game} onClick={onClick} isHost={isHost}/>
         )))
     }, [onClick])
 
@@ -20,7 +20,6 @@ export default function GameSearchBar({onClick, currGame}) {
         let matchingGames = gamelist.filter(game => (game.toLowerCase().includes(searchedContent.toLowerCase())))
         changeGameList(matchingGames)
     }, [searchedContent, changeGameList])
-
     return (
         <Box
             sx={{

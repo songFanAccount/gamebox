@@ -40,9 +40,7 @@ export default function TicTacToe() {
             ? row.map((el, cIndex) => cIndex === colIndex ? turn : el)
             : row
         ))
-        setBoard(
-            newBoardState
-        )
+        setBoard(newBoardState)
         /* Update win condition states if won */
         if(winner !== 0) {
             if(rowWin) setRowWin(rowIndex)

@@ -22,6 +22,7 @@ module.exports = (io, socket) => {
             password: isEmptyStr(password) ? null : password,
             hostID: creatorID, 
             players: playersObj,
+            game: null,
             recentDisconnects: {}
         }
         socketidToRoom[creatorID] = code
@@ -92,8 +93,18 @@ module.exports = (io, socket) => {
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
 
     })
+    socket.on('gameroom_isHost', ({roomCode}, callback) => {
+        console.log('checking if is host')
+        console.log(rooms[roomCode], socket.id)
+        const roomHostID = rooms[roomCode]?.hostID
+        if(!roomHostID) return
+        callback({host: roomHostID === socket.id})
+    })
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
         updatePlayerList(roomCode)
+    })
+    socket.on('gameroom_requestCurrentGameInfo', (callback) => {
+        console.log('requesting current game info')
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
@@ -153,7 +164,12 @@ module.exports = (io, socket) => {
         */
         if(room.hostID === socket.id) {
             const potentialHost = Object.keys(room.players)[0]
-            potentialHost ? room.hostID = potentialHost : delete rooms[roomCode]
+            if(potentialHost) {
+                room.hostID = potentialHost
+                io.to(potentialHost).emit('gameroom_newHost')
+            } else {
+                delete rooms[roomCode]
+            }
         }
         /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
         if(rooms.hasOwnProperty(roomCode)) {
