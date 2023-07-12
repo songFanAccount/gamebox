@@ -76,10 +76,9 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClick={selectGame} isHost={isHost}/>
+            <GameSearchBar onClick={selectGame} currGame={currGame} isHost={isHost}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
-
         </Box>
     )
 }
