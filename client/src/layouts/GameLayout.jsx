@@ -29,7 +29,7 @@ export default function GameLayout() {
         socket.emit('registerGameHandlers', {roomCode, gameName})
     }
     function recommendGame(gameName) {
-        setRecommendedGame(prevRecommendedGame => [...prevRecommendedGame, gameName])
+        if (!recommendedGame.includes(gameName)) setRecommendedGame(prevRecommendedGame => [...prevRecommendedGame, gameName])
     }
     socket.on('gameroom_newHost', () => {
         setIsHost(true)
