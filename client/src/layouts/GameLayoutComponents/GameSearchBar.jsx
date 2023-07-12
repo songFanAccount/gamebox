@@ -5,14 +5,14 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClick, currGame, isHost}) {
+export default function GameSearchBar({onClickGame, onClickRecommend, currGame, recommendedGame, isHost}) {
     // With a given list of games searched, create game buttons.
     let [gameButton, setGameButton] = useState([])
     const changeGameList = useCallback((games) => {
         setGameButton(games?.map(game => (
-            <GameButton key={game} gameName={game} onClick={onClick} isHost={isHost}/>
+            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={onClickRecommend} isHost={isHost}/>
         )))
-    }, [onClick])
+    }, [onClickGame, onClickRecommend, isHost])
 
     // Whenever user input is changed, search gamelist with modified input.
     const [searchedContent, setSearchedContent] = useState('')
@@ -20,6 +20,9 @@ export default function GameSearchBar({onClick, currGame, isHost}) {
         let matchingGames = gamelist.filter(game => (game.toLowerCase().includes(searchedContent.toLowerCase())))
         changeGameList(matchingGames)
     }, [searchedContent, changeGameList])
+
+    const toPlayNext = recommendedGame.map(game => (<GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={onClickRecommend} isHost={isHost}/>))
+
     return (
         <Box
             sx={{
@@ -62,6 +65,7 @@ export default function GameSearchBar({onClick, currGame, isHost}) {
                 }}
             >
                 <Typography fontFamily='orbit'>To play next</Typography>
+                {toPlayNext}
             </Box>
         </Box>
     )

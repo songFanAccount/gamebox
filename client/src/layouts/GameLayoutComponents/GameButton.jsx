@@ -3,7 +3,7 @@ import { GBButton } from "../../components/generalComponents"
 import { Box, IconButton } from "@mui/material"
 import RecommendIcon from '@mui/icons-material/Recommend';
 
-export default function GameButton({gameName, onClick, isHost}) {
+export default function GameButton({gameName, onClickGame, onClickRecommend, isHost}) {
     return (
         <Box
             sx={{
@@ -11,14 +11,14 @@ export default function GameButton({gameName, onClick, isHost}) {
                 display: 'flex'
             }}
         >
-            <GBButton children={gameName} onClick={() => onClick(gameName)} disabled={!isHost} />
+            <GBButton children={gameName} onClick={() => onClickGame(gameName)} disabled={!isHost} />
             <Box
                 sx={{ml: 'auto', my: 'auto'}}
             >
                 <IconButton 
                     aria-label="recommend"
                     color="primary"
-                    onClick={() => console.log('recommending '+gameName)}
+                    onClick={() => onClickRecommend(gameName)}
                     size='large'
                     disableRipple
                 >

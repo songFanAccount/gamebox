@@ -16,6 +16,7 @@ export default function GameLayout() {
     const [isHost, setIsHost] = useState(false)
     const [roomName, setRoomName] = useState('')
     const [currGame, setCurrGame] = useState('')
+    const [recommendedGame, setRecommendedGame] = useState([])
     function selectGame(gameName) {
         setCurrGame(gameName)
         /* If clicking on the same game, do nothing */
@@ -26,6 +27,9 @@ export default function GameLayout() {
         socket.emit(`${gameName}-terminate`)
         /* Switching to new game involves registering this room to the new game's event listeners */
         socket.emit('registerGameHandlers', {roomCode, gameName})
+    }
+    function recommendGame(gameName) {
+        setRecommendedGame(prevRecommendedGame => [...prevRecommendedGame, gameName])
     }
     socket.on('gameroom_newHost', () => {
         setIsHost(true)
@@ -76,7 +80,7 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClick={selectGame} currGame={currGame} isHost={isHost}/>
+            <GameSearchBar onClickGame={selectGame} onClickRecommend={recommendGame} currGame={currGame} recommendedGame={recommendedGame} isHost={isHost}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
         </Box>
