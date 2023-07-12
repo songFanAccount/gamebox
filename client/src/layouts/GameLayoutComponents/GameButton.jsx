@@ -2,8 +2,9 @@ import React from "react"
 import { GBButton } from "../../components/generalComponents"
 import { Box, IconButton } from "@mui/material"
 import RecommendIcon from '@mui/icons-material/Recommend';
+import CancelIcon from '@mui/icons-material/Cancel';
 
-export default function GameButton({gameName, onClickGame, onClickRecommend, isHost}) {
+export default function GameButton({gameName, onClickGame, onClickRecommend, onClickCancel, isHost, isPlayNext=false}) {
     return (
         <Box
             sx={{
@@ -15,6 +16,7 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, isH
             <Box
                 sx={{ml: 'auto', my: 'auto'}}
             >
+                {!isPlayNext &&
                 <IconButton 
                     aria-label="recommend"
                     color="primary"
@@ -23,7 +25,17 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, isH
                     disableRipple
                 >
                     <RecommendIcon/>
-                </IconButton>
+                </IconButton>}
+                {isPlayNext &&
+                <IconButton 
+                    aria-label="cancel"
+                    color="fail"
+                    onClick={() => onClickCancel(gameName)}
+                    size='large'
+                    disableRipple
+                >
+                    <CancelIcon sx={{color: '#d50000'}}/>
+                </IconButton>}
             </Box>
         </Box>
     )

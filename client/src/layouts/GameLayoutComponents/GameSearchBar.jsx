@@ -5,14 +5,33 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClickGame, onClickRecommend, currGame, recommendedGame, isHost}) {
+export default function GameSearchBar({onClickGame, currGame, isHost}) {
+    // list of recommended games and functions to add or remove game from the list
+    const [recommendedGame, setRecommendedGame] = useState([])
+    const recommendGame = useCallback((gameName) => {
+        if (!recommendedGame.includes(gameName)) 
+            setRecommendedGame(prevRecommendedGame => [...prevRecommendedGame, gameName])
+    }, [recommendedGame])
+    const cancelRecommendGame = useCallback((gameName) => {
+        if (recommendedGame.includes(gameName)) 
+            setRecommendedGame(prevRecommendedGame => {prevRecommendedGame.splice(prevRecommendedGame.indexOf(gameName), 1); return [...prevRecommendedGame]});
+    }, [recommendedGame])
+
+    // buttons those are placed in the to-play-next section
+    const [toPlayNext, setToPlayNext] = useState([])
+    useEffect(() => {
+        setToPlayNext(recommendedGame.map(game => (
+            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>
+        )))
+    }, [recommendedGame, onClickGame, cancelRecommendGame, isHost])
+
     // With a given list of games searched, create game buttons.
-    let [gameButton, setGameButton] = useState([])
+    const [gameButton, setGameButton] = useState([])
     const changeGameList = useCallback((games) => {
         setGameButton(games?.map(game => (
-            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={onClickRecommend} isHost={isHost}/>
+            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={recommendGame} isHost={isHost}/>
         )))
-    }, [onClickGame, onClickRecommend, isHost])
+    }, [onClickGame, recommendGame, isHost])
 
     // Whenever user input is changed, search gamelist with modified input.
     const [searchedContent, setSearchedContent] = useState('')
@@ -20,11 +39,6 @@ export default function GameSearchBar({onClickGame, onClickRecommend, currGame, 
         let matchingGames = gamelist.filter(game => (game.toLowerCase().includes(searchedContent.toLowerCase())))
         changeGameList(matchingGames)
     }, [searchedContent, changeGameList])
-
-    const [toPlayNext, setToPlayNext] = useState([])
-    useEffect(() =>{
-        setToPlayNext(recommendedGame.map(game => (<GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={onClickRecommend} isHost={isHost}/>)))
-    }, [recommendedGame])
 
     return (
         <Box
@@ -66,6 +80,7 @@ export default function GameSearchBar({onClickGame, onClickRecommend, currGame, 
                 sx={{
                     height: '50%'
                 }}
+                // key={recommendedGame}
             >
                 <Typography fontFamily='orbit'>To play next</Typography>
                 {toPlayNext}
