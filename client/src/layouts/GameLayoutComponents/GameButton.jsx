@@ -5,11 +5,26 @@ import RecommendIcon from '@mui/icons-material/Recommend';
 
 export default function GameButton({gameName, onClick, isHost}) {
     return (
-        <Box>
-            <GBButton children={gameName} onClick={() => onClick(gameName)} disabled={!isHost}/>
-            <IconButton aria-label="recommend" color="primary" onClick={() => console.log('recommending '+gameName)}>
-                <RecommendIcon/>
-            </IconButton>
+        <Box
+            sx={{
+                m: 1,
+                display: 'flex'
+            }}
+        >
+            <GBButton children={gameName} onClick={() => onClick(gameName)} disabled={!isHost} />
+            <Box
+                sx={{ml: 'auto', my: 'auto'}}
+            >
+                <IconButton 
+                    aria-label="recommend"
+                    color="primary"
+                    onClick={() => console.log('recommending '+gameName)}
+                    size='large'
+                    disableRipple
+                >
+                    <RecommendIcon/>
+                </IconButton>
+            </Box>
         </Box>
     )
 }
