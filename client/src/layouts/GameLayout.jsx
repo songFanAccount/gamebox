@@ -13,8 +13,8 @@ export default function GameLayout() {
     const socket = global.socket
     const navigate = useNavigate()
     const roomCode = useQuery().get("code")
+    const [isHost, setIsHost] = useState(false)
     const [roomName, setRoomName] = useState('')
-
     const [currGame, setCurrGame] = useState('')
     function selectGame(gameName) {
         setCurrGame(gameName)
@@ -42,13 +42,20 @@ export default function GameLayout() {
                 const storedPassword = localStorage.getItem('password')
                 const storedUserID = localStorage.getItem('userID')
                 socket.emit("gameroom_attempt_reconnect", {roomCode: storedRoomCode, password: storedPassword, userID: storedUserID}, ({success}) => {
-                    if(success) socket.emit("gameroom_requestPlayerNames", {roomCode})
-                    else {
+                    if(!success) {
                         navigate('/')
                         return
                     }
                 })
             }
+            /* If everything is successful, we have successfully joined the room. Now acquire the current room info */
+            socket.emit("gameroom_isHost", {roomCode}, ({host}) => {
+                setIsHost(host)
+            })
+            socket.emit("gameroom_requestPlayerNames", {roomCode})
+            socket.emit("gameroom_requestCurrentGameInfo", {roomCode}, ({gameName}) => {
+                setCurrGame(gameName)
+            })
             setRoomName(roomName)
         })
     // eslint-disable-next-line
@@ -66,7 +73,7 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClick={selectGame}/>
+            <GameSearchBar onClick={selectGame} isHost={isHost}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
 

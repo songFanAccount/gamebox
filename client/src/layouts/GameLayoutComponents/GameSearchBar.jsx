@@ -5,10 +5,10 @@ import { Button } from "@mui/material"
 import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 
-export default function GameSearchBar({onClick}) {
+export default function GameSearchBar({onClick, isHost}) {
     let gameButton = []
     gameButton = gamelist?.map(game => (
-        <GameButton key={game} gameName={game} onClick={onClick}/>
+        <GameButton key={game} gameName={game} onClick={onClick} isHost={isHost}/>
     ))
     return (
         <Box
