@@ -21,7 +21,10 @@ export default function GameSearchBar({onClickGame, onClickRecommend, currGame, 
         changeGameList(matchingGames)
     }, [searchedContent, changeGameList])
 
-    const toPlayNext = recommendedGame.map(game => (<GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={onClickRecommend} isHost={isHost}/>))
+    const [toPlayNext, setToPlayNext] = useState([])
+    useEffect(() =>{
+        setToPlayNext(recommendedGame.map(game => (<GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={onClickRecommend} isHost={isHost}/>)))
+    }, [recommendedGame])
 
     return (
         <Box
