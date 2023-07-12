@@ -164,7 +164,12 @@ module.exports = (io, socket) => {
         */
         if(room.hostID === socket.id) {
             const potentialHost = Object.keys(room.players)[0]
-            potentialHost ? room.hostID = potentialHost : delete rooms[roomCode]
+            if(potentialHost) {
+                room.hostID = potentialHost
+                io.to(potentialHost).emit('gameroom_newHost')
+            } else {
+                delete rooms[roomCode]
+            }
         }
         /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
         if(rooms.hasOwnProperty(roomCode)) {

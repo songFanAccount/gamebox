@@ -27,6 +27,9 @@ export default function GameLayout() {
         /* Switching to new game involves registering this room to the new game's event listeners */
         socket.emit('registerGameHandlers', {roomCode, gameName})
     }
+    socket.on('gameroom_newHost', () => {
+        setIsHost(true)
+    })
     useEffect(() => {
         socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
             if(!validCode) {
