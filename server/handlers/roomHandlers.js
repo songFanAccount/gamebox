@@ -23,7 +23,8 @@ module.exports = (io, socket) => {
             hostID: creatorID, 
             players: playersObj,
             game: null,
-            recentDisconnects: {}
+            recentDisconnects: {},
+            gameRecommendation: []
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -58,6 +59,18 @@ module.exports = (io, socket) => {
     function sendAnnouncementToRoom(roomCode, message) {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
+    function sendGameRecommendation(roomCode, gameList) {
+        io.to(roomCode).emit('gameroom_newRecommendation', {gameList})
+    }
+    socket.on('recommend-game', ({roomCode, gameName}) => {
+        const gameList = [...rooms[roomCode].gameRecommendation, gameName]
+        sendGameRecommendation(roomCode, gameList)
+    })
+    socket.on('cancel-game', ({roomCode, gameName}) => {
+        let gameList = rooms[roomCode].gameRecommendation
+        originalGameList.splice(originalGameList.indexOf(gameName), 1)
+        sendGameRecommendation(roomCode, gameList)
+    })
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
         if(isEmptyStr(creatorName)) creatorName = defaultUsername

@@ -5,17 +5,25 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClickGame, currGame, isHost}) {
+export default function GameSearchBar({onClickGame, currGame, isHost, roomCode}) {
+    const socket = global.socket
     // list of recommended games and functions to add or remove game from the list
     const [recommendedGame, setRecommendedGame] = useState([])
     const recommendGame = useCallback((gameName) => {
-        if (!recommendedGame.includes(gameName)) 
-            setRecommendedGame(prevRecommendedGame => [...prevRecommendedGame, gameName])
-    }, [recommendedGame])
+        console.log('adding to recommendation')
+        if (!recommendedGame.includes(gameName)) {
+            socket.emit('recommend-game', {roomCode, gameName});
+            console.log('added to recommendation');
+        }
+    }, [recommendedGame, roomCode, socket])
     const cancelRecommendGame = useCallback((gameName) => {
-        if (recommendedGame.includes(gameName)) 
-            setRecommendedGame(prevRecommendedGame => {prevRecommendedGame.splice(prevRecommendedGame.indexOf(gameName), 1); return [...prevRecommendedGame]});
-    }, [recommendedGame])
+        if (recommendedGame.includes(gameName)) socket.emit('cancel-game', {roomCode, gameName})
+    }, [recommendedGame, roomCode, socket])
+
+    socket.on('gameroom_newRecommendation', ({newRocommendation}) => {
+        setRecommendedGame(newRocommendation)
+        console.log('set new recommendation list')
+    })
 
     // buttons those are placed in the to-play-next section
     const [toPlayNext, setToPlayNext] = useState([])
