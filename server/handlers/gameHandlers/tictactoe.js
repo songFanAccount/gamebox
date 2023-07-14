@@ -1,8 +1,7 @@
 /* Need to store multiple game instances so that many rooms can play their own game */
 let games = {}
 function initNewGameObj(roomCode) {
-    // if(games.hasOwnProperty(roomCode)) throw new Error('initGameObj: This room already has a game instance running!')
-    console.log(`Initiating new game instance for room ${roomCode}`)
+    if(games.hasOwnProperty(roomCode)) return // This room is already playing this game
     games[roomCode] = {
         turn: -1,
         numEmptySpaces: 9,
@@ -69,6 +68,5 @@ module.exports = (io, socket, room) => {
         : {rowIndex, colIndex, winner: 0, draw}
         io.to(room).emit('tictactoe-clickResponse', response)
         game.turn *= -1
-        console.log(game)
     })
 }

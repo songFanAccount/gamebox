@@ -20,16 +20,17 @@ const registerTictactoeHandlers = require('./handlers/gameHandlers/tictactoe')
 
 io.on('connection', (socket) => {
     registerRoomHandlers(io, socket)
-    socket.on('registerGameHandlers', ({roomCode, gameName}) => {
-        switch(gameName) {
+    socket.on('registerGameHandlers', ({roomCode, gamename}) => {
+        switch(gamename) {
             case 'tictactoe':
                 registerTictactoeHandlers(io, socket, roomCode)
                 break
             case 'sudoku':
                 break
             default:
-                throw new Error('registerRoomHandlers: Unsupported game name -> ' + gameName)
+                throw new Error('registerRoomHandlers: Unsupported game name -> ' + gamename)
         }
+        
     })
 })
 

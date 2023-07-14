@@ -2,6 +2,7 @@ const { generateAlphanumericCode, isEmptyStr } = require('../generalHelpers')
 
 const codeLen = 6
 const rooms = {}
+global.rooms = rooms
 const socketidToRoom = {}
 const defaultUsername = 'Anon Andy'
 
@@ -22,7 +23,7 @@ module.exports = (io, socket) => {
             password: isEmptyStr(password) ? null : password,
             hostID: creatorID, 
             players: playersObj,
-            game: null,
+            gamename: null,
             recentDisconnects: {}
         }
         socketidToRoom[creatorID] = code
@@ -94,8 +95,6 @@ module.exports = (io, socket) => {
 
     })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {
-        console.log('checking if is host')
-        console.log(rooms[roomCode], socket.id)
         const roomHostID = rooms[roomCode]?.hostID
         if(!roomHostID) return
         callback({host: roomHostID === socket.id})
@@ -103,8 +102,16 @@ module.exports = (io, socket) => {
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
         updatePlayerList(roomCode)
     })
-    socket.on('gameroom_requestCurrentGameInfo', (callback) => {
-        console.log('requesting current game info')
+    socket.on('gameroom_setGameName', ({roomCode, gameName}) => {
+        rooms[roomCode].gamename = gameName
+    })
+    socket.on('gameroom_curGameName', ({roomCode}, callback) => {
+        const gamename = rooms[roomCode]?.gamename
+        callback({gamename})
+    })
+    socket.on('registerGameHandlers', ({roomCode, gamename}) => {
+        rooms[roomCode].gamename = gamename
+        io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
