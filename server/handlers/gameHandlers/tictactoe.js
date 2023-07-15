@@ -19,21 +19,15 @@ module.exports = (io, socket, room) => {
             return
         }
         games[roomCode] = {
-            lastRowIndex: -1,
-            lastColIndex: -1,
-            turn: -1,
+            lastRowIndex: -1, lastColIndex: -1, turn: -1,
             numEmptySpaces: 9,
             board: [
                 [0, 0, 0],
                 [0, 0, 0],
                 [0, 0, 0]
             ],
-            winner: 0,
-            draw: false,
-            rowWin: false, 
-            colWin: false, 
-            leftDiagWin: false, 
-            rightDiagWin: false,
+            winner: 0, draw: false,
+            rowWin: false, colWin: false, leftDiagWin: false, rightDiagWin: false,
             stats: {}
         }
     }
