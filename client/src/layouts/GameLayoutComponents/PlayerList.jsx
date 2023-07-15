@@ -13,7 +13,6 @@ export default function PlayerList({roomCode}) {
     // eslint-disable-next-line
     }, [])
     socket.on('gameroom_getPlayerNames', ({hostName, playersNames}) => {
-        console.log(hostName, playersNames)
         setHost(hostName)
         setPlayers(playersNames)
     })

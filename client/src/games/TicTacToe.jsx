@@ -19,7 +19,12 @@ export default function TicTacToe() {
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
-    socket.on('tictactoe-newGame', () => {
+    socket.on('tictactoe_setGameState', ({game}) => {
+        if(!game) return
+        setBoard(game.board)
+        setTurn(game.turn)
+    })
+    socket.on('tictactoe_newGame', () => {
         setBoard([
             [0, 0, 0],
             [0, 0, 0],
@@ -33,7 +38,7 @@ export default function TicTacToe() {
         setLeftDiagWin(false)
         setRightDiagWin(false)
     })
-    socket.on('tictactoe-clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
+    socket.on('tictactoe_clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
         board.map((row, rIndex) => (
             rIndex === rowIndex 
@@ -53,10 +58,10 @@ export default function TicTacToe() {
         setTurn(-turn)
     })
     function clickSquare(rowIndex, colIndex) {
-        socket.emit('tictactoe-click', {rowIndex, colIndex})
+        socket.emit('tictactoe_click', {rowIndex, colIndex})
     }
     function requestNewGame() {
-        socket.emit('tictactoe-newGameReq')
+        socket.emit('tictactoe_newGameReq')
     }
     const squareWidth = 100
     const Element = ({el}) => {

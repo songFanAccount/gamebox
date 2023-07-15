@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
@@ -7,8 +7,6 @@ import GameWindow from './GameLayoutComponents/GameWindow'
 import UserInteractionBar from './GameLayoutComponents/UserInteractionBar'
 
 export default function GameLayout() {
-    const initTime = useMemo(() => Date().toLocaleString(), [])
-    console.log(initTime)
 
     const socket = global.socket
     const navigate = useNavigate()
@@ -60,6 +58,7 @@ export default function GameLayout() {
             socket.emit("gameroom_requestPlayerNames", {roomCode})
             socket.emit("gameroom_curGameName", {roomCode}, ({gamename}) => {
                 setCurrGame(gamename)
+                if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
             })
             setRoomName(roomName)
         })

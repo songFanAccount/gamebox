@@ -1,19 +1,5 @@
 /* Need to store multiple game instances so that many rooms can play their own game */
 let games = {}
-function initNewGameObj(roomCode) {
-    if(games.hasOwnProperty(roomCode)) return // This room is already playing this game
-    games[roomCode] = {
-        turn: -1,
-        numEmptySpaces: 9,
-        board: [
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0]
-        ],
-        stats: {}
-    }
-    console.log(games)
-}
 function newGame(room) {
     const game = games[room]
     if(!game) throw new Error('Unexpected newGame request from room ' + room)
@@ -26,13 +12,31 @@ function newGame(room) {
     ]
 }
 module.exports = (io, socket, room) => {
+    function initNewGameObj(roomCode) {
+        if(games.hasOwnProperty(roomCode)) {
+            const game = games[room]
+            io.to(socket.id).emit('tictactoe_setGameState', {game})
+            return
+        }
+        games[roomCode] = {
+            turn: -1,
+            numEmptySpaces: 9,
+            board: [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            stats: {}
+        }
+    }
     initNewGameObj(room)
-    socket.on('tictactoe-newGameReq', () => {
+    socket.on('tictactoe_newGameReq', () => {
         newGame(room)
-        io.to(room).emit('tictactoe-newGame')
+        io.to(room).emit('tictactoe_newGame')
     })
-    socket.on('tictactoe-click', ({rowIndex, colIndex}) => {
+    socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]
+        if(!game) return
         if(game.numEmptySpaces === 0) throw new Error('TicTacToe: Unexpected error, numEmptySpaces === 0!')
         game.board[rowIndex][colIndex] = game.turn
         game.numEmptySpaces--
@@ -66,7 +70,7 @@ module.exports = (io, socket, room) => {
         const response = win 
         ? {rowIndex, colIndex, winner: game.turn, rowWin, colWin, leftDiagWin, rightDiagWin}
         : {rowIndex, colIndex, winner: 0, draw}
-        io.to(room).emit('tictactoe-clickResponse', response)
+        io.to(room).emit('tictactoe_clickResponse', response)
         game.turn *= -1
     })
 }
