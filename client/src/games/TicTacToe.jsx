@@ -23,6 +23,13 @@ export default function TicTacToe() {
         if(!game) return
         setBoard(game.board)
         setTurn(game.turn)
+        if(game.winner !== 0) {
+            if(game.rowWin) setRowWin(game.lastRowIndex)
+            if(game.colWin) setColWin(game.lastColIndex)
+            setLeftDiagWin(game.leftDiagWin)
+            setRightDiagWin(game.rightDiagWin)
+            setWinner(game.winner)
+        } else if(game.draw) setDraw(true)
     })
     socket.on('tictactoe_newGame', () => {
         setBoard([

@@ -19,6 +19,8 @@ module.exports = (io, socket, room) => {
             return
         }
         games[roomCode] = {
+            lastRowIndex: -1,
+            lastColIndex: -1,
             turn: -1,
             numEmptySpaces: 9,
             board: [
@@ -26,6 +28,12 @@ module.exports = (io, socket, room) => {
                 [0, 0, 0],
                 [0, 0, 0]
             ],
+            winner: 0,
+            draw: false,
+            rowWin: false, 
+            colWin: false, 
+            leftDiagWin: false, 
+            rightDiagWin: false,
             stats: {}
         }
     }
@@ -38,6 +46,8 @@ module.exports = (io, socket, room) => {
         const game = games[room]
         if(!game) return
         if(game.numEmptySpaces === 0) throw new Error('TicTacToe: Unexpected error, numEmptySpaces === 0!')
+        game.lastRowIndex = rowIndex
+        game.lastColIndex = colIndex
         game.board[rowIndex][colIndex] = game.turn
         game.numEmptySpaces--
         /* 
@@ -63,14 +73,19 @@ module.exports = (io, socket, room) => {
         const draw = !win && game.numEmptySpaces === 0
         /* Update game statistics if won */
         if(win) {
+            game.winner = game.turn
+            game.rowWin = rowWin
+            game.colWin = colWin
+            game.leftDiagWin = leftDiagWin
+            game.rightDiagWin = rightDiagWin
         }
         /* If not, check if a draw has occurred (no more empty spaces) */
-        else if(draw) {}
+        else if(draw) game.draw = true
         /* Send response to each client in room */
         const response = win 
         ? {rowIndex, colIndex, winner: game.turn, rowWin, colWin, leftDiagWin, rightDiagWin}
         : {rowIndex, colIndex, winner: 0, draw}
         io.to(room).emit('tictactoe_clickResponse', response)
-        game.turn *= -1
+        if(!win && !draw) game.turn *= -1
     })
 }
