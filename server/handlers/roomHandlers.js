@@ -102,16 +102,14 @@ module.exports = (io, socket) => {
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
         updatePlayerList(roomCode)
     })
-    socket.on('gameroom_setGameName', ({roomCode, gameName}) => {
-        rooms[roomCode].gamename = gameName
+    socket.on('gameroom_changeGame', ({roomCode, gamename}) => {
+        rooms[roomCode].gamename = gamename
+        console.log(rooms)
+        io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_curGameName', ({roomCode}, callback) => {
         const gamename = rooms[roomCode]?.gamename
         callback({gamename})
-    })
-    socket.on('registerGameHandlers', ({roomCode, gamename}) => {
-        rooms[roomCode].gamename = gamename
-        io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName

@@ -36,6 +36,10 @@ module.exports = (io, socket, room) => {
         newGame(room)
         io.to(room).emit('tictactoe_newGame')
     })
+    socket.on('tictactoe_terminate', ({roomCode}) => {
+        if(!games.hasOwnProperty(roomCode)) return
+        delete games[roomCode]
+    })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]
         if(!game) return

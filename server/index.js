@@ -21,6 +21,7 @@ const registerTictactoeHandlers = require('./handlers/gameHandlers/tictactoe')
 io.on('connection', (socket) => {
     registerRoomHandlers(io, socket)
     socket.on('registerGameHandlers', ({roomCode, gamename}) => {
+        console.log(`registerGameHandlers called, roomCode: ${roomCode}, gamename: ${gamename}`)
         switch(gamename) {
             case 'tictactoe':
                 registerTictactoeHandlers(io, socket, roomCode)
