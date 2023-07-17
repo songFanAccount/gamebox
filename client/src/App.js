@@ -9,6 +9,7 @@ import InfoPageLayout from './infoPages/InfoPageLayout';
 import About from './infoPages/About';
 import Contact from './infoPages/Contact';
 import Temp from './Temp';
+import { useEffect } from 'react';
 const socket = io.connect('http://localhost:3001')
 global.socket = socket
 socket.on('update_localStorage_room', ({roomCode, password, userID}) => {

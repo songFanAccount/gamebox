@@ -16,21 +16,23 @@ export default function GameLayout() {
     const [currGame, setCurrGame] = useState('')
     function selectGame(gamename) {
         /* If clicking on the same game, do nothing */
-        if(gamename === currGame) return
+        if(!gamename || gamename === currGame) return
         /* Only the host should be able to call this, should open up a modal to confirm changing game, as all current game progress will be deleted. */
 
         /* If successful, should terminate current game properly before switching to new game. */
-        socket.emit(`${gamename}-terminate`)
-        /* Switching to new game involves registering this room to the new game's event listeners */
-        socket.emit('registerGameHandlers', {roomCode, gamename})
+        socket.emit(`${currGame}_terminate`, {roomCode})
+        /* Change game on server-side, which will notify all other people in the room */
+        socket.emit('gameroom_changeGame', {roomCode, gamename})
     }
-    socket.on('gameroom_newHost', () => {
-        setIsHost(true)
-    })
-    socket.on('gameroom_newGame', ({gamename}) => {
-        setCurrGame(gamename)
-    })
     useEffect(() => {
+        socket.on('gameroom_newHost', () => {
+            setIsHost(true)
+        })
+        socket.on('gameroom_newGame', ({gamename}) => {
+            console.log('newGame called')
+            setCurrGame(gamename)
+            if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
+        })
         socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
             if(!validCode) {
                 navigate('/') // If room code isn't valid, just go back home
