@@ -10,18 +10,18 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
     // list of recommended games and functions to add or remove game from the list
     const [recommendedGame, setRecommendedGame] = useState([])
     const recommendGame = useCallback((gameName) => {
-        console.log('adding to recommendation')
-        if (!recommendedGame.includes(gameName)) {
-            socket.emit('recommend-game', {roomCode, gameName});
-            console.log('added to recommendation');
-        }
+        if (!recommendedGame.includes(gameName)) socket.emit('recommend-game', {roomCode, gameName})
     }, [recommendedGame, roomCode, socket])
     const cancelRecommendGame = useCallback((gameName) => {
         if (recommendedGame.includes(gameName)) socket.emit('cancel-game', {roomCode, gameName})
     }, [recommendedGame, roomCode, socket])
 
     socket.on('gameroom_newRecommendation', (newRocommendation) => {
-        setRecommendedGame(newRocommendation.gameList)
+        setRecommendedGame([...recommendedGame, newRocommendation.gameName])
+    })
+
+    socket.on('gameroom_cancelRecommendation', (newRocommendation) => {
+        setRecommendedGame((prevRecommendedGame) => prevRecommendedGame.filter((game) => game !== newRocommendation.gameName))
     })
 
     // buttons those are placed in the to-play-next section
