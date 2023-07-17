@@ -60,16 +60,15 @@ module.exports = (io, socket) => {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
     function sendGameRecommendation(roomCode, gameList) {
-        console.log(gameList)
         io.to(roomCode).emit('gameroom_newRecommendation', {gameList})
     }
     socket.on('recommend-game', ({roomCode, gameName}) => {
-        const gameList = [...rooms[roomCode].gameRecommendation, gameName]
+        let gameList = [...rooms[roomCode].gameRecommendation, gameName]
         sendGameRecommendation(roomCode, gameList)
     })
     socket.on('cancel-game', ({roomCode, gameName}) => {
         let gameList = rooms[roomCode].gameRecommendation
-        originalGameList.splice(originalGameList.indexOf(gameName), 1)
+        gameList.splice(gameList.indexOf(gameName), 1)
         sendGameRecommendation(roomCode, gameList)
     })
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {

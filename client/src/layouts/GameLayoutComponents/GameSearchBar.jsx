@@ -20,16 +20,13 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
         if (recommendedGame.includes(gameName)) socket.emit('cancel-game', {roomCode, gameName})
     }, [recommendedGame, roomCode, socket])
 
-    socket.on('gameroom_newRecommendation', ({newRocommendation}) => {
-        console.log('set new recommendation list ' + newRocommendation)
-        setRecommendedGame(newRocommendation)
-        console.log('set new recommendation list ' + newRocommendation)
+    socket.on('gameroom_newRecommendation', (newRocommendation) => {
+        setRecommendedGame(newRocommendation.gameList)
     })
 
     // buttons those are placed in the to-play-next section
     const [toPlayNext, setToPlayNext] = useState([])
     useEffect(() => {
-        console.log(recommendedGame)
         setToPlayNext(recommendedGame.map(game => (
             <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>
         )))
