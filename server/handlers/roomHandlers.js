@@ -58,12 +58,6 @@ module.exports = (io, socket) => {
     function sendAnnouncementToRoom(roomCode, message) {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
-    socket.on('recommend-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_newRecommendation', {gameName})
-    })
-    socket.on('cancel-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_cancelRecommendation', {gameName})
-    })
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         console.log('Attempting to create new room with name: ' + roomName)
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
@@ -181,5 +175,11 @@ module.exports = (io, socket) => {
         if(rooms.hasOwnProperty(roomCode)) {
             updatePlayerList(roomCode)
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
+    })
+    socket.on('recommend-game', ({roomCode, gameName}) => {
+        io.to(roomCode).emit('gameroom_newRecommendation', {gameName})
+    })
+    socket.on('cancel-game', ({roomCode, gameName}) => {
+        io.to(roomCode).emit('gameroom_cancelRecommendation', {gameName})
     })
 }
