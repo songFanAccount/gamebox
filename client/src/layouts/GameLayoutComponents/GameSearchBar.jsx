@@ -25,6 +25,8 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
     })
 
     // buttons those are placed in the to-play-next section
+    // they are essentially list of recommended games.
+    // the difference with state recommendedGame is it's wrapped with GameButton.
     const [toPlayNext, setToPlayNext] = useState([])
     useEffect(() => {
         setToPlayNext(recommendedGame.map(game => (
