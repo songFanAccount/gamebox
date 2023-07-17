@@ -183,4 +183,10 @@ module.exports = (io, socket) => {
             updatePlayerList(roomCode)
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
     })
+    socket.on('recommend-game', ({roomCode, gameName}) => {
+        io.to(roomCode).emit('gameroom_newRecommendation', {gameName})
+    })
+    socket.on('cancel-game', ({roomCode, gameName}) => {
+        io.to(roomCode).emit('gameroom_cancelRecommendation', {gameName})
+    })
 }
