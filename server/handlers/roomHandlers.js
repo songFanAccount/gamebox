@@ -60,6 +60,7 @@ module.exports = (io, socket) => {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
     function sendGameRecommendation(roomCode, gameList) {
+        console.log(gameList)
         io.to(roomCode).emit('gameroom_newRecommendation', {gameList})
     }
     socket.on('recommend-game', ({roomCode, gameName}) => {
