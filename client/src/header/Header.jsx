@@ -1,10 +1,18 @@
 import { Stack } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import GBLinkWrapper from '../components/GBLinkWrapper'
-import { GBText } from '../components/generalComponents'
+import { GBStandardConfirmModal, GBText } from '../components/generalComponents'
 import HeaderNav from './HeaderNav'
 
 export default function Header() {
+    const path = useLocation().pathname
+    const [confirmModalOpen, setOpen] = useState(false)
+    const inGameroom = path.startsWith('/game')
+    function openConfirmModal() {
+        console.log('Opening confirm modal')
+        setOpen(true)
+    }
     return (
         <Stack direction="row" justifyContent="space-between" alignItems="center"
             sx={{
@@ -14,7 +22,15 @@ export default function Header() {
                 borderBottom: 1, borderColor: '#FFFFFF', boxSizing: 'border-box'
             }}
         >
-            <GBLinkWrapper to="/" underline={false}>
+            <GBStandardConfirmModal
+                open={confirmModalOpen}
+                onClose={() => setOpen(false)}
+                title="Are you sure?"
+                desc="This action will cause you to leave the current room."
+            >
+                
+            </GBStandardConfirmModal>
+            <GBLinkWrapper to="/" underline={false} interruptFunc={inGameroom && openConfirmModal}>
                 <GBText text="GameBox" fontFamily="Braah One" fs={40} ml={4}/>
             </GBLinkWrapper>
             <HeaderNav/>
