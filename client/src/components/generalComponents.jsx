@@ -1,5 +1,6 @@
-import { Box, Button, IconButton, InputAdornment, InputBase, Modal, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, InputBase, Modal, Stack, TextField, Typography, Link } from "@mui/material";
 import { useState } from "react";
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
@@ -192,7 +193,8 @@ export function GBModalWrapper({open, onClose, children}) {
 
 export function GBStandardConfirmModal({open, onClose, 
                                         title, desc, 
-                                        cancelText="Cancel", confirmText="Confirm"}) {
+                                        cancelText="Cancel", confirmText="Confirm",
+                                        cancelFunc, confirmFunc}) {
     return (
         <GBModalWrapper
             open={open}
@@ -200,7 +202,7 @@ export function GBStandardConfirmModal({open, onClose,
         >
             <Stack
                 direction="column"
-                rowGap={2}
+                rowGap={3}
             >
                 <GBText invert fontFamily="Montserrat" text={title}/>
                 <GBText invert fontFamily="Montserrat" fs={16} text={desc}/>
@@ -211,17 +213,73 @@ export function GBStandardConfirmModal({open, onClose,
                     <GBButton
                         invert
                         fontFamily="Montserrat" fs={16}
+                        onClick={cancelFunc}
                     >
                         {cancelText}
                     </GBButton>
                     <GBButton
                         invert
                         fontFamily="Montserrat" fs={16}
+                        onClick={confirmFunc}
                     >
                         {confirmText}
                     </GBButton>
                 </Stack>
             </Stack>
         </GBModalWrapper>
+    )
+}
+
+export function GBLinkWrapper({to, children, fs=16, underline=true, interruptFunc=null}) {
+    function onClick(event) {
+        if(interruptFunc) {
+            event.preventDefault()
+            interruptFunc(to)
+        } else {
+            window.scrollTo(0,0)
+        }
+    }
+    return (
+        <Link
+            component={RouterLink}
+            to={to}
+            onClick={(e) => onClick(e)}
+            sx={{
+                color: '#FFFFFF',
+                fontFamily: 'Orbit', fontSize: fs,
+                textDecoration: 'none',
+                textUnderlineOffset: 4,
+                '&:hover': {
+                    textDecoration: underline ? 'underline' : 'none'
+                }
+            }}
+        >
+            {children}
+        </Link>
+    )
+}
+
+export function GBModalLinkWrapper({to, children, fs=16, underline=true,
+                                    title="Are you sure?", desc}) {
+    const [modalOpen, setModalOpen] = useState(false)
+    const navigate = useNavigate()
+    function confirmModal() {
+        setModalOpen(false)
+        navigate(to)
+    }
+    return (
+        <>
+            <GBStandardConfirmModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                title={title}
+                desc={desc}
+                cancelFunc={() => setModalOpen(false)}
+                confirmFunc={confirmModal}
+            />
+            <GBLinkWrapper to={to} fs={fs} underline={underline} interruptFunc={() => setModalOpen(true)}>
+                {children}
+            </GBLinkWrapper>
+        </>
     )
 }
