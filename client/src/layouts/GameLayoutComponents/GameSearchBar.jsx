@@ -24,6 +24,10 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
         setRecommendedGame(newRocommendation.toPlayNext)
     })
 
+    socket.on('setCurrRecommendation', (currRecommendation) => {
+        setRecommendedGame(currRecommendation.toPlayNext)
+    })
+
     // buttons those are placed in the to-play-next section
     // they are essentially list of recommended games.
     // the difference with state recommendedGame is it's wrapped with GameButton.
