@@ -64,7 +64,6 @@ export default function GameLayout() {
                 if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
             })
             setRoomName(roomName)
-            console.log('got curr recommendation ' + toPlayNext)
             setCurrGameRecommendation(toPlayNext)
         })
     // eslint-disable-next-line

@@ -182,13 +182,17 @@ module.exports = (io, socket) => {
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
     })
     socket.on('recommend-game', ({roomCode, gameName}) => {
-        rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
-        const toPlayNext = rooms[roomCode].toPlayNext
-        io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+        if (!rooms[roomCode].toPlayNext.includes(gameName)) {
+            rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
+            const toPlayNext = rooms[roomCode].toPlayNext
+            io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+        }
     })
     socket.on('cancel-game', ({roomCode, gameName}) => {
-        rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
-        const toPlayNext = rooms[roomCode].toPlayNext
-        io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
+        if (rooms[roomCode].toPlayNext.includes(gameName)) {
+            rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
+            const toPlayNext = rooms[roomCode].toPlayNext
+            io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
+        }
     })
 }
