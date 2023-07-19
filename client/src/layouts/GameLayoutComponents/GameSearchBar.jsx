@@ -5,15 +5,17 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClickGame, currGame, isHost, roomCode}) {
+export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, currGameRecommendation}) {
     const socket = global.socket
     // list of recommended games and functions to add or remove game from the list
-    const [recommendedGame, setRecommendedGame] = useState([])
+    // console.log(currGameRecommendation)
+    const [recommendedGame, setRecommendedGame] = useState(currGameRecommendation)
+    console.log('registerred current game recommendation ' + currGameRecommendation)
     const recommendGame = useCallback((gameName) => {
-        if (!recommendedGame.includes(gameName)) socket.emit('recommend-game', {roomCode, gameName})
+        if (!recommendedGame?.includes(gameName)) socket.emit('recommend-game', {roomCode, gameName})
     }, [recommendedGame, roomCode, socket])
     const cancelRecommendGame = useCallback((gameName) => {
-        if (recommendedGame.includes(gameName)) socket.emit('cancel-game', {roomCode, gameName})
+        if (recommendedGame?.includes(gameName)) socket.emit('cancel-game', {roomCode, gameName})
     }, [recommendedGame, roomCode, socket])
 
     socket.on('gameroom_newRecommendation', (newRocommendation) => {
@@ -24,16 +26,15 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
         setRecommendedGame(newRocommendation.toPlayNext)
     })
 
-    socket.on('setCurrRecommendation', (currRecommendation) => {
-        setRecommendedGame(currRecommendation.toPlayNext)
-    })
-
     // buttons those are placed in the to-play-next section
     // they are essentially list of recommended games.
     // the difference with state recommendedGame is it's wrapped with GameButton.
-    const [toPlayNext, setToPlayNext] = useState([])
+    const [toPlayNext, setToPlayNext] = useState(recommendedGame?.map(game => (
+        <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>
+    )))
+    // console.log('creating button toPlayNext ' +toPlayNext)
     useEffect(() => {
-        setToPlayNext(recommendedGame.map(game => (
+        setToPlayNext(recommendedGame?.map(game => (
             <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>
         )))
     }, [recommendedGame, onClickGame, cancelRecommendGame, isHost])

@@ -93,8 +93,6 @@ module.exports = (io, socket) => {
         socket.join(code)
         joinRoom(code, userName, callback, socket.id)
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
-        const toPlayNext = rooms[code].toPlayNext
-        io.to(socket.id).emit('setCurrRecommendation', {toPlayNext})
     })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {
         const roomHostID = rooms[roomCode]?.hostID
@@ -125,7 +123,8 @@ module.exports = (io, socket) => {
         }
         const hasThisUser = room.players.hasOwnProperty(socket.id)
         const roomName = room.roomName
-        callback({validCode, hasThisUser, roomName})
+        const toPlayNext = room.toPlayNext
+        callback({validCode, hasThisUser, roomName, toPlayNext})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
         /* Assumes room code belongs to an existing room */
