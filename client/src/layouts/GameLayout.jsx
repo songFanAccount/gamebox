@@ -14,6 +14,7 @@ export default function GameLayout() {
     const [isHost, setIsHost] = useState(false)
     const [roomName, setRoomName] = useState('')
     const [currGame, setCurrGame] = useState('')
+    const [currGameRecommendation, setCurrGameRecommendation] = useState([])
     function selectGame(gamename) {
         /* If clicking on the same game, do nothing */
         if(!gamename || gamename === currGame) return
@@ -33,7 +34,7 @@ export default function GameLayout() {
             setCurrGame(gamename)
             if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
         })
-        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
+        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName, toPlayNext}) => {
             if(!validCode) {
                 navigate('/') // If room code isn't valid, just go back home
                 return
@@ -63,6 +64,7 @@ export default function GameLayout() {
                 if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
             })
             setRoomName(roomName)
+            setCurrGameRecommendation(toPlayNext)
         })
     // eslint-disable-next-line
     }, [])
@@ -79,7 +81,7 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClickGame={selectGame} currGame={currGame} isHost={isHost} roomCode={roomCode}/>
+            <GameSearchBar onClickGame={selectGame} currGame={currGame} isHost={isHost} roomCode={roomCode} currGameRecommendation={currGameRecommendation}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
         </Box>

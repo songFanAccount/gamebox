@@ -5,34 +5,31 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClickGame, currGame, isHost, roomCode}) {
+export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, currGameRecommendation}) {
     const socket = global.socket
     // list of recommended games and functions to add or remove game from the list
-    const [recommendedGame, setRecommendedGame] = useState([])
     const recommendGame = useCallback((gameName) => {
-        if (!recommendedGame.includes(gameName)) socket.emit('recommend-game', {roomCode, gameName})
-    }, [recommendedGame, roomCode, socket])
+        socket.emit('recommend-game', {roomCode, gameName})
+    }, [roomCode, socket])
     const cancelRecommendGame = useCallback((gameName) => {
-        if (recommendedGame.includes(gameName)) socket.emit('cancel-game', {roomCode, gameName})
-    }, [recommendedGame, roomCode, socket])
+        socket.emit('cancel-game', {roomCode, gameName})
+    }, [roomCode, socket])
+    function covert2Button(gameList) {
+        return gameList?.map(game => (<GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>))
+    }
 
+    const [recommendedGame, setRecommendedGame] = useState(covert2Button(currGameRecommendation))
+    useEffect(()=>{
+        setRecommendedGame(covert2Button(currGameRecommendation))
+    }, [currGameRecommendation])
+    
     socket.on('gameroom_newRecommendation', (newRocommendation) => {
-        setRecommendedGame([...recommendedGame, newRocommendation.gameName])
+        setRecommendedGame(covert2Button(newRocommendation.toPlayNext))
     })
 
     socket.on('gameroom_cancelRecommendation', (newRocommendation) => {
-        setRecommendedGame((prevRecommendedGame) => prevRecommendedGame.filter((game) => game !== newRocommendation.gameName))
+        setRecommendedGame(covert2Button(newRocommendation.toPlayNext))
     })
-
-    // buttons those are placed in the to-play-next section
-    // they are essentially list of recommended games.
-    // the difference with state recommendedGame is it's wrapped with GameButton.
-    const [toPlayNext, setToPlayNext] = useState([])
-    useEffect(() => {
-        setToPlayNext(recommendedGame.map(game => (
-            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>
-        )))
-    }, [recommendedGame, onClickGame, cancelRecommendGame, isHost])
 
     // With a given list of games searched, create game buttons.
     const [gameButton, setGameButton] = useState([])
@@ -89,10 +86,9 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
                 sx={{
                     height: '50%'
                 }}
-                // key={recommendedGame}
             >
                 <Typography fontFamily='orbit'>To play next</Typography>
-                {toPlayNext}
+                {recommendedGame}
             </Box>
         </Box>
     )
