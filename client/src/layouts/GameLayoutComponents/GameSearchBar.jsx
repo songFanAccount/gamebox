@@ -17,11 +17,11 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
     }, [recommendedGame, roomCode, socket])
 
     socket.on('gameroom_newRecommendation', (newRocommendation) => {
-        setRecommendedGame([...recommendedGame, newRocommendation.gameName])
+        setRecommendedGame(newRocommendation.toPlayNext)
     })
 
     socket.on('gameroom_cancelRecommendation', (newRocommendation) => {
-        setRecommendedGame((prevRecommendedGame) => prevRecommendedGame.filter((game) => game !== newRocommendation.gameName))
+        setRecommendedGame(newRocommendation.toPlayNext)
     })
 
     // buttons those are placed in the to-play-next section
@@ -89,7 +89,6 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode})
                 sx={{
                     height: '50%'
                 }}
-                // key={recommendedGame}
             >
                 <Typography fontFamily='orbit'>To play next</Typography>
                 {toPlayNext}

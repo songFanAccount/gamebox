@@ -24,7 +24,8 @@ module.exports = (io, socket) => {
             hostID: creatorID, 
             players: playersObj,
             gamename: null,
-            recentDisconnects: {}
+            recentDisconnects: {},
+            toPlayNext: []
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -181,9 +182,13 @@ module.exports = (io, socket) => {
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
     })
     socket.on('recommend-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_newRecommendation', {gameName})
+        rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
+        const toPlayNext = rooms[roomCode].toPlayNext
+        io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
     })
     socket.on('cancel-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_cancelRecommendation', {gameName})
+        rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
+        const toPlayNext = rooms[roomCode].toPlayNext
+        io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
     })
 }
