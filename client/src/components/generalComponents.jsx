@@ -260,10 +260,12 @@ export function GBLinkWrapper({to, children, fs=16, underline=true, interruptFun
 }
 
 export function GBModalLinkWrapper({to, children, fs=16, underline=true,
-                                    title="Are you sure?", desc}) {
+                                    title="Are you sure?", desc,
+                                    confirmFunc}) {
     const [modalOpen, setModalOpen] = useState(false)
     const navigate = useNavigate()
     function confirmModal() {
+        if(confirmFunc) confirmFunc()
         setModalOpen(false)
         navigate(to)
     }

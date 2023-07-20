@@ -38,6 +38,40 @@ module.exports = (io, socket) => {
         sendAnnouncementToRoom(code, playerJoinMsg)
         callback({success: true})
     }
+    function leaveRoom(roomCode, socket) {
+        const room = rooms[roomCode]
+        if(!room) return
+        /* Check that the user actually is in our rooms object */
+        if(!room.players.hasOwnProperty(socket.id)) {
+            console.log("Specified room already doesn't have this player!")
+            return
+        }
+        /* Cache this player info in the recent disconnects */
+        room.recentDisconnects[socket.id] = room.players[socket.id]
+        /* Remove the user from this room */
+        const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
+        delete room.players[socket.id]
+        socket.leave(roomCode)
+        /* 
+        If the user is the host, then: 
+        - If there are still players in the room, reassign one of them to be host
+        - Otherwise, all players have left the room, close the room
+        */
+        if(room.hostID === socket.id) {
+            const potentialHost = Object.keys(room.players)[0]
+            if(potentialHost) {
+                room.hostID = potentialHost
+                io.to(potentialHost).emit('gameroom_newHost')
+            } else {
+                delete rooms[roomCode]
+            }
+        }
+        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
+        if(rooms.hasOwnProperty(roomCode)) {
+            updatePlayerList(roomCode)
+            sendAnnouncementToRoom(roomCode, `${userName} has left.`)
+        }
+    }
     function getPlayerInfoFromRoom(roomCode, playerID) {
         // AVI: room exists for the given room code, and the room has a player with the given player id
         return rooms[roomCode].players[playerID]
@@ -94,6 +128,9 @@ module.exports = (io, socket) => {
         joinRoom(code, userName, callback, socket.id)
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
     })
+    socket.on('leave_room', ({roomCode}) => {
+        leaveRoom(roomCode, socket)
+    })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {
         const roomHostID = rooms[roomCode]?.hostID
         if(!roomHostID) return
@@ -127,6 +164,7 @@ module.exports = (io, socket) => {
         callback({validCode, hasThisUser, roomName, toPlayNext})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
+        console.log('GR attempt reconnect called')
         /* Assumes room code belongs to an existing room */
         const room = rooms[roomCode]
         /* If room has a password, first check the password */
@@ -149,37 +187,7 @@ module.exports = (io, socket) => {
         console.log(`${socket.id} disconnected.`)
         /* Get the room the user belongs to, if none, do nothing */
         const roomCode = socketidToRoom[socket.id]
-        const room = rooms?.[roomCode]
-        if(!room) return
-        /* Check that the user actually is in our rooms object */
-        if(!room.players.hasOwnProperty(socket.id)) {
-            console.log("Specified room already doesn't have this player!")
-            return
-        }
-        /* Cache this player info in the recent disconnects */
-        room.recentDisconnects[socket.id] = room.players[socket.id]
-        /* Remove the user from this room */
-        const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
-        delete room.players[socket.id]
-        socket.leave(roomCode)
-        /* 
-        If the user is the host, then: 
-        - If there are still players in the room, reassign one of them to be host
-        - Otherwise, all players have left the room, close the room
-        */
-        if(room.hostID === socket.id) {
-            const potentialHost = Object.keys(room.players)[0]
-            if(potentialHost) {
-                room.hostID = potentialHost
-                io.to(potentialHost).emit('gameroom_newHost')
-            } else {
-                delete rooms[roomCode]
-            }
-        }
-        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
-        if(rooms.hasOwnProperty(roomCode)) {
-            updatePlayerList(roomCode)
-            sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
+        leaveRoom(roomCode, socket)
     })
     socket.on('recommend-game', ({roomCode, gameName}) => {
         if (!rooms[roomCode].toPlayNext.includes(gameName)) {
