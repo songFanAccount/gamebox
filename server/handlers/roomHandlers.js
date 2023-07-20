@@ -24,7 +24,8 @@ module.exports = (io, socket) => {
             hostID: creatorID, 
             players: playersObj,
             gamename: null,
-            recentDisconnects: {}
+            recentDisconnects: {},
+            toPlayNext: []
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -92,7 +93,6 @@ module.exports = (io, socket) => {
         socket.join(code)
         joinRoom(code, userName, callback, socket.id)
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
-
     })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {
         const roomHostID = rooms[roomCode]?.hostID
@@ -102,16 +102,13 @@ module.exports = (io, socket) => {
     socket.on('gameroom_requestPlayerNames', ({roomCode}) => {
         updatePlayerList(roomCode)
     })
-    socket.on('gameroom_setGameName', ({roomCode, gameName}) => {
-        rooms[roomCode].gamename = gameName
+    socket.on('gameroom_changeGame', ({roomCode, gamename}) => {
+        rooms[roomCode].gamename = gamename
+        io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_curGameName', ({roomCode}, callback) => {
         const gamename = rooms[roomCode]?.gamename
         callback({gamename})
-    })
-    socket.on('registerGameHandlers', ({roomCode, gamename}) => {
-        rooms[roomCode].gamename = gamename
-        io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_sendMsgToChat', ({roomCode, message}) => {
         const playerName = getPlayerInfoFromRoom(roomCode, socket.id).displayName
@@ -126,7 +123,8 @@ module.exports = (io, socket) => {
         }
         const hasThisUser = room.players.hasOwnProperty(socket.id)
         const roomName = room.roomName
-        callback({validCode, hasThisUser, roomName})
+        const toPlayNext = room.toPlayNext
+        callback({validCode, hasThisUser, roomName, toPlayNext})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
         /* Assumes room code belongs to an existing room */
@@ -184,9 +182,17 @@ module.exports = (io, socket) => {
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
     })
     socket.on('recommend-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_newRecommendation', {gameName})
+        if (!rooms[roomCode].toPlayNext.includes(gameName)) {
+            rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
+            const toPlayNext = rooms[roomCode].toPlayNext
+            io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+        }
     })
     socket.on('cancel-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_cancelRecommendation', {gameName})
+        if (rooms[roomCode].toPlayNext.includes(gameName)) {
+            rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
+            const toPlayNext = rooms[roomCode].toPlayNext
+            io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
+        }
     })
 }
