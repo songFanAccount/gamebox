@@ -42,10 +42,7 @@ module.exports = (io, socket) => {
         const room = rooms[roomCode]
         if(!room) return
         /* Check that the user actually is in our rooms object */
-        if(!room.players.hasOwnProperty(socket.id)) {
-            console.log("Specified room already doesn't have this player!")
-            return
-        }
+        if(!room.players.hasOwnProperty(socket.id)) return
         /* Cache this player info in the recent disconnects */
         room.recentDisconnects[socket.id] = room.players[socket.id]
         /* Remove the user from this room */
@@ -78,7 +75,7 @@ module.exports = (io, socket) => {
     }
     function updatePlayerList(roomCode) {
         const room = rooms[roomCode]
-        if(!room) {console.log('updatePlayerList: no room exist with this room code!'); return}
+        if(!room) return
         const hostID = room.hostID
         let hostName
         const playersNames = []
@@ -95,20 +92,17 @@ module.exports = (io, socket) => {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
-        console.log('Attempting to create new room with name: ' + roomName)
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
         /* Generate 6 letter alphanumeric room codes until one is valid (not already existing) */
         let roomCode
         do {
             roomCode = generateAlphanumericCode(codeLen)
         } while(roomInfo(roomCode))
-        console.log('Generated room with code: ' + roomCode)
         socket.join(roomCode)
         createRoom(roomCode, roomName, password, creatorName, socket.id)
         callback({success: true, code: roomCode})
     })
     socket.on('join-room', ({code, password, userName}, callback) => {
-        console.log('Attemping to join room with code: ' + code + ', password: ' + password)
         if(isEmptyStr(userName)) userName = defaultUsername
         let errorMsg = null
         /* Code validation */
@@ -164,7 +158,6 @@ module.exports = (io, socket) => {
         callback({validCode, hasThisUser, roomName, toPlayNext})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
-        console.log('GR attempt reconnect called')
         /* Assumes room code belongs to an existing room */
         const room = rooms[roomCode]
         /* If room has a password, first check the password */

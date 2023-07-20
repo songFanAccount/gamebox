@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { motion } from "framer-motion";
 import { GBButton, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';

@@ -21,6 +21,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     const [recommendedGame, setRecommendedGame] = useState(covert2Button(currGameRecommendation))
     useEffect(()=>{
         setRecommendedGame(covert2Button(currGameRecommendation))
+    // eslint-disable-next-line
     }, [currGameRecommendation])
     
     socket.on('gameroom_newRecommendation', (newRocommendation) => {
@@ -37,6 +38,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
         setGameButton(games?.map(game => (
             <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={recommendGame} isHost={isHost}/>
         )))
+    // eslint-disable-next-line
     }, [onClickGame, recommendGame, isHost])
 
     // Whenever user input is changed, search gamelist with modified input.

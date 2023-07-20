@@ -30,7 +30,6 @@ export default function Chat({roomCode}) {
     const Announcement = ({msg}) => { return <GBText color='#B3B3B3' fs={msgFS} text={msg}/> }
     socket.on('gameroom_newChatMsg', ({message, playerName}) => {
         addMessage(<Message playerName={playerName} msg={message}/>)
-        console.log('new message is ' + message)
     })
     socket.on('gameroom_newChatAnnouncement', ({message}) => {
         addMessage(<Announcement msg={message}/>)
