@@ -72,7 +72,8 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
             <Box
                 sx={{
                     borderBottom: 1,
-                    height: '50%'
+                    height: '50%',
+                    overflowY: 'auto'
                 }}
             >
                 <Box
@@ -86,7 +87,8 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
             </Box>
             <Box
                 sx={{
-                    height: '50%'
+                    height: '50%',
+                    overflowY: 'auto'
                 }}
             >
                 <GBText text={'To play next'} fs={16} ml={0.5}/>
