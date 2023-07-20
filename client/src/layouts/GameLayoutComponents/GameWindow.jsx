@@ -22,7 +22,16 @@ export default function GameWindow({roomCode, roomName, gameName}) {
                     mt: 1
                 }}
             >
-                {game}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        height: '100%',
+                        pt: 5, // alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    {game}
+                </Box>
             </Box>
         </Box>
     )
