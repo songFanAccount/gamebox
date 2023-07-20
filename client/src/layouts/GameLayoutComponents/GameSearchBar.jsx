@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useCallback } from "react"
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 
 import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
-import { GBNakedInput } from "../../components/generalComponents"
+import { GBNakedInput, GBText } from "../../components/generalComponents"
 
 export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, currGameRecommendation}) {
     const socket = global.socket
@@ -65,9 +65,9 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
                     backgroundColor: '#FFF', color: '#121212',
                 }}
             >
-                <Typography fontFamily='orbit' fontSize={18}> Currently Playing</Typography>
-                <Typography fontFamily='orbit'>{currGame}</Typography>
-                {!currGame && <Typography fontFamily='orbit'>-</Typography>}
+                <GBText text={' Currently Playing'} fs={18} color={'#121212'}/>
+                <GBText text={currGame} color={'#121212'} fs={16}/>
+                {!currGame && <GBText text={'-'} color={'#121212'} fs={16}/>}
             </Box>
             <Box
                 sx={{
@@ -89,7 +89,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
                     height: '50%'
                 }}
             >
-                <Typography fontFamily='orbit'>To play next</Typography>
+                <GBText text={'To play next'} fs={16} ml={0.5}/>
                 {recommendedGame}
             </Box>
         </Box>
