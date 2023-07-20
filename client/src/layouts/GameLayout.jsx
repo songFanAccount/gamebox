@@ -66,6 +66,11 @@ export default function GameLayout() {
             setRoomName(roomName)
             setCurrGameRecommendation(toPlayNext)
         })
+        return () => {
+            socket.removeAllListeners('gameroom_newHost')
+            socket.removeAllListeners('gameroom_newGame')
+            socket.emit('leave_room', {roomCode})
+        }
     // eslint-disable-next-line
     }, [])
     return (

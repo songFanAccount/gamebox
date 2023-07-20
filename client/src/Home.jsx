@@ -38,7 +38,7 @@ export default function Home() {
         const anims = []
         anims.push(['.createButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.joinButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
-        anims.push(['.options', {height: [0, 250], opacity: [0, 1]}, {duration: 0.5}])
+        anims.push(['.options', {height: [0, 240], opacity: [0, 1]}, {duration: 0.5}])
         await animate(anims)
         busy.current = false
     }
@@ -50,7 +50,7 @@ export default function Home() {
         const anims = []
         anims.push(['.joinButton', {width: ['45%', '100%']}, {duration: 0.5}])
         anims.push(['.createButton', {width: ['45%', '0%'], opacity: [1, 0]}, {at: '<', duration: 0.5}])
-        anims.push(['.options', {height: [0, 250], opacity: [0, 1]}, {duration: 0.5}])
+        anims.push(['.options', {height: [0, 240], opacity: [0, 1]}, {duration: 0.5}])
         await animate(anims)
         busy.current = false
     }
@@ -59,7 +59,7 @@ export default function Home() {
         busy.current = true
         const anims = []
         anims.push(['.options', {opacity: [1, 0]}, {duration: 0.25}])
-        anims.push(['.options', {height: [250, 0]}, {duration: 0.5, at: '<'}])
+        anims.push(['.options', {height: [240, 0]}, {duration: 0.5, at: '<'}])
         anims.push([createJoinState === 1 ? '.createButton' : '.joinButton', {width: ['0%', '45%'], opacity: [0, 1]}, {duration: 0.5}])
         anims.push([createJoinState === -1 ? '.createButton' : '.joinButton', {width: ['100%', '45%'], opacity: [1, 1]}, {at: '<', duration: 0.5}])
         await animate(anims)
@@ -161,7 +161,7 @@ export default function Home() {
                                         <GBTextInput value={password} onChange={setPassword} placeholder="-" maxLength={25} type="password"/>
                                     </Stack>
                                 </Stack>
-                                <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
+                                <Stack direction="row" justifyContent="space-between" mt={3.5} mb={1}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={createAndJoinRoom} endIcon={<DoneIcon/>}>Create</GBButton>
                                 </Stack>
@@ -179,7 +179,7 @@ export default function Home() {
                                         <GBTextInput value={joinPassword} onChange={setJoinPassword} placeholder="-" maxLength={25} type="password"/>
                                     </Stack>
                                 </Stack>
-                                <Stack direction="row" justifyContent="space-between" mt={3.5} mb={3}>
+                                <Stack direction="row" justifyContent="space-between" mt={3.5} mb={1}>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={back} endIcon={<ArrowBackIosIcon/>}>Back</GBButton>
                                     <GBButton disabled={loading} px={1.5} fs={16} onClick={joinRoom} endIcon={<ArrowForwardIcon/>}>Join</GBButton>
                                 </Stack>

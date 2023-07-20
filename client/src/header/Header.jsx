@@ -1,10 +1,22 @@
 import { Stack } from '@mui/material'
-import React from 'react'
-import GBLinkWrapper from '../components/GBLinkWrapper'
-import { GBText } from '../components/generalComponents'
+import { useLocation } from 'react-router-dom'
+import { GBLinkWrapper, GBModalLinkWrapper, GBText } from '../components/generalComponents'
 import HeaderNav from './HeaderNav'
 
 export default function Header() {
+    const path = useLocation().pathname
+    const inGameroom = path.startsWith('/game')
+    const GameboxIconButton = () => (
+        inGameroom
+        ?
+            <GBModalLinkWrapper to="/" underline={false} desc="This action will cause you to leave the current room.">
+                <GBText text="GameBox" fontFamily="Braah One" fs={40} ml={4}/>
+            </GBModalLinkWrapper>
+        :
+            <GBLinkWrapper to="/" underline={false}>
+                <GBText text="GameBox" fontFamily="Braah One" fs={40} ml={4}/>
+            </GBLinkWrapper>
+    )
     return (
         <Stack direction="row" justifyContent="space-between" alignItems="center"
             sx={{
@@ -14,10 +26,8 @@ export default function Header() {
                 borderBottom: 1, borderColor: '#FFFFFF', boxSizing: 'border-box'
             }}
         >
-            <GBLinkWrapper to="/" underline={false}>
-                <GBText text="GameBox" fontFamily="Braah One" fs={40} ml={4}/>
-            </GBLinkWrapper>
-            <HeaderNav/>
+            <GameboxIconButton/>
+            <HeaderNav inGameroom={inGameroom}/>
         </Stack>
     )
 }
