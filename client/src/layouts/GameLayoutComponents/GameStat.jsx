@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import { GBText } from "../../components/generalComponents"
 import { GBToastContainer } from '../../components/toast';
 import { toast } from "react-toastify"
