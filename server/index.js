@@ -28,6 +28,14 @@ io.on('connection', (socket) => {
                 break
             case 'sudoku':
                 break
+            case 'snake':
+                break
+            case 'chess':
+                break
+            case '2048':
+                break
+            case 'arithmetic':
+                break
             default:
                 throw new Error('registerRoomHandlers: Unsupported game name -> ' + gamename)
         }

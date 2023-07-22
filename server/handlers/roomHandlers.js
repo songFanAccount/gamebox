@@ -24,7 +24,8 @@ module.exports = (io, socket) => {
             hostID: creatorID, 
             players: playersObj,
             gamename: null,
-            recentDisconnects: {}
+            recentDisconnects: {},
+            toPlayNext: []
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -37,13 +38,44 @@ module.exports = (io, socket) => {
         sendAnnouncementToRoom(code, playerJoinMsg)
         callback({success: true})
     }
+    function leaveRoom(roomCode, socket) {
+        const room = rooms[roomCode]
+        if(!room) return
+        /* Check that the user actually is in our rooms object */
+        if(!room.players.hasOwnProperty(socket.id)) return
+        /* Cache this player info in the recent disconnects */
+        room.recentDisconnects[socket.id] = room.players[socket.id]
+        /* Remove the user from this room */
+        const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
+        delete room.players[socket.id]
+        socket.leave(roomCode)
+        /* 
+        If the user is the host, then: 
+        - If there are still players in the room, reassign one of them to be host
+        - Otherwise, all players have left the room, close the room
+        */
+        if(room.hostID === socket.id) {
+            const potentialHost = Object.keys(room.players)[0]
+            if(potentialHost) {
+                room.hostID = potentialHost
+                io.to(potentialHost).emit('gameroom_newHost')
+            } else {
+                delete rooms[roomCode]
+            }
+        }
+        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
+        if(rooms.hasOwnProperty(roomCode)) {
+            updatePlayerList(roomCode)
+            sendAnnouncementToRoom(roomCode, `${userName} has left.`)
+        }
+    }
     function getPlayerInfoFromRoom(roomCode, playerID) {
         // AVI: room exists for the given room code, and the room has a player with the given player id
         return rooms[roomCode].players[playerID]
     }
     function updatePlayerList(roomCode) {
         const room = rooms[roomCode]
-        if(!room) {console.log('updatePlayerList: no room exist with this room code!'); return}
+        if(!room) return
         const hostID = room.hostID
         let hostName
         const playersNames = []
@@ -60,20 +92,17 @@ module.exports = (io, socket) => {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
-        console.log('Attempting to create new room with name: ' + roomName)
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
         /* Generate 6 letter alphanumeric room codes until one is valid (not already existing) */
         let roomCode
         do {
             roomCode = generateAlphanumericCode(codeLen)
         } while(roomInfo(roomCode))
-        console.log('Generated room with code: ' + roomCode)
         socket.join(roomCode)
         createRoom(roomCode, roomName, password, creatorName, socket.id)
         callback({success: true, code: roomCode})
     })
     socket.on('join-room', ({code, password, userName}, callback) => {
-        console.log('Attemping to join room with code: ' + code + ', password: ' + password)
         if(isEmptyStr(userName)) userName = defaultUsername
         let errorMsg = null
         /* Code validation */
@@ -92,7 +121,9 @@ module.exports = (io, socket) => {
         socket.join(code)
         joinRoom(code, userName, callback, socket.id)
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
-
+    })
+    socket.on('leave_room', ({roomCode}) => {
+        leaveRoom(roomCode, socket)
     })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {
         const roomHostID = rooms[roomCode]?.hostID
@@ -123,7 +154,8 @@ module.exports = (io, socket) => {
         }
         const hasThisUser = room.players.hasOwnProperty(socket.id)
         const roomName = room.roomName
-        callback({validCode, hasThisUser, roomName})
+        const toPlayNext = room.toPlayNext
+        callback({validCode, hasThisUser, roomName, toPlayNext})
     })
     socket.on('gameroom_attempt_reconnect', ({roomCode, password, userID}, callback) => {
         /* Assumes room code belongs to an existing room */
@@ -148,42 +180,20 @@ module.exports = (io, socket) => {
         console.log(`${socket.id} disconnected.`)
         /* Get the room the user belongs to, if none, do nothing */
         const roomCode = socketidToRoom[socket.id]
-        const room = rooms?.[roomCode]
-        if(!room) return
-        /* Check that the user actually is in our rooms object */
-        if(!room.players.hasOwnProperty(socket.id)) {
-            console.log("Specified room already doesn't have this player!")
-            return
-        }
-        /* Cache this player info in the recent disconnects */
-        room.recentDisconnects[socket.id] = room.players[socket.id]
-        /* Remove the user from this room */
-        const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
-        delete room.players[socket.id]
-        socket.leave(roomCode)
-        /* 
-        If the user is the host, then: 
-        - If there are still players in the room, reassign one of them to be host
-        - Otherwise, all players have left the room, close the room
-        */
-        if(room.hostID === socket.id) {
-            const potentialHost = Object.keys(room.players)[0]
-            if(potentialHost) {
-                room.hostID = potentialHost
-                io.to(potentialHost).emit('gameroom_newHost')
-            } else {
-                delete rooms[roomCode]
-            }
-        }
-        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
-        if(rooms.hasOwnProperty(roomCode)) {
-            updatePlayerList(roomCode)
-            sendAnnouncementToRoom(roomCode, `${userName} has left.`)        }
+        leaveRoom(roomCode, socket)
     })
     socket.on('recommend-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_newRecommendation', {gameName})
+        if (!rooms[roomCode].toPlayNext.includes(gameName)) {
+            rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
+            const toPlayNext = rooms[roomCode].toPlayNext
+            io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+        }
     })
     socket.on('cancel-game', ({roomCode, gameName}) => {
-        io.to(roomCode).emit('gameroom_cancelRecommendation', {gameName})
+        if (rooms[roomCode].toPlayNext.includes(gameName)) {
+            rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
+            const toPlayNext = rooms[roomCode].toPlayNext
+            io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
+        }
     })
 }

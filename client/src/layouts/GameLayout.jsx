@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import GameSearchBar from './GameLayoutComponents/GameSearchBar'
@@ -13,7 +13,9 @@ export default function GameLayout() {
     const roomCode = useQuery().get("code")
     const [isHost, setIsHost] = useState(false)
     const [roomName, setRoomName] = useState('')
-    const [currGame, setCurrGame] = useState('')
+    const [currGame, setCurrGame] = useState(null)
+    const curGameRef = useRef(null)
+    const [currGameRecommendation, setCurrGameRecommendation] = useState([])
     function selectGame(gamename) {
         /* If clicking on the same game, do nothing */
         if(!gamename || gamename === currGame) return
@@ -29,11 +31,12 @@ export default function GameLayout() {
             setIsHost(true)
         })
         socket.on('gameroom_newGame', ({gamename}) => {
-            console.log('newGame called')
+            socket.emit(`${curGameRef.current}_unsubscribe`)
             setCurrGame(gamename)
+            curGameRef.current = gamename
             if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
         })
-        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName}) => {
+        socket.emit("gameroom_validation", {roomCode}, ({validCode, hasThisUser, roomName, toPlayNext}) => {
             if(!validCode) {
                 navigate('/') // If room code isn't valid, just go back home
                 return
@@ -60,10 +63,17 @@ export default function GameLayout() {
             socket.emit("gameroom_requestPlayerNames", {roomCode})
             socket.emit("gameroom_curGameName", {roomCode}, ({gamename}) => {
                 setCurrGame(gamename)
+                curGameRef.current = gamename
                 if(gamename) socket.emit("registerGameHandlers", {roomCode, gamename})
             })
             setRoomName(roomName)
+            setCurrGameRecommendation(toPlayNext)
         })
+        return () => {
+            socket.removeAllListeners('gameroom_newHost')
+            socket.removeAllListeners('gameroom_newGame')
+            socket.emit('leave_room', {roomCode})
+        }
     // eslint-disable-next-line
     }, [])
     return (
@@ -79,7 +89,7 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClickGame={selectGame} currGame={currGame} isHost={isHost} roomCode={roomCode}/>
+            <GameSearchBar onClickGame={selectGame} currGame={currGame} isHost={isHost} roomCode={roomCode} currGameRecommendation={currGameRecommendation}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
         </Box>

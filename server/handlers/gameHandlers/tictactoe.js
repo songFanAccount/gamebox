@@ -40,11 +40,13 @@ module.exports = (io, socket, room) => {
         socket.removeAllListeners('tictactoe_newGameReq')
         socket.removeAllListeners('tictactoe_terminate')
         socket.removeAllListeners('tictactoe_click')
+        socket.removeAllListeners('tictactoe_unsubscribing')
     }
-    socket.on('tictactoe_terminate', ({roomCode}) => {
-        console.log('tictactoe_terminate called')
-        if(!games.hasOwnProperty(roomCode)) return
+    socket.on('tictactoe_unsubscribe', () => {
         unsubscribeEvents()
+    })
+    socket.on('tictactoe_terminate', ({roomCode}) => {
+        if(!games.hasOwnProperty(roomCode)) return
         delete games[roomCode]
     })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
@@ -92,6 +94,5 @@ module.exports = (io, socket, room) => {
         : {rowIndex, colIndex, winner: 0, draw}
         io.to(room).emit('tictactoe_clickResponse', response)
         if(!win && !draw) game.turn *= -1
-        console.log(game)
     })
 }
