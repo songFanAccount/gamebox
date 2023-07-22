@@ -119,88 +119,108 @@ export default function TicTacToe() {
         }
       };
     return (
-        <Box>
+        <Stack
+            direction="column"
+            alignItems="center"
+            rowGap={5}
+        >
             <GBText text="Tic Tac Toe"/>
-            <GameStatus/>
-            <Stack direction="column"
+            <Stack
+                direction="row"
+                alignItems="center"
+                columnGap={10}
                 sx={{
-                    width: 300, height: 300,
-                    border: 1, borderColor: '#FFFFFF'
+                    height: 'fit-content'
                 }}
             >
-                <Box
-                    component={motion.svg}
-                    initial="hidden"
-                    animate="visible"
-                    sx={{
-                        width: 300, height: 300,
-                        position: 'absolute',
-                    }}
+                <Stack
+                    direction="column"
+                    alignItems="center"
+                    rowGap={3}
                 >
-                    {rowWin !== -1 && 
-                        <motion.line
-                            x1="18"
-                            y1={50 + rowWin * 100}
-                            x2="282"
-                            y2={50 + rowWin * 100}
-                            variants={drawAnim}
-                        />
-                    }
-                    {colWin !== -1 && 
-                        <motion.line
-                            x1={50 + colWin * 100}
-                            y1="18"
-                            x2={50 + colWin * 100}
-                            y2="282"
-                            variants={drawAnim}
-                        />
-                    }
-                    {leftDiagWin && 
-                        <motion.line
-                            x1="20"
-                            y1="20"
-                            x2="280"
-                            y2="280"
-                            variants={drawAnim}
-                        />
-                    }
-                    {rightDiagWin && 
-                        <motion.line
-                            x1="280"
-                            y1="20"
-                            x2="20"
-                            y2="280"
-                            variants={drawAnim}
-                        />
-                    }
-                </Box>
-                {board.map((row, rowIndex)=> (
-                    <Stack direction="row">
-                        {row.map((el, colIndex) => (
-                            <Button
-                                className={`tictactoe-${rowIndex}-${colIndex}`}
-                                disableRipple
-                                disabled={el !== 0 || winner !== 0}
-                                onClick={() => clickSquare(rowIndex, colIndex)}
-                                sx={{
-                                    p:0, m:0, 
-                                    width: squareWidth, height: squareWidth,
-                                    border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 0,
-                                    display: 'flex', justifyContent: 'center', alignItems: 'center',
-                                    '&:hover': {
-                                        backgroundColor: 'transparent',
-                                    }
-                                }}
+                    <GameStatus/>
+                    <Stack direction="column"
+                        sx={{
+                            width: 300, height: 300,
+                            border: 1, borderColor: '#FFFFFF'
+                        }}
+                        >
+                        <Box
+                            component={motion.svg}
+                            initial="hidden"
+                            animate="visible"
+                            sx={{
+                                width: 300, height: 300,
+                                position: 'absolute',
+                            }}
                             >
-                                <Element el={el}/>
-                            </Button>
+                            {rowWin !== -1 && 
+                                <motion.line
+                                x1="18"
+                                y1={50 + rowWin * 100}
+                                x2="282"
+                                y2={50 + rowWin * 100}
+                                variants={drawAnim}
+                                />
+                            }
+                            {colWin !== -1 && 
+                                <motion.line
+                                    x1={50 + colWin * 100}
+                                    y1="18"
+                                    x2={50 + colWin * 100}
+                                    y2="282"
+                                    variants={drawAnim}
+                                    />
+                                }
+                            {leftDiagWin && 
+                                <motion.line
+                                x1="20"
+                                y1="20"
+                                    x2="280"
+                                    y2="280"
+                                    variants={drawAnim}
+                                    />
+                                }
+                            {rightDiagWin && 
+                                <motion.line
+                                x1="280"
+                                y1="20"
+                                x2="20"
+                                y2="280"
+                                variants={drawAnim}
+                                />
+                            }
+                        </Box>
+                        {board.map((row, rowIndex)=> (
+                            <Stack direction="row">
+                                {row.map((el, colIndex) => (
+                                    <Button
+                                    className={`tictactoe-${rowIndex}-${colIndex}`}
+                                    disableRipple
+                                        disabled={el !== 0 || winner !== 0}
+                                        onClick={() => clickSquare(rowIndex, colIndex)}
+                                        sx={{
+                                            p:0, m:0, 
+                                            width: squareWidth, height: squareWidth,
+                                            border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 0,
+                                            display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                            }
+                                        }}
+                                        >
+                                        <Element el={el}/>
+                                    </Button>
+                                ))}
+                            </Stack>
                         ))}
                     </Stack>
-                ))}
-                <GBButton py={3} onClick={requestNewGame}>
-                    Restart
-                </GBButton>
+                    <GBButton onClick={requestNewGame}>
+                        Restart
+                    </GBButton>
+                </Stack>
+                <GBText text="stats"/>
             </Stack>
-        </Box>
+        </Stack>
     )
 }
