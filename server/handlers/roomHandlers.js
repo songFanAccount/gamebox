@@ -25,7 +25,7 @@ module.exports = (io, socket) => {
             players: playersObj,
             gamename: null,
             recentDisconnects: {},
-            toPlayNext: []
+            toPlayNext: {}
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -182,18 +182,31 @@ module.exports = (io, socket) => {
         const roomCode = socketidToRoom[socket.id]
         leaveRoom(roomCode, socket)
     })
-    socket.on('recommend-game', ({roomCode, gameName}) => {
-        if (!rooms[roomCode].toPlayNext.includes(gameName)) {
-            rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
-            const toPlayNext = rooms[roomCode].toPlayNext
-            io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+    socket.on('recommend-game', ({roomCode, gameName, playerId}) => {
+        if (!(gameName in rooms[roomCode].toPlayNext)) {
+            rooms[roomCode].toPlayNext[gameName] = [playerId]
         }
+        else {
+            if (!rooms[roomCode].toPlayNext[gameName].includes(playerId)) {
+                rooms[roomCode].toPlayNext[gameName] = [...rooms[roomCode].toPlayNext[gameName], playerId]
+            }
+        }
+        const toPlayNext = rooms[roomCode].toPlayNext
+        console.log(toPlayNext)
+        io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
     })
-    socket.on('cancel-game', ({roomCode, gameName}) => {
-        if (rooms[roomCode].toPlayNext.includes(gameName)) {
-            rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
-            const toPlayNext = rooms[roomCode].toPlayNext
-            io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
+    socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
+        let toPlayNext = rooms[roomCode].toPlayNext
+        if (gameName in toPlayNext) {
+            if (playerId in toPlayNext[gameName]) {
+                toPlayNext[gameName] = toPlayNext[gameName].filter((id) => id !== playerId)
+                if (toPlayNext[gameName].length === 0) {
+                    toPlayNext = toPlayNext.filter((game) => game !== gameName)
+                }
+            }
+            rooms[roomCode].toPlayNext = toPlayNext
+            const result = toPlayNext
+            io.to(roomCode).emit('gameroom_cancelRecommendation', {result})
         }
     })
 }

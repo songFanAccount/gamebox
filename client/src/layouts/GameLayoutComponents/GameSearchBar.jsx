@@ -5,17 +5,24 @@ import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput, GBText } from "../../components/generalComponents"
 
-export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, currGameRecommendation}) {
+export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, currGameRecommendation, playerId}) {
     const socket = global.socket
     // list of recommended games and functions to add or remove game from the list
-    const recommendGame = useCallback((gameName) => {
-        socket.emit('recommend-game', {roomCode, gameName})
+    const recommendGame = useCallback((gameName, playerId) => {
+        socket.emit('recommend-game', {roomCode, gameName, playerId})
     }, [roomCode, socket])
-    const cancelRecommendGame = useCallback((gameName) => {
-        socket.emit('cancel-game', {roomCode, gameName})
+    const cancelRecommendGame = useCallback((gameName, playerId) => {
+        socket.emit('cancel-game', {roomCode, gameName, playerId})
     }, [roomCode, socket])
     function covert2Button(gameList) {
-        return gameList?.map(game => (<GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true}/>))
+        let buttons = []
+        for (const game in gameList) {
+            if (gameList.hasOwnProperty(game)) {
+                const newButton = <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true} playerId={playerId} recommenders={gameList[game]}/>
+                buttons = [...buttons, newButton]
+            }
+        }
+        return buttons
     }
 
     const [recommendedGame, setRecommendedGame] = useState(covert2Button(currGameRecommendation))
@@ -36,7 +43,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     const [gameButton, setGameButton] = useState([])
     const changeGameList = useCallback((games) => {
         setGameButton(games?.map(game => (
-            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={recommendGame} isHost={isHost}/>
+            <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickRecommend={recommendGame} isHost={isHost} playerId={playerId}/>
         )))
     // eslint-disable-next-line
     }, [onClickGame, recommendGame, isHost])

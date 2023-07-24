@@ -3,8 +3,9 @@ import { GBButton } from "../../components/generalComponents"
 import { Box, IconButton } from "@mui/material"
 import RecommendIcon from '@mui/icons-material/Recommend';
 import CancelIcon from '@mui/icons-material/Cancel';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
-export default function GameButton({gameName, onClickGame, onClickRecommend, onClickCancel, isHost, isPlayNext=false}) {
+export default function GameButton({gameName, onClickGame, onClickRecommend, onClickCancel, isHost, isPlayNext=false, playerId, recommenders}) {
     return (
         <Box
             sx={{
@@ -13,6 +14,7 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
             }}
         >
             <GBButton children={gameName} onClick={() => onClickGame(gameName)} disabled={!isHost} />
+            {/* {recommenders} */}
             <Box
                 sx={{ml: 'auto', my: 'auto'}}
             >
@@ -20,17 +22,26 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                 <IconButton 
                     aria-label="recommend"
                     color="primary"
-                    onClick={() => onClickRecommend(gameName)}
+                    onClick={() => onClickRecommend(gameName, playerId)}
                     size='large'
                     disableRipple
                 >
                     <RecommendIcon/>
                 </IconButton>}
                 {isPlayNext &&
+                <IconButton
+                    aria-label="recommender"
+                    // color="fail"
+                    size='large'
+                    disableRipple
+                >
+                    <PeopleAltIcon sx={{color: '#FFFFFF'}}/>
+                </IconButton>}
+                {isPlayNext &&
                 <IconButton 
                     aria-label="cancel"
                     color="fail"
-                    onClick={() => onClickCancel(gameName)}
+                    onClick={() => onClickCancel(gameName, playerId)}
                     size='large'
                     disableRipple
                 >

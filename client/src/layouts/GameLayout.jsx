@@ -89,7 +89,7 @@ export default function GameLayout() {
                 color: "white"
             }}
         >
-            <GameSearchBar onClickGame={selectGame} currGame={currGame} isHost={isHost} roomCode={roomCode} currGameRecommendation={currGameRecommendation}/>
+            <GameSearchBar onClickGame={selectGame} currGame={currGame} isHost={isHost} roomCode={roomCode} currGameRecommendation={currGameRecommendation} playerId={localStorage.getItem('userID')}/>
             <GameWindow roomCode={roomCode} roomName={roomName} gameName={currGame}/>
             <UserInteractionBar roomCode={roomCode}/>
         </Box>
