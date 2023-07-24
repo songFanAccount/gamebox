@@ -78,7 +78,9 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
             >
                 <Box
                     sx={{
-                        borderBottom: 1, borderColor: '#494d52'
+                        borderBottom: 1, borderColor: '#494d52',
+                        position: 'sticky', top: 0, left: 0, zIndex: 1,
+                        backgroundColor: '#121212'
                     }}
                 >
                     <GBNakedInput value={searchedContent} onChange={(e => setSearchedContent(e.target.value))} placeholder={'search'}/>
