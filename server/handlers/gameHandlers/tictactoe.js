@@ -43,7 +43,7 @@ module.exports = (io, socket, room) => {
         socket.removeAllListeners('tictactoe_terminate')
         socket.removeAllListeners('tictactoe_click')
         socket.removeAllListeners('tictactoe_joinAsPlayer')
-        socket.removeAllListeners('tictactoe_unsubscribing')
+        socket.removeAllListeners('tictactoe_unsubscribe')
     }
     socket.on('tictactoe_unsubscribe', () => {
         unsubscribeEvents()
@@ -52,16 +52,16 @@ module.exports = (io, socket, room) => {
         if(!games.hasOwnProperty(roomCode)) return
         delete games[roomCode]
     })
-    socket.on('tictactoe_joinAsPlayer', ({roomCode}) => {
-        if(!games.hasOwnProperty(roomCode)) return
-        const game = games[roomCode]
+    socket.on('tictactoe_joinAsPlayer', () => {
+        console.log('request to join tictactoe from room: ' + room)
+        if(!games.hasOwnProperty(room)) return
+        const game = games[room]
         if(!game.xUserID) game.xUserID = socket.id
         else if(!game.oUserID) game.oUserID = socket.id
         else throw new Error("Unexpected error! tictactoe_joinAsPlayer: Called when game already has two players!")
         /* Get the user's display name to send to everyone */
-        const room = rooms[roomCode]
-        const displayName = room.players[socket.id].displayName
-        io.to(roomCode).emit('tictactoe_newPlayerJoin', {displayName})
+        const displayName = rooms[room]?.players[socket.id].displayName
+        io.to(room).emit('tictactoe_newPlayerJoin', {id: socket.id, displayName})
     })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]

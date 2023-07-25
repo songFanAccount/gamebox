@@ -7,6 +7,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 export default function TicTacToe() {
     const socket = global.socket
+    /* Game related info */
     const [board, setBoard] = useState([
         [0, 0, 0],
         [0, 0, 0],
@@ -19,6 +20,45 @@ export default function TicTacToe() {
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
+    /* Room related info */
+    const [isPlaying, setIsPlaying] = useState(0) // -1 for X, 1 for O, 0 for not playing - spectating
+    const [players, setPlayers] = useState({
+        left: {
+            displayName: null,
+            side: null
+        },
+        right: {
+            displayName: null,
+            side: null
+        }
+    })
+    const JoinButton = () => {
+        if(isPlaying) return <GBButton>Leave</GBButton>
+        else return <GBButton width={120} onClick={joinAsPlayer}>Join</GBButton>
+    }
+    const Versus = () => {
+        let leftText = players.left.displayName
+        if(!leftText) leftText = '?'
+        else {
+            const leftSide = players.left.side
+            if(leftSide) {
+                leftText += ` (${leftSide === -1 ? 'X' : 'O'})`
+            } else {
+                leftText += ' (?)'
+            }
+        }
+        let rightText = players.right.displayName
+        if(!rightText) rightText = '?'
+        else {
+            const rightSide = players.right.side
+            if(rightSide) {
+                rightText += ` (${rightSide === -1 ? 'X' : 'O'})`
+            } else {
+                rightText += ' (?)'
+            }
+        }
+        return <GBText text={`${leftText} vs ${rightText}`}/>
+    }
     socket.on('tictactoe_setGameState', ({game}) => {
         if(!game) return
         setBoard(game.board)
@@ -45,6 +85,21 @@ export default function TicTacToe() {
         setLeftDiagWin(false)
         setRightDiagWin(false)
     })
+    socket.on('tictactoe_newPlayerJoin', ({id, displayName}) => {
+        if(!players.left.displayName) {
+            /* 1/2 player join */
+            setPlayers({...players, left: {
+                displayName,
+                side: null
+            }})
+        } else {
+            /* 2/2 player join */
+            setPlayers({...players, right: {
+                displayName,
+                side: null
+            }})
+        }
+    })
     socket.on('tictactoe_clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
         board.map((row, rIndex) => (
@@ -70,6 +125,10 @@ export default function TicTacToe() {
     function requestNewGame() {
         socket.emit('tictactoe_newGameReq')
     }
+    function joinAsPlayer() {
+        setIsPlaying(players.left.displayName ? 1 : -1)
+        socket.emit('tictactoe_joinAsPlayer')
+    }
     const squareWidth = 100
     const Element = ({el}) => {
         /* el can be -1 (X), 0 (None), or 1 (O) */
@@ -93,6 +152,10 @@ export default function TicTacToe() {
         }
     }
     const GameStatus = () => {
+        if(!players.right.displayName) {
+            /* Game does not have two players yet, game not in progress */
+            return <GBText text="Join the game to start!"/>
+        }
         if(winner === 0) {
             return draw 
             ? (
@@ -197,7 +260,7 @@ export default function TicTacToe() {
                                     <Button
                                     className={`tictactoe-${rowIndex}-${colIndex}`}
                                     disableRipple
-                                        disabled={el !== 0 || winner !== 0}
+                                        disabled={isPlaying === 0 || el !== 0 || winner !== 0}
                                         onClick={() => clickSquare(rowIndex, colIndex)}
                                         sx={{
                                             p:0, m:0, 
@@ -219,7 +282,15 @@ export default function TicTacToe() {
                         Restart
                     </GBButton>
                 </Stack>
-                <GBText text="stats"/>
+                
+                <Stack direction="column" alignItems="center"
+                    sx={{
+                        width: 300, height: 300
+                    }}
+                >
+                    <JoinButton/>
+                    <Versus/>
+                </Stack>
             </Stack>
         </Stack>
     )

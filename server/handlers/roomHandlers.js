@@ -38,7 +38,7 @@ module.exports = (io, socket) => {
         sendAnnouncementToRoom(code, playerJoinMsg)
         callback({success: true})
     }
-    function leaveRoom(roomCode, socket) {
+    function leaveRoom(roomCode, socket, callback) {
         const room = rooms[roomCode]
         if(!room) return
         /* Check that the user actually is in our rooms object */
@@ -52,7 +52,7 @@ module.exports = (io, socket) => {
         /* 
         If the user is the host, then: 
         - If there are still players in the room, reassign one of them to be host
-        - Otherwise, all players have left the room, close the room
+        - Otherwise, all players have left the room, so terminate the current game, then close the room
         */
         if(room.hostID === socket.id) {
             const potentialHost = Object.keys(room.players)[0]
@@ -60,6 +60,8 @@ module.exports = (io, socket) => {
                 room.hostID = potentialHost
                 io.to(potentialHost).emit('gameroom_newHost')
             } else {
+                console.log("callback: roomDeleted")
+                callback({roomDeleted: true})
                 delete rooms[roomCode]
             }
         }
@@ -122,8 +124,8 @@ module.exports = (io, socket) => {
         joinRoom(code, userName, callback, socket.id)
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
     })
-    socket.on('leave_room', ({roomCode}) => {
-        leaveRoom(roomCode, socket)
+    socket.on('leave_room', ({roomCode}, callback) => {
+        leaveRoom(roomCode, socket, callback)
     })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {
         const roomHostID = rooms[roomCode]?.hostID
