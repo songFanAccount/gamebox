@@ -4,6 +4,7 @@ import { Box } from '@mui/material'
 import { gamelist } from '../../games/gamelist'
 import GameButton from "./GameButton"
 import { GBNakedInput, GBText } from "../../components/generalComponents"
+import { toast } from "react-toastify"
 
 export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, currGameRecommendation, playerId}) {
     const socket = global.socket
@@ -31,8 +32,10 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     // eslint-disable-next-line
     }, [currGameRecommendation])
     
-    socket.on('gameroom_newRecommendation', (newRocommendation) => {
+    socket.once('gameroom_newRecommendation', (newRocommendation) => {
         setRecommendedGame(covert2Button(newRocommendation.toPlayNext))
+        toast.success(newRocommendation.message)
+        console.log("listener")
     })
 
     socket.on('gameroom_cancelRecommendation', (newRocommendation) => {

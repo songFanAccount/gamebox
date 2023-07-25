@@ -23,7 +23,6 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                     color="primary"
                     onClick={() => onClickRecommend(gameName, playerId)}
                     size='large'
-                    disableRipple
                 >
                     <RecommendIcon/>
                 </IconButton>}
@@ -43,7 +42,6 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                     color="fail"
                     onClick={() => onClickCancel(gameName, playerId)}
                     size='large'
-                    disableRipple
                 >
                     <CancelIcon sx={{color: '#d50000'}}/>
                 </IconButton>}

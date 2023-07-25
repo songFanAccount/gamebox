@@ -183,6 +183,7 @@ module.exports = (io, socket) => {
         leaveRoom(roomCode, socket)
     })
     socket.on('recommend-game', ({roomCode, gameName, playerId}) => {
+        let message = `Recommended ${gameName}!`
         if (!(gameName in rooms[roomCode].toPlayNext)) {
             rooms[roomCode].toPlayNext[gameName] = [playerId]
         }
@@ -190,9 +191,12 @@ module.exports = (io, socket) => {
             if (!rooms[roomCode].toPlayNext[gameName].includes(playerId)) {
                 rooms[roomCode].toPlayNext[gameName] = [...rooms[roomCode].toPlayNext[gameName], playerId]
             }
+            else {
+                message = "You've already recommended"
+            }
         }
         const toPlayNext = rooms[roomCode].toPlayNext
-        io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+        io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext, message})
     })
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
         let toPlayNext = rooms[roomCode].toPlayNext
