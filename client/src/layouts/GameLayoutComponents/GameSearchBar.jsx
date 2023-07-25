@@ -15,31 +15,34 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     const cancelRecommendGame = useCallback((gameName, playerId) => {
         socket.emit('cancel-game', {roomCode, gameName, playerId})
     }, [roomCode, socket])
-    function covert2Button(gameList) {
+    function convert2ToPlayNextButton(gamesObject) {
+        // sort keys(game name) by the number of up voters
+        const keySorted = Object.keys(gamesObject).sort(function(a,b){return gamesObject[b].length - gamesObject[a].length})
         let buttons = []
-        for (const game in gameList) {
-            if (gameList.hasOwnProperty(game)) {
-                const newButton = <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true} playerId={playerId} recommenders={gameList[game]}/>
+        for (let i = 0; i < keySorted.length; i++) {
+            const game = keySorted[i]
+            if (gamesObject.hasOwnProperty(game)) {
+                const newButton = <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true} playerId={playerId} recommenders={gamesObject[game]}/>
                 buttons = [...buttons, newButton]
             }
         }
         return buttons
     }
 
-    const [recommendedGame, setRecommendedGame] = useState(covert2Button(currGameRecommendation))
+    const [recommendedGame, setRecommendedGame] = useState(convert2ToPlayNextButton(currGameRecommendation))
     useEffect(()=>{
-        setRecommendedGame(covert2Button(currGameRecommendation))
+        setRecommendedGame(convert2ToPlayNextButton(currGameRecommendation))
     // eslint-disable-next-line
     }, [currGameRecommendation])
     
     socket.once('gameroom_newRecommendation', (newRocommendation) => {
-        setRecommendedGame(covert2Button(newRocommendation.toPlayNext))
+        setRecommendedGame(convert2ToPlayNextButton(newRocommendation.toPlayNext))
         toast.success(newRocommendation.message)
         console.log("listener")
     })
 
     socket.on('gameroom_cancelRecommendation', (newRocommendation) => {
-        setRecommendedGame(covert2Button(newRocommendation.toPlayNext))
+        setRecommendedGame(convert2ToPlayNextButton(newRocommendation.toPlayNext))
     })
 
     // With a given list of games searched, create game buttons.
