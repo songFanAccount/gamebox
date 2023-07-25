@@ -192,21 +192,19 @@ module.exports = (io, socket) => {
             }
         }
         const toPlayNext = rooms[roomCode].toPlayNext
-        console.log(toPlayNext)
         io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
     })
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
         let toPlayNext = rooms[roomCode].toPlayNext
         if (gameName in toPlayNext) {
-            if (playerId in toPlayNext[gameName]) {
+            if (toPlayNext[gameName].includes(playerId)) {
                 toPlayNext[gameName] = toPlayNext[gameName].filter((id) => id !== playerId)
                 if (toPlayNext[gameName].length === 0) {
-                    toPlayNext = toPlayNext.filter((game) => game !== gameName)
+                    delete toPlayNext[gameName]
                 }
             }
             rooms[roomCode].toPlayNext = toPlayNext
-            const result = toPlayNext
-            io.to(roomCode).emit('gameroom_cancelRecommendation', {result})
+            io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
         }
     })
 }
