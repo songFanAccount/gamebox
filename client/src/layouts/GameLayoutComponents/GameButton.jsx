@@ -1,6 +1,6 @@
-import React from "react"
+import {React} from "react"
 import { GBButton } from "../../components/generalComponents"
-import { Box, IconButton } from "@mui/material"
+import { Box, IconButton, Tooltip } from "@mui/material"
 import RecommendIcon from '@mui/icons-material/Recommend';
 import CancelIcon from '@mui/icons-material/Cancel';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
@@ -14,7 +14,6 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
             }}
         >
             <GBButton children={gameName} onClick={() => onClickGame(gameName)} disabled={!isHost} />
-            {/* {recommenders} */}
             <Box
                 sx={{ml: 'auto', my: 'auto'}}
             >
@@ -29,14 +28,15 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                     <RecommendIcon/>
                 </IconButton>}
                 {isPlayNext &&
-                <IconButton
-                    aria-label="recommender"
-                    // color="fail"
-                    size='large'
-                    disableRipple
-                >
-                    <PeopleAltIcon sx={{color: '#FFFFFF'}}/>
-                </IconButton>}
+                <Tooltip title={`${recommenders.map((recommender) => (recommender))}`}>
+                    <IconButton
+                        aria-label="recommender"
+                        size='small'
+                        disableRipple
+                    >
+                        <PeopleAltIcon sx={{color: '#FFFFFF'}}/>
+                    </IconButton>
+                </Tooltip>}
                 {isPlayNext &&
                 <IconButton 
                     aria-label="cancel"
