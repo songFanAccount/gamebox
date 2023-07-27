@@ -33,7 +33,7 @@ export default function TicTacToe() {
         }
     })
     const JoinButton = () => {
-        if(isPlaying) return <GBButton>Leave</GBButton>
+        if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
         else return <GBButton width={120} onClick={joinAsPlayer}>Join</GBButton>
     }
     const Versus = () => {
@@ -85,7 +85,7 @@ export default function TicTacToe() {
         setLeftDiagWin(false)
         setRightDiagWin(false)
     })
-    socket.on('tictactoe_newPlayerJoin', ({id, displayName}) => {
+    socket.on('tictactoe_newPlayerJoin', ({displayName}) => {
         if(!players.left.displayName) {
             /* 1/2 player join */
             setPlayers({...players, left: {
@@ -98,6 +98,20 @@ export default function TicTacToe() {
                 displayName,
                 side: null
             }})
+        }
+    })
+    socket.on('tictactoe_playerLeft', ({side}) => {
+        /* Side should be either -1 (left) or 1 (right) */
+        if(side === -1) {
+            setPlayers({
+                left: players.right.displayName ? {...players.right} : {displayName: null, side: null},
+                right: {displayName: null, side: null}
+            })
+        } else if(side === 1) {
+            setPlayers({
+                ...players,
+                right: {displayName: null, side: null}
+            })
         }
     })
     socket.on('tictactoe_clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
@@ -128,6 +142,10 @@ export default function TicTacToe() {
     function joinAsPlayer() {
         setIsPlaying(players.left.displayName ? 1 : -1)
         socket.emit('tictactoe_joinAsPlayer')
+    }
+    function leaveAsPlayer() {
+        setIsPlaying(0)
+        socket.emit('tictactoe_leaveAsPlayer')
     }
     const squareWidth = 100
     const Element = ({el}) => {
@@ -219,11 +237,11 @@ export default function TicTacToe() {
                             >
                             {rowWin !== -1 && 
                                 <motion.line
-                                x1="18"
-                                y1={50 + rowWin * 100}
-                                x2="282"
-                                y2={50 + rowWin * 100}
-                                variants={drawAnim}
+                                    x1="18"
+                                    y1={50 + rowWin * 100}
+                                    x2="282"
+                                    y2={50 + rowWin * 100}
+                                    variants={drawAnim}
                                 />
                             }
                             {colWin !== -1 && 
@@ -237,8 +255,8 @@ export default function TicTacToe() {
                                 }
                             {leftDiagWin && 
                                 <motion.line
-                                x1="20"
-                                y1="20"
+                                    x1="20"
+                                    y1="20"
                                     x2="280"
                                     y2="280"
                                     variants={drawAnim}
@@ -246,11 +264,11 @@ export default function TicTacToe() {
                                 }
                             {rightDiagWin && 
                                 <motion.line
-                                x1="280"
-                                y1="20"
-                                x2="20"
-                                y2="280"
-                                variants={drawAnim}
+                                    x1="280"
+                                    y1="20"
+                                    x2="20"
+                                    y2="280"
+                                    variants={drawAnim}
                                 />
                             }
                         </Box>
@@ -288,8 +306,8 @@ export default function TicTacToe() {
                         width: 300, height: 300
                     }}
                 >
-                    <JoinButton/>
                     <Versus/>
+                    <JoinButton/>
                 </Stack>
             </Stack>
         </Stack>

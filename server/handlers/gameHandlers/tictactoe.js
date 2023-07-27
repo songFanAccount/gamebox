@@ -20,7 +20,8 @@ module.exports = (io, socket, room) => {
             return
         }
         games[roomCode] = {
-            xUserID: null, oUserID: null,
+            leftUserID: null, rightUserID: null,
+            xSide: null,
             lastRowIndex: -1, lastColIndex: -1, turn: -1,
             numEmptySpaces: 9,
             board: [
@@ -53,15 +54,32 @@ module.exports = (io, socket, room) => {
         delete games[roomCode]
     })
     socket.on('tictactoe_joinAsPlayer', () => {
-        console.log('request to join tictactoe from room: ' + room)
         if(!games.hasOwnProperty(room)) return
         const game = games[room]
-        if(!game.xUserID) game.xUserID = socket.id
-        else if(!game.oUserID) game.oUserID = socket.id
+        if(!game.leftUserID) game.leftUserID = socket.id
+        else if(!game.rightUserID) game.rightUserID = socket.id
         else throw new Error("Unexpected error! tictactoe_joinAsPlayer: Called when game already has two players!")
         /* Get the user's display name to send to everyone */
         const displayName = rooms[room]?.players[socket.id].displayName
         io.to(room).emit('tictactoe_newPlayerJoin', {id: socket.id, displayName})
+    })
+    socket.on('tictactoe_leaveAsPlayer', () => {
+        if(!games.hasOwnProperty(room)) return
+        const game = games[room]
+        let side
+        if(game.leftUserID === socket.id) {
+            side = -1
+            /* If there is someone on the right side, make them the new left player */
+            if(game.rightUserID) {
+                game.leftUserID = game.rightUserID
+                game.rightUserID = null
+            } else game.leftUserID = null
+        } else if (game.rightUserID === socket.id) {
+            side = 1
+            game.rightUserID = null
+        } else throw new Error('tictactoe_leavePlayer: Request from non-player!')
+        console.log('tictactoe_playerLeft on side: ' + side)
+        io.to(room).emit('tictactoe_playerLeft', {side})
     })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]

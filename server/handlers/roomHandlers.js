@@ -61,7 +61,7 @@ module.exports = (io, socket) => {
                 io.to(potentialHost).emit('gameroom_newHost')
             } else {
                 console.log("callback: roomDeleted")
-                callback({roomDeleted: true})
+                if(callback) callback({roomDeleted: true})
                 delete rooms[roomCode]
             }
         }
