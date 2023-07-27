@@ -33,14 +33,10 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     // eslint-disable-next-line
     }, [currGameRecommendation])
     
-    socket.on('gameroom_newRecommendation', (newRocommendation) => {
+    socket.on('gameroom_updateRecommendation', (newRocommendation) => {
         setRecommendedGame(convert2ToPlayNextButton(newRocommendation.toPlayNext))
         toast.success(newRocommendation.message)
         console.log("listener")
-    })
-
-    socket.on('gameroom_cancelRecommendation', (newRocommendation) => {
-        setRecommendedGame(convert2ToPlayNextButton(newRocommendation.toPlayNext))
     })
 
     // With a given list of games searched, create game buttons.
