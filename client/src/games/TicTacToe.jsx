@@ -86,7 +86,7 @@ export default function TicTacToe() {
         setLeftDiagWin(false)
         setRightDiagWin(false)
     })
-    socket.on('tictactoe_newPlayerJoin', ({displayName}) => {
+    socket.on('tictactoe_newPlayerJoin', ({displayName, xSide}) => {
         if(!players.left.displayName) {
             /* 1/2 player join */
             setPlayers({...players, left: {
@@ -95,10 +95,16 @@ export default function TicTacToe() {
             }})
         } else {
             /* 2/2 player join */
-            setPlayers({...players, right: {
-                displayName,
-                side: null
-            }})
+            setPlayers({
+                left: {
+                    displayName: players.left.displayName,
+                    side: xSide
+                },
+                right: {
+                    displayName,
+                    side: -xSide
+                }
+            })
         }
     })
     socket.on('tictactoe_playerLeft', ({side}) => {

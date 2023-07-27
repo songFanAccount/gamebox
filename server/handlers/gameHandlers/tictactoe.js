@@ -60,11 +60,14 @@ module.exports = (io, socket, room) => {
         else if(!game.rightUserID) {
             game.rightUserID = socket.id
             /* Since this player is the second, the 1v1 game will begin. So, assign X or O to them */
+            const rand = Math.random()
+            if(rand < 0.5) game.xSide = -1
+            else game.xSide = 1
         }
         else throw new Error("Unexpected error! tictactoe_joinAsPlayer: Called when game already has two players!")
         /* Get the user's display name to send to everyone */
         const displayName = rooms[room]?.players[socket.id].displayName
-        io.to(room).emit('tictactoe_newPlayerJoin', {id: socket.id, displayName})
+        io.to(room).emit('tictactoe_newPlayerJoin', {displayName, xSide: game.xSide})
     })
     socket.on('tictactoe_leaveAsPlayer', () => {
         if(!games.hasOwnProperty(room)) return
