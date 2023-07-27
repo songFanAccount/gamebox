@@ -34,6 +34,7 @@ export default function TicTacToe() {
     })
     const JoinButton = () => {
         if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
+        else if(players.right.displayName) return <></>
         else return <GBButton width={120} onClick={joinAsPlayer}>Join</GBButton>
     }
     const Versus = () => {
@@ -278,7 +279,7 @@ export default function TicTacToe() {
                                     <Button
                                     className={`tictactoe-${rowIndex}-${colIndex}`}
                                     disableRipple
-                                        disabled={isPlaying === 0 || el !== 0 || winner !== 0}
+                                        disabled={isPlaying === 0 || !players.right.displayName || el !== 0 || winner !== 0}
                                         onClick={() => clickSquare(rowIndex, colIndex)}
                                         sx={{
                                             p:0, m:0, 
