@@ -33,7 +33,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     // eslint-disable-next-line
     }, [currGameRecommendation])
     
-    socket.once('gameroom_newRecommendation', (newRocommendation) => {
+    socket.on('gameroom_newRecommendation', (newRocommendation) => {
         setRecommendedGame(convert2ToPlayNextButton(newRocommendation.toPlayNext))
         toast.success(newRocommendation.message)
         console.log("listener")

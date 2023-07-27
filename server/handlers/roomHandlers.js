@@ -135,6 +135,10 @@ module.exports = (io, socket) => {
     })
     socket.on('gameroom_changeGame', ({roomCode, gamename}) => {
         rooms[roomCode].gamename = gamename
+        delete rooms[roomCode].toPlayNext[gamename]
+        const toPlayNext = rooms[roomCode].toPlayNext
+        const message = 'removing..'
+        io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext, message})
         io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_curGameName', ({roomCode}, callback) => {
