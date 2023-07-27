@@ -184,12 +184,13 @@ module.exports = (io, socket) => {
     })
     socket.on('recommend-game', ({roomCode, gameName, playerId}) => {
         let message = `Recommended ${gameName}!`
+        const playerName = getPlayerInfoFromRoom(roomCode, playerId).displayName
         if (!(gameName in rooms[roomCode].toPlayNext)) {
-            rooms[roomCode].toPlayNext[gameName] = [playerId]
+            rooms[roomCode].toPlayNext[gameName] = [{'id': playerId, 'name': playerName}]
         }
         else {
             if (!rooms[roomCode].toPlayNext[gameName].includes(playerId)) {
-                rooms[roomCode].toPlayNext[gameName] = [...rooms[roomCode].toPlayNext[gameName], playerId]
+                rooms[roomCode].toPlayNext[gameName] = [...rooms[roomCode].toPlayNext[gameName], {'id': playerId, 'name': playerName}]
             }
             else {
                 message = "You've already recommended"
@@ -201,8 +202,9 @@ module.exports = (io, socket) => {
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
         let toPlayNext = rooms[roomCode].toPlayNext
         if (gameName in toPlayNext) {
-            if (toPlayNext[gameName].includes(playerId)) {
-                toPlayNext[gameName] = toPlayNext[gameName].filter((id) => id !== playerId)
+            const userDetails = {'id': playerId, 'name': getPlayerInfoFromRoom(roomCode, playerId).displayName}
+            if (toPlayNext[gameName].includes(userDetails)) {
+                toPlayNext[gameName] = toPlayNext[gameName].filter((userInfo) => userInfo['id'] == playerId)
                 if (toPlayNext[gameName].length === 0) {
                     delete toPlayNext[gameName]
                 }

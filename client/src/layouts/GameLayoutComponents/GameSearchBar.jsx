@@ -21,10 +21,8 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
         let buttons = []
         for (let i = 0; i < keySorted.length; i++) {
             const game = keySorted[i]
-            if (gamesObject.hasOwnProperty(game)) {
-                const newButton = <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true} playerId={playerId} recommenders={gamesObject[game]}/>
-                buttons = [...buttons, newButton]
-            }
+            const newButton = <GameButton key={game} gameName={game} onClickGame={onClickGame} onClickCancel={cancelRecommendGame} isHost={isHost} isPlayNext={true} playerId={playerId} recommenders={gamesObject[game]}/>
+            buttons = [...buttons, newButton]
         }
         return buttons
     }

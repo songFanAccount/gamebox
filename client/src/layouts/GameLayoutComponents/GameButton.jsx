@@ -27,7 +27,7 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                     <ThumbUpOffAltIcon/>
                 </IconButton>}
                 {isPlayNext &&
-                <Tooltip title={`${recommenders.map((recommender) => (recommender))}`}>
+                <Tooltip title={`${recommenders.map((recommender) => (recommender['name']))}`}>
                     <IconButton
                         aria-label="recommender"
                         size='small'
