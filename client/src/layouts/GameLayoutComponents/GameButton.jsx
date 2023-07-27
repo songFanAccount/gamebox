@@ -1,8 +1,8 @@
 import {React} from "react"
 import { GBButton } from "../../components/generalComponents"
 import { Box, IconButton, Tooltip } from "@mui/material"
-import RecommendIcon from '@mui/icons-material/Recommend';
-import CancelIcon from '@mui/icons-material/Cancel';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
 export default function GameButton({gameName, onClickGame, onClickRecommend, onClickCancel, isHost, isPlayNext=false, playerId, recommenders}) {
@@ -22,9 +22,9 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                     aria-label="recommend"
                     color="primary"
                     onClick={() => onClickRecommend(gameName, playerId)}
-                    size='large'
+                    size='small'
                 >
-                    <RecommendIcon/>
+                    <ThumbUpOffAltIcon/>
                 </IconButton>}
                 {isPlayNext &&
                 <Tooltip title={`${recommenders.map((recommender) => (recommender))}`}>
@@ -41,9 +41,9 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                     aria-label="cancel"
                     color="fail"
                     onClick={() => onClickCancel(gameName, playerId)}
-                    size='large'
+                    size='small'
                 >
-                    <CancelIcon sx={{color: '#d50000'}}/>
+                    <ThumbDownOffAltIcon sx={{color: '#d50000'}}/>
                 </IconButton>}
             </Box>
         </Box>
