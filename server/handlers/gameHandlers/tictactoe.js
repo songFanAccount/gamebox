@@ -63,6 +63,8 @@ module.exports = (io, socket, room) => {
             const rand = Math.random()
             if(rand < 0.5) game.xSide = -1
             else game.xSide = 1
+            io.to(game.leftUserID).emit('tictactoe_setPlaySide', {side: game.xSide})
+            io.to(game.rightUserID).emit('tictactoe_setPlaySide', {side: -game.xSide})
         }
         else throw new Error("Unexpected error! tictactoe_joinAsPlayer: Called when game already has two players!")
         /* Get the user's display name to send to everyone */

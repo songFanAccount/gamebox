@@ -21,7 +21,8 @@ export default function TicTacToe() {
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
     /* Room related info */
-    const [isPlaying, setIsPlaying] = useState(0) // -1 for X, 1 for O, 0 for not playing - spectating
+    const [playSide, setPlaySide] = useState(0) // -1 for X, 1 for right, 0 for not playing
+    const [isPlaying, setIsPlaying] = useState(0) // -1 for left, 1 for right, 0 for not playing - spectating
     const [players, setPlayers] = useState({
         left: {
             displayName: null,
@@ -107,6 +108,9 @@ export default function TicTacToe() {
             })
         }
     })
+    socket.on('tictactoe_setPlaySide', ({side}) => {
+        setPlaySide(side)
+    })
     socket.on('tictactoe_playerLeft', ({side}) => {
         /* Side should be either -1 (left) or 1 (right) */
         if(side === -1) {
@@ -138,7 +142,7 @@ export default function TicTacToe() {
             setWinner(winner)
         /* Process draw if applicable */
         } else if(draw) setDraw(true)
-        setTurn(-turn)
+        else setTurn(-turn)
     })
     function clickSquare(rowIndex, colIndex) {
         socket.emit('tictactoe_click', {rowIndex, colIndex})
@@ -181,17 +185,18 @@ export default function TicTacToe() {
             /* Game does not have two players yet, game not in progress */
             return <GBText text="Join the game to start!"/>
         }
+        const curPlayer = turn === -1 ? players.left : players.right
         if(winner === 0) {
             return draw 
             ? (
                 <GBText text='Draw!'/>
             )
             : (
-                <GBText text={`${turn}'s turn!`}/>
+                <GBText text={`${curPlayer.displayName}'s turn!`}/>
             )
         } else {
             return (
-                <GBText text={`${winner} wins!`}/>
+                <GBText text={`${curPlayer.displayName} wins!`}/>
             )
         }
     }
@@ -285,7 +290,7 @@ export default function TicTacToe() {
                                     <Button
                                     className={`tictactoe-${rowIndex}-${colIndex}`}
                                     disableRipple
-                                        disabled={isPlaying === 0 || !players.right.displayName || el !== 0 || winner !== 0}
+                                        disabled={isPlaying === 0 || !players.right.displayName || turn !== playSide || el !== 0 || winner !== 0}
                                         onClick={() => clickSquare(rowIndex, colIndex)}
                                         sx={{
                                             p:0, m:0, 
