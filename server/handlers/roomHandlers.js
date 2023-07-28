@@ -25,7 +25,7 @@ module.exports = (io, socket) => {
             players: playersObj,
             gamename: null,
             recentDisconnects: {},
-            toPlayNext: []
+            toPlayNext: {}
         }
         socketidToRoom[creatorID] = code
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: creatorID})
@@ -45,6 +45,11 @@ module.exports = (io, socket) => {
         if(!room.players.hasOwnProperty(socket.id)) return
         /* Cache this player info in the recent disconnects */
         room.recentDisconnects[socket.id] = room.players[socket.id]
+        /* Remove user's recommendation of the games */
+        for (const gameName in room.toPlayNext) {
+            rooms[roomCode].toPlayNext[gameName] = room.toPlayNext[gameName].filter(user => user['id'] !== socket.id)
+            if (rooms[roomCode].toPlayNext[gameName].length === 0) delete rooms[roomCode].toPlayNext[gameName]
+        }
         /* Remove the user from this room */
         const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
         delete room.players[socket.id]
@@ -63,10 +68,11 @@ module.exports = (io, socket) => {
                 delete rooms[roomCode]
             }
         }
-        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
+        /* Notify players in the room to update player list, toPlayNext, as well as sending an appropriate announcement in the chat */
         if(rooms.hasOwnProperty(roomCode)) {
             updatePlayerList(roomCode)
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)
+            sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '')
         }
     }
     function getPlayerInfoFromRoom(roomCode, playerID) {
@@ -90,6 +96,9 @@ module.exports = (io, socket) => {
     }
     function sendAnnouncementToRoom(roomCode, message) {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
+    }
+    function sendNewRecommendationToRoom(roomCode, toPlayNext, message) {
+        io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
@@ -135,6 +144,8 @@ module.exports = (io, socket) => {
     })
     socket.on('gameroom_changeGame', ({roomCode, gamename}) => {
         rooms[roomCode].gamename = gamename
+        delete rooms[roomCode].toPlayNext[gamename]
+        sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '')
         io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_curGameName', ({roomCode}, callback) => {
@@ -182,18 +193,43 @@ module.exports = (io, socket) => {
         const roomCode = socketidToRoom[socket.id]
         leaveRoom(roomCode, socket)
     })
-    socket.on('recommend-game', ({roomCode, gameName}) => {
-        if (!rooms[roomCode].toPlayNext.includes(gameName)) {
-            rooms[roomCode].toPlayNext = [...rooms[roomCode].toPlayNext, gameName]
-            const toPlayNext = rooms[roomCode].toPlayNext
-            io.to(roomCode).emit('gameroom_newRecommendation', {toPlayNext})
+    socket.on('recommend-game', ({roomCode, gameName, playerId}) => {
+        let message = `voting for ${gameName}!`
+        let toPlayNext = rooms[roomCode].toPlayNext
+        const userDetails = {'id': playerId, 'name': getPlayerInfoFromRoom(roomCode, playerId).displayName}
+
+        if (!(gameName in toPlayNext)) {
+            toPlayNext[gameName] = [userDetails]
         }
+        else {
+            const matchingUserFound = toPlayNext[gameName].filter((details) => details['id'] === userDetails['id']).length > 0
+            if (!matchingUserFound) {
+                toPlayNext[gameName] = [...toPlayNext[gameName], userDetails]
+            }
+            else {
+                message = "You've already voted!"
+            }
+        }
+        rooms[roomCode].toPlayNext = toPlayNext
+        sendNewRecommendationToRoom(roomCode, toPlayNext, message)
+        
     })
-    socket.on('cancel-game', ({roomCode, gameName}) => {
-        if (rooms[roomCode].toPlayNext.includes(gameName)) {
-            rooms[roomCode].toPlayNext = rooms[roomCode].toPlayNext.filter((game) => game !== gameName)
-            const toPlayNext = rooms[roomCode].toPlayNext
-            io.to(roomCode).emit('gameroom_cancelRecommendation', {toPlayNext})
+    socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
+        let message = 'vote removed'
+        let toPlayNext = rooms[roomCode].toPlayNext
+
+        if (gameName in toPlayNext) {
+            const userDetails = {'id': playerId, 'name': getPlayerInfoFromRoom(roomCode, playerId).displayName}
+            const matchingUserFound = toPlayNext[gameName].filter((details) => details['id'] === userDetails['id']).length > 0
+
+            if (matchingUserFound) {
+                toPlayNext[gameName] = toPlayNext[gameName].filter((details) => details['id'] !== userDetails['id'])
+                if (toPlayNext[gameName].length === 0) {
+                    delete toPlayNext[gameName]
+                }
+            }
+            rooms[roomCode].toPlayNext = toPlayNext
+            sendNewRecommendationToRoom(roomCode, toPlayNext, message)
         }
     })
 }

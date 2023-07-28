@@ -1,10 +1,11 @@
-import React from "react"
+import {React} from "react"
 import { GBButton } from "../../components/generalComponents"
-import { Box, IconButton } from "@mui/material"
-import RecommendIcon from '@mui/icons-material/Recommend';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Box, IconButton, Tooltip } from "@mui/material"
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
-export default function GameButton({gameName, onClickGame, onClickRecommend, onClickCancel, isHost, isPlayNext=false}) {
+export default function GameButton({gameName, onClickGame, onClickRecommend, onClickCancel, isHost, isPlayNext=false, playerId, recommenders}) {
     return (
         <Box
             sx={{
@@ -20,21 +21,29 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                 <IconButton 
                     aria-label="recommend"
                     color="primary"
-                    onClick={() => onClickRecommend(gameName)}
-                    size='large'
-                    disableRipple
+                    onClick={() => onClickRecommend(gameName, playerId)}
+                    size='small'
                 >
-                    <RecommendIcon/>
+                    <ThumbUpOffAltIcon/>
                 </IconButton>}
+                {isPlayNext &&
+                <Tooltip title={`${recommenders.map((recommender) => (recommender['name']))}`}>
+                    <IconButton
+                        aria-label="recommender"
+                        size='small'
+                        disableRipple
+                    >
+                        <PeopleAltIcon sx={{color: '#FFFFFF'}}/>
+                    </IconButton>
+                </Tooltip>}
                 {isPlayNext &&
                 <IconButton 
                     aria-label="cancel"
                     color="fail"
-                    onClick={() => onClickCancel(gameName)}
-                    size='large'
-                    disableRipple
+                    onClick={() => onClickCancel(gameName, playerId)}
+                    size='small'
                 >
-                    <CancelIcon sx={{color: '#d50000'}}/>
+                    <ThumbDownOffAltIcon sx={{color: '#d50000'}}/>
                 </IconButton>}
             </Box>
         </Box>
