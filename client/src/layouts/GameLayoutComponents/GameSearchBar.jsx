@@ -35,8 +35,8 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     
     socket.on('gameroom_updateRecommendation', (newRocommendation) => {
         setRecommendedGame(convert2ToPlayNextButton(newRocommendation.toPlayNext))
-        toast.success(newRocommendation.message)
-        console.log("listener")
+        // console.log(typeof newRocommendation.showMessage)
+        // if (newRocommendation.showMessage) {toast.success(newRocommendation.message)}
     })
 
     // With a given list of games searched, create game buttons.
