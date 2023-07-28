@@ -61,8 +61,18 @@ export default function TicTacToe() {
         }
         return <GBText text={`${leftText} vs ${rightText}`}/>
     }
-    socket.on('tictactoe_setGameState', ({game}) => {
+    socket.on('tictactoe_setGameState', ({game, curPlayers}) => {
         if(!game) return
+        setPlayers({
+            left: {
+                displayName: curPlayers.leftName,
+                side: game.xSide
+            },
+            right: {
+                displayName: curPlayers.rightName,
+                side: -game.xSide
+            }
+        })
         setBoard(game.board)
         setTurn(game.turn)
         if(game.winner !== 0) {
@@ -185,7 +195,7 @@ export default function TicTacToe() {
             /* Game does not have two players yet, game not in progress */
             return <GBText text="Join the game to start!"/>
         }
-        const curPlayer = turn === -1 ? players.left : players.right
+        const curPlayer = turn === players.left.side ? players.left : players.right
         if(winner === 0) {
             return draw 
             ? (

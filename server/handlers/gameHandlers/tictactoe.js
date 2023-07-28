@@ -16,7 +16,10 @@ module.exports = (io, socket, room) => {
     function initNewGameObj(roomCode) {
         if(games.hasOwnProperty(roomCode)) {
             const game = games[room]
-            io.to(socket.id).emit('tictactoe_setGameState', {game})
+            const curRoom = rooms[room]
+            const leftName = curRoom?.players[game.leftUserID]?.displayName
+            const rightName = curRoom?.players[game.rightUserID]?.displayName
+            io.to(socket.id).emit('tictactoe_setGameState', {game, curPlayers: {leftName: leftName ? leftName : null, rightName: rightName ? rightName : null}})
             return
         }
         games[roomCode] = {
