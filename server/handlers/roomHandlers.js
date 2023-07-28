@@ -187,7 +187,7 @@ module.exports = (io, socket) => {
         leaveRoom(roomCode, socket)
     })
     socket.on('recommend-game', ({roomCode, gameName, playerId}) => {
-        let message = `Recommended ${gameName}!`
+        let message = `voting for ${gameName}!`
         let toPlayNext = rooms[roomCode].toPlayNext
         const userDetails = {'id': playerId, 'name': getPlayerInfoFromRoom(roomCode, playerId).displayName}
 
@@ -195,26 +195,27 @@ module.exports = (io, socket) => {
             toPlayNext[gameName] = [userDetails]
         }
         else {
-            if (!toPlayNext[gameName].includes(userDetails)) {
-                console.log('new user, adding')
-                console.log(toPlayNext[gameName], userDetails)
+            const matchingUserFound = toPlayNext[gameName].filter((details) => details['id'] === userDetails['id']).length > 0
+            if (!matchingUserFound) {
                 toPlayNext[gameName] = [...toPlayNext[gameName], userDetails]
             }
             else {
-                message = "You've already recommended"
+                message = "You've already voted!"
             }
         }
         rooms[roomCode].toPlayNext = toPlayNext
         io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
     })
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
-        let message = 'cancel..'
+        let message = 'vote removed'
         let toPlayNext = rooms[roomCode].toPlayNext
-        const userDetails = {'id': playerId, 'name': getPlayerInfoFromRoom(roomCode, playerId).displayName}
 
         if (gameName in toPlayNext) {
-            if (toPlayNext[gameName].includes(userDetails)) {
-                toPlayNext[gameName] = toPlayNext[gameName].filter((userInfo) => userInfo['id'] == playerId)
+            const userDetails = {'id': playerId, 'name': getPlayerInfoFromRoom(roomCode, playerId).displayName}
+            const matchingUserFound = toPlayNext[gameName].filter((details) => details['id'] === userDetails['id']).length > 0
+
+            if (matchingUserFound) {
+                toPlayNext[gameName] = toPlayNext[gameName].filter((details) => details['id'] !== userDetails['id'])
                 if (toPlayNext[gameName].length === 0) {
                     delete toPlayNext[gameName]
                 }
