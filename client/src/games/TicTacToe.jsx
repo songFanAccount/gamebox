@@ -61,6 +61,17 @@ export default function TicTacToe() {
         }
         return <GBText text={`${leftText} vs ${rightText}`}/>
     }
+    const RestartButton = () => {
+        /* Restart button should only show up for current players, and only when in game (2 players) */
+        const show = isPlaying && players.right.displayName
+        return show
+        ?
+            <GBButton onClick={requestNewGame}>
+                Restart
+            </GBButton>
+        :
+            <></>
+    }
     socket.on('tictactoe_setGameState', ({game, curPlayers}) => {
         if(!game) return
         setPlayers({
@@ -318,9 +329,7 @@ export default function TicTacToe() {
                             </Stack>
                         ))}
                     </Stack>
-                    <GBButton onClick={requestNewGame}>
-                        Restart
-                    </GBButton>
+                    <RestartButton/>
                 </Stack>
                 
                 <Stack direction="column" alignItems="center"
