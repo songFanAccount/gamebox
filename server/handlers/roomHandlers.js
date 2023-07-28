@@ -45,6 +45,11 @@ module.exports = (io, socket) => {
         if(!room.players.hasOwnProperty(socket.id)) return
         /* Cache this player info in the recent disconnects */
         room.recentDisconnects[socket.id] = room.players[socket.id]
+        /* Remove user's recommendation of the games */
+        for (const gameName in room.toPlayNext) {
+            rooms[roomCode].toPlayNext[gameName] = room.toPlayNext[gameName].filter(user => user['id'] !== socket.id)
+            if (rooms[roomCode].toPlayNext[gameName].length === 0) delete rooms[roomCode].toPlayNext[gameName]
+        }
         /* Remove the user from this room */
         const userName = room.players[socket.id].displayName // Get display name before deleting it from rooms
         delete room.players[socket.id]
@@ -63,10 +68,11 @@ module.exports = (io, socket) => {
                 delete rooms[roomCode]
             }
         }
-        /* Notify players in the room to update player list, as well as sending an appropriate announcement in the chat */
+        /* Notify players in the room to update player list, toPlayNext, as well as sending an appropriate announcement in the chat */
         if(rooms.hasOwnProperty(roomCode)) {
             updatePlayerList(roomCode)
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)
+            sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '')
         }
     }
     function getPlayerInfoFromRoom(roomCode, playerID) {
@@ -90,6 +96,9 @@ module.exports = (io, socket) => {
     }
     function sendAnnouncementToRoom(roomCode, message) {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
+    }
+    function sendNewRecommendationToRoom(roomCode, toPlayNext, message) {
+        io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
@@ -136,9 +145,7 @@ module.exports = (io, socket) => {
     socket.on('gameroom_changeGame', ({roomCode, gamename}) => {
         rooms[roomCode].gamename = gamename
         delete rooms[roomCode].toPlayNext[gamename]
-        const toPlayNext = rooms[roomCode].toPlayNext
-        const message = 'removing..'
-        io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
+        sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '')
         io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_curGameName', ({roomCode}, callback) => {
@@ -204,7 +211,8 @@ module.exports = (io, socket) => {
             }
         }
         rooms[roomCode].toPlayNext = toPlayNext
-        io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
+        sendNewRecommendationToRoom(roomCode, toPlayNext, message)
+        
     })
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
         let message = 'vote removed'
@@ -221,7 +229,7 @@ module.exports = (io, socket) => {
                 }
             }
             rooms[roomCode].toPlayNext = toPlayNext
-            io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
+            sendNewRecommendationToRoom(roomCode, toPlayNext, message)
         }
     })
 }
