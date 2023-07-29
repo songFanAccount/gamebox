@@ -38,7 +38,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
     })
 
     socket.once('gameroom_recommendationAlarm', ({message, showMessage}) => {
-        if (showMessage) toast.success(message)
+        // if (showMessage) toast.success(message)
     })
 
     // With a given list of games searched, create game buttons.
