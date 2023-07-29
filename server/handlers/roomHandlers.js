@@ -72,7 +72,7 @@ module.exports = (io, socket) => {
         if(rooms.hasOwnProperty(roomCode)) {
             updatePlayerList(roomCode)
             sendAnnouncementToRoom(roomCode, `${userName} has left.`)
-            sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '')
+            sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '', false)
         }
     }
     function getPlayerInfoFromRoom(roomCode, playerID) {
@@ -97,8 +97,9 @@ module.exports = (io, socket) => {
     function sendAnnouncementToRoom(roomCode, message) {
         io.to(roomCode).emit('gameroom_newChatAnnouncement', {message})
     }
-    function sendNewRecommendationToRoom(roomCode, toPlayNext, message) {
-        io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext, message})
+    function sendNewRecommendationToRoom(roomCode, toPlayNext, message, showMessage) {
+        io.to(roomCode).emit('gameroom_updateRecommendation', {toPlayNext})
+        io.to(socket.id).emit('gameroom_recommendationAlarm', {message, showMessage})
     }
     socket.on('create-room', ({roomName, password, creatorName}, callback) => {
         if(isEmptyStr(creatorName)) creatorName = defaultUsername
@@ -145,7 +146,7 @@ module.exports = (io, socket) => {
     socket.on('gameroom_changeGame', ({roomCode, gamename}) => {
         rooms[roomCode].gamename = gamename
         delete rooms[roomCode].toPlayNext[gamename]
-        sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '')
+        sendNewRecommendationToRoom(roomCode, rooms[roomCode].toPlayNext, '', false)
         io.to(roomCode).emit('gameroom_newGame', {gamename})
     })
     socket.on('gameroom_curGameName', ({roomCode}, callback) => {
@@ -211,11 +212,11 @@ module.exports = (io, socket) => {
             }
         }
         rooms[roomCode].toPlayNext = toPlayNext
-        sendNewRecommendationToRoom(roomCode, toPlayNext, message)
+        sendNewRecommendationToRoom(roomCode, toPlayNext, message, true)
         
     })
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
-        let message = 'vote removed'
+        let message = "you are not a voter for this game!"
         let toPlayNext = rooms[roomCode].toPlayNext
 
         if (gameName in toPlayNext) {
@@ -227,9 +228,10 @@ module.exports = (io, socket) => {
                 if (toPlayNext[gameName].length === 0) {
                     delete toPlayNext[gameName]
                 }
+                message = 'vote removed'
             }
             rooms[roomCode].toPlayNext = toPlayNext
-            sendNewRecommendationToRoom(roomCode, toPlayNext, message)
+            sendNewRecommendationToRoom(roomCode, toPlayNext, message, true)
         }
     })
 }
