@@ -216,7 +216,7 @@ module.exports = (io, socket) => {
         
     })
     socket.on('cancel-game', ({roomCode, gameName, playerId}) => {
-        let message = 'vote removed'
+        let message = "you are not a voter for this game!"
         let toPlayNext = rooms[roomCode].toPlayNext
 
         if (gameName in toPlayNext) {
@@ -228,6 +228,7 @@ module.exports = (io, socket) => {
                 if (toPlayNext[gameName].length === 0) {
                     delete toPlayNext[gameName]
                 }
+                message = 'vote removed'
             }
             rooms[roomCode].toPlayNext = toPlayNext
             sendNewRecommendationToRoom(roomCode, toPlayNext, message, true)
