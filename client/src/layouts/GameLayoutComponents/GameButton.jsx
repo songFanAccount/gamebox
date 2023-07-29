@@ -1,5 +1,5 @@
 import {React} from "react"
-import { GBButton } from "../../components/generalComponents"
+import { GBButton, GBText } from "../../components/generalComponents"
 import { Box, IconButton, Tooltip } from "@mui/material"
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
@@ -15,7 +15,7 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
         >
             <GBButton children={gameName} onClick={() => onClickGame(gameName)} disabled={!isHost} />
             <Box
-                sx={{ml: 'auto', my: 'auto'}}
+                sx={{ml: 'auto', my: 'auto', display: 'flex'}}
             >
                 {!isPlayNext &&
                 <IconButton 
@@ -36,6 +36,12 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                         <PeopleAltIcon sx={{color: '#FFFFFF'}}/>
                     </IconButton>
                 </Tooltip>}
+
+                {isPlayNext &&
+                <Box>
+                    <GBText text={recommenders.length} fs={13}/>
+                </Box>
+                }
                 {isPlayNext &&
                 <IconButton 
                     aria-label="cancel"
