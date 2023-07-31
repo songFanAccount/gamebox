@@ -45,7 +45,7 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
             socket.removeAllListeners('gameroom_recommendationAlarm')
         }
         // eslint-disable-next-line
-    }, [])
+    }, [convert2ToPlayNextButton])
 
     // With a given list of games searched, create game buttons.
     const [gameButton, setGameButton] = useState([])
