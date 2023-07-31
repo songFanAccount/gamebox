@@ -37,8 +37,8 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
         socket.on('gameroom_updateRecommendation', ({toPlayNext}) => {
             setRecommendedGame(convert2ToPlayNextButton(toPlayNext))
         })
-        socket.on('gameroom_recommendationAlarm', ({message, showMessage}) => {
-            if (showMessage) toast.success(message)
+        socket.on('gameroom_recommendationAlarm', ({message}) => {
+            toast.success(message)
         })
         return () => {
             socket.removeAllListeners('gameroom_updateRecommendation')
