@@ -13,7 +13,7 @@ export default function GameButton({gameName, onClickGame, onClickRecommend, onC
                 display: 'flex'
             }}
         >
-            <GBButton children={gameName} onClick={() => onClickGame(gameName)} disabled={!isHost} />
+            <GBButton children={gameName} onClick={() => onClickGame(gameName)} disabled={!isHost} fs={18}/>
             <Box
                 sx={{ml: 'auto', my: 'auto', display: 'flex'}}
             >
