@@ -32,14 +32,20 @@ export default function GameSearchBar({onClickGame, currGame, isHost, roomCode, 
         setRecommendedGame(convert2ToPlayNextButton(currGameRecommendation))
     // eslint-disable-next-line
     }, [currGameRecommendation])
-    
-    socket.once('gameroom_updateRecommendation', ({toPlayNext}) => {
-        setRecommendedGame(convert2ToPlayNextButton(toPlayNext))
-    })
 
-    socket.once('gameroom_recommendationAlarm', ({message, showMessage}) => {
-        // if (showMessage) toast.success(message)
-    })
+    useEffect(() => {
+        socket.on('gameroom_updateRecommendation', ({toPlayNext}) => {
+            setRecommendedGame(convert2ToPlayNextButton(toPlayNext))
+        })
+        socket.on('gameroom_recommendationAlarm', ({message}) => {
+            toast.success(message)
+        })
+        return () => {
+            socket.removeAllListeners('gameroom_updateRecommendation')
+            socket.removeAllListeners('gameroom_recommendationAlarm')
+        }
+        // eslint-disable-next-line
+    }, [])
 
     // With a given list of games searched, create game buttons.
     const [gameButton, setGameButton] = useState([])
