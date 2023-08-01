@@ -1,7 +1,7 @@
 import { Box, Button, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { motion } from "framer-motion";
-import { GBButton, GBText } from '../components/generalComponents'
+import { GBButton, GBRequestModal, GBStandardConfirmModal, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
@@ -33,6 +33,9 @@ export default function TicTacToe() {
             side: null
         }
     })
+    /* Modals stuff */
+    const [restartReq, setRestartReq] = useState(false)
+    const [restartConf, setRestartConf] = useState(false)
     const JoinButton = () => {
         if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
         else if(players.right.displayName) return <></>
@@ -72,6 +75,41 @@ export default function TicTacToe() {
         :
             <></>
     }
+    const Modals = () => {
+        return (
+            <>
+                <GBRequestModal
+                    open={restartReq}
+                    title="Awaiting response..."
+                    desc="Both players need to agree in order to restart the game."
+                    cancelFunc={() => 
+                        {
+                            setRestartReq(false)
+                        }
+                    }
+                />
+                <GBStandardConfirmModal
+                    open={restartConf}
+                    onClose={() => setRestartConf(false)}
+                    title="Restart request"
+                    desc="Your opponent has requested to restart the game, what do you say?"
+                    cancelText="Decline"
+                    cancelFunc={
+                        () => {
+                            setRestartConf(false)
+                            socket.emit('tictactoe_restartRes', {restart: false})
+                        }
+                    }
+                    confirmFunc={() => 
+                        {
+                            setRestartConf(false)
+                            socket.emit('tictactoe_restartRes', {restart: true})
+                        }
+                    }
+                />
+            </>
+        )
+    }
     socket.on('tictactoe_setGameState', ({game, curPlayers}) => {
         if(!game) return
         setPlayers({
@@ -95,6 +133,7 @@ export default function TicTacToe() {
         } else if(game.draw) setDraw(true)
     })
     socket.on('tictactoe_newGame', () => {
+        setRestartReq(false)
         setBoard([
             [0, 0, 0],
             [0, 0, 0],
@@ -141,9 +180,10 @@ export default function TicTacToe() {
             }
         })
     })
-    socket.on('tictactoe_setPlaySide', ({side}) => {
-        setPlaySide(side)
-    })
+    socket.on('tictactoe_setPlaySide', ({side}) => { setPlaySide(side) })
+    socket.on('tictactoe_restartReq', () => { setRestartConf(true) })
+    socket.on('tictactoe_restartReqCancel', () => { setRestartConf(false) })
+    socket.on('tictactoe_declineRestart', () => { setRestartReq(false) })
     socket.on('tictactoe_playerLeft', ({side}) => {
         /* Side should be either -1 (left) or 1 (right) */
         if(side === -1) {
@@ -181,6 +221,13 @@ export default function TicTacToe() {
         socket.emit('tictactoe_click', {rowIndex, colIndex})
     }
     function requestNewGame() {
+        /* If game has finished (win/draw), this should just skip the request and just restart */
+        if(winner !== 0) {
+            socket.emit('tictactoe_restartRes', {restart: true})
+            return
+        }
+        /* Open up a modal while waiting for the other player to respond to this request */
+        setRestartReq(true)
         socket.emit('tictactoe_newGameReq')
     }
     function joinAsPlayer() {
@@ -339,13 +386,14 @@ export default function TicTacToe() {
                 
                 <Stack direction="column" alignItems="center"
                     sx={{
-                        width: 300, height: 300
+                        width: 350, height: 300
                     }}
                 >
                     <Versus/>
                     <JoinButton/>
                 </Stack>
             </Stack>
+            <Modals/>
         </Stack>
     )
 }

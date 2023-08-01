@@ -9,7 +9,7 @@ module.exports = (io, socket, room) => {
         /* 
         Resetting for new game
         - Unchanged: left/rightUserID,
-        - xSide: Should be randomised for the new game
+        - xSide: Should be swapped (not randomised) for the new game
         - All others should reset to init values
         */
         /* Resetting to init values */
@@ -28,10 +28,8 @@ module.exports = (io, socket, room) => {
         game.colWin = false 
         game.leftDiagWin = false 
         game.rightDiagWin = false
-        /* Randomising X and O sides for new game */
-        const rand = Math.random()
-        if(rand < 0.5) game.xSide = -1
-        else game.xSide = 1
+        /* Swapping X and O sides for new game */
+        game.xSide = -game.xSide
         io.to(game.leftUserID).emit('tictactoe_setPlaySide', {side: game.xSide})
         io.to(game.rightUserID).emit('tictactoe_setPlaySide', {side: -game.xSide})
         io.to(room).emit('tictactoe_setXSide', {xSide: game.xSide})
@@ -62,11 +60,33 @@ module.exports = (io, socket, room) => {
     }
     initNewGameObj(room)
     socket.on('tictactoe_newGameReq', () => {
-        newGame(room)
-        io.to(room).emit('tictactoe_newGame')
+        /* Game should only restart if both current players agree to it, so, notify the other player of this request */
+        const game = games[room]
+        if(!game) return
+        const otherPlayerID = socket.id === game.leftUserID ? game.rightUserID : game.leftUserID
+        io.to(otherPlayerID).emit('tictactoe_restartReq')
+    })
+    socket.on('tictactoe_newGameReqCancel', () => {
+        const game = games[room]
+        if(!game) return
+        const otherPlayerID = socket.id === game.leftUserID ? game.rightUserID : game.leftUserID
+        io.to(otherPlayerID).emit('tictactoe_restartReqCancel')
+    })
+    socket.on('tictactoe_restartRes', ({restart}) => {
+        if(restart) {
+            newGame(room)
+            io.to(room).emit('tictactoe_newGame')
+        } else {
+            /* Notify the player who requested the restart of this refusal */
+            const game = games[room]
+            if(!game) return
+            const otherPlayerID = socket.id === game.leftUserID ? game.rightUserID : game.leftUserID
+            io.to(otherPlayerID).emit('tictactoe_declineRestart')
+        }
     })
     function unsubscribeEvents() {
-        socket.removeAllListeners('tictactoe_newGameReq')
+        socket.removeAllListeners('tictactoe_newGameReq')        
+        socket.removeAllListeners('tictactoe_restartRes')        
         socket.removeAllListeners('tictactoe_terminate')
         socket.removeAllListeners('tictactoe_click')
         socket.removeAllListeners('tictactoe_joinAsPlayer')

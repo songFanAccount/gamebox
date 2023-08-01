@@ -191,6 +191,37 @@ export function GBModalWrapper({open, onClose, children}) {
     )
 }
 
+export function GBRequestModal({open, onClose,
+                                title, desc,
+                                cancelText="Cancel", cancelFunc}) {
+    return (
+        <GBModalWrapper
+            open={open}
+            onClose={onClose}
+        >
+            <Stack
+                direction="column"
+                rowGap={3}
+            >
+                <GBText invert fontFamily="Montserrat" text={title}/>
+                <GBText invert fontFamily="Montserrat" fs={16} text={desc}/>
+                <Stack
+                    direction="row"
+                    justifyContent="center"
+                >
+                    <GBButton
+                        invert
+                        fontFamily="Montserrat" fs={16}
+                        onClick={cancelFunc}
+                    >
+                        {cancelText}
+                    </GBButton>
+                </Stack>
+            </Stack>
+        </GBModalWrapper>
+    )
+}
+
 export function GBStandardConfirmModal({open, onClose, 
                                         title, desc, 
                                         cancelText="Cancel", confirmText="Confirm",
