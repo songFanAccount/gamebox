@@ -129,6 +129,18 @@ export default function TicTacToe() {
             })
         }
     })
+    socket.on('tictactoe_setXSide', ({xSide}) => {
+        setPlayers({
+            left: {
+                displayName: players.left.displayName,
+                side: xSide
+            },
+            right: {
+                displayName: players.right.displayName,
+                side: -xSide
+            }
+        })
+    })
     socket.on('tictactoe_setPlaySide', ({side}) => {
         setPlaySide(side)
     })

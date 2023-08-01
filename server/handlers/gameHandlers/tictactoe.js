@@ -1,18 +1,41 @@
 /* Need to store multiple game instances so that many rooms can play their own game */
 let games = {}
-function newGame(room) {
-    const game = games[room]
-    if(!game) throw new Error('Unexpected newGame request from room ' + room)
-    game.turn = -1
-    game.numEmptySpaces = 9
-    game.board = [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-    ]
-}
 const rooms = global.rooms
 module.exports = (io, socket, room) => {
+    function newGame(room) {
+        /* Assume that this function can only be called if there are two players in the game */
+        const game = games[room]
+        if(!game) throw new Error('Unexpected newGame request from room ' + room)
+        /* 
+        Resetting for new game
+        - Unchanged: left/rightUserID,
+        - xSide: Should be randomised for the new game
+        - All others should reset to init values
+        */
+        /* Resetting to init values */
+        game.lastRowIndex = -1
+        game.lastColIndex = -1
+        game.turn = -1
+        game.numEmptySpaces = 9
+        game.board = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ]
+        game.winner = 0
+        game.draw = false
+        game.rowWin = false 
+        game.colWin = false 
+        game.leftDiagWin = false 
+        game.rightDiagWin = false
+        /* Randomising X and O sides for new game */
+        const rand = Math.random()
+        if(rand < 0.5) game.xSide = -1
+        else game.xSide = 1
+        io.to(game.leftUserID).emit('tictactoe_setPlaySide', {side: game.xSide})
+        io.to(game.rightUserID).emit('tictactoe_setPlaySide', {side: -game.xSide})
+        io.to(room).emit('tictactoe_setXSide', {xSide: game.xSide})
+    }
     function initNewGameObj(roomCode) {
         if(games.hasOwnProperty(roomCode)) {
             const game = games[room]
