@@ -219,19 +219,12 @@ export default function TicTacToe() {
             return <GBText text="Join the game to start!"/>
         }
         const curPlayer = turn === players.left.side ? players.left : players.right
+        let displayMsg
         if(winner === 0) {
-            return draw 
-            ? (
-                <GBText text='Draw!'/>
-            )
-            : (
-                <GBText text={`${curPlayer.displayName}'s turn!`}/>
-            )
-        } else {
-            return (
-                <GBText text={`${curPlayer.displayName} wins!`}/>
-            )
-        }
+            if(draw) displayMsg = 'Draw!'
+            else displayMsg = turn === playSide ? 'Your turn!' : `${curPlayer.displayName}'s turn!`
+        } else displayMsg = turn === playSide ? 'You win!' : `${curPlayer.displayName} wins!`
+        return <GBText text={displayMsg}/>
     }
     const drawAnim = {
         hidden: { pathLength: 0, opacity: 0, stroke: "#FFFFFF", strokeWidth: 5 },
