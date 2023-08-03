@@ -16,6 +16,7 @@ export default function TicTacToe() {
     const [turn, setTurn] = useState(-1) // -1 for X, 1 for O
     const [winner, setWinner] = useState(0) // -1 for X, 1 for O, 0 for undetermined
     const [draw, setDraw] = useState(false)
+    const [forfeit, setForfeit] = useState(null) // null for no forfeit, others should store the display name of the player who forfeited
     const [rowWin, setRowWin] = useState(-1) // -1 for no row win, otherwise 0,1,2 for which row won
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
@@ -36,6 +37,7 @@ export default function TicTacToe() {
     /* Modals stuff */
     const [restartReq, setRestartReq] = useState(false)
     const [restartConf, setRestartConf] = useState(false)
+    const [forfeitConf, setForfeitConf] = useState(false)
     const JoinButton = () => {
         if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
         else if(players.right.displayName) return <></>
@@ -108,6 +110,21 @@ export default function TicTacToe() {
                         }
                     }
                 />
+                <GBStandardConfirmModal
+                    open={forfeitConf}
+                    onClose={() => setForfeitConf(false)}
+                    title="Forfeit?"
+                    desc="Leaving mid game will count as a forfeit! Are you sure?"
+                    cancelText="Cancel"
+                    cancelFunc={() => setForfeitConf(false)}
+                    confirmText="Forfeit"
+                    confirmFunc={() => 
+                        {
+                            setForfeitConf(false)
+                            leaveGame()
+                        }
+                    }
+                />
             </>
         )
     }
@@ -133,7 +150,7 @@ export default function TicTacToe() {
             setWinner(game.winner)
         } else if(game.draw) setDraw(true)
     })
-    socket.on('tictactoe_newGame', () => {
+    function resetGame() {
         setRestartReq(false)
         setBoard([
             [0, 0, 0],
@@ -147,6 +164,9 @@ export default function TicTacToe() {
         setColWin(-1)
         setLeftDiagWin(false)
         setRightDiagWin(false)
+    }
+    socket.on('tictactoe_newGame', () => {
+        resetGame()
     })
     socket.on('tictactoe_newPlayerJoin', ({displayName, xSide}) => {
         if(!players.left.displayName) {
@@ -185,16 +205,31 @@ export default function TicTacToe() {
     socket.on('tictactoe_restartReq', () => { setRestartConf(true) })
     socket.on('tictactoe_restartReqCancel', () => { setRestartConf(false) })
     socket.on('tictactoe_declineRestart', () => { setRestartReq(false) })
-    socket.on('tictactoe_playerLeft', ({side}) => {
+    socket.on('tictactoe_playerLeft', ({side, midGame}) => {
+        /* If someone left mid game, reset relevant info, and display the forfeit in game status */
+        if(midGame) {
+            const player = side === -1 ? players.left : players.right
+            setForfeit(player.displayName)
+            setTurn(-1)
+            if(winner) {
+                setRowWin(-1)
+                setColWin(-1)
+                setLeftDiagWin(false)
+                setRightDiagWin(false)
+            }
+            setWinner(0)
+            setDraw(false)
+            setPlaySide(0)
+        }
         /* Side should be either -1 (left) or 1 (right) */
         if(side === -1) {
             setPlayers({
-                left: players.right.displayName ? {...players.right} : {displayName: null, side: null},
+                left: players.right.displayName ? {displayName: players.right.displayName, side: null} : {displayName: null, side: null},
                 right: {displayName: null, side: null}
             })
         } else if(side === 1) {
             setPlayers({
-                ...players,
+                left: {displayName: players.left.displayName, side: null},
                 right: {displayName: null, side: null}
             })
         }
@@ -235,9 +270,17 @@ export default function TicTacToe() {
         setIsPlaying(players.left.displayName ? 1 : -1)
         socket.emit('tictactoe_joinAsPlayer')
     }
-    function leaveAsPlayer() {
+    function leaveGame() {
         setIsPlaying(0)
         socket.emit('tictactoe_leaveAsPlayer')
+    }
+    function leaveAsPlayer() {
+        /* If there is an ongoing game, this action should result in a forfeit. Prompt the user with a modal */
+        if(playSide !== 0 && winner === 0 && !draw) {
+            setForfeitConf(true)
+            return
+        }
+        leaveGame()
     }
     const squareWidth = 100
     const Element = ({el}) => {
@@ -262,6 +305,7 @@ export default function TicTacToe() {
         }
     }
     const GameStatus = () => {
+        if(forfeit) return <GBText text={`${forfeit} forfeited!`}/>
         if(!players.right.displayName) {
             /* Game does not have two players yet, game not in progress */
             return <GBText text="Join the game to start!"/>

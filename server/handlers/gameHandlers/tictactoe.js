@@ -90,6 +90,7 @@ module.exports = (io, socket, room) => {
         socket.removeAllListeners('tictactoe_terminate')
         socket.removeAllListeners('tictactoe_click')
         socket.removeAllListeners('tictactoe_joinAsPlayer')
+        socket.removeAllListeners('tictactoe_leaveAsPlayer')
         socket.removeAllListeners('tictactoe_unsubscribe')
     }
     socket.on('tictactoe_unsubscribe', () => {
@@ -121,6 +122,7 @@ module.exports = (io, socket, room) => {
         if(!games.hasOwnProperty(room)) return
         const game = games[room]
         let side
+        const midGame = game.rightUserID && game.winner === 0 && !game.draw
         if(game.leftUserID === socket.id) {
             side = -1
             /* If there is someone on the right side, make them the new left player */
@@ -132,8 +134,8 @@ module.exports = (io, socket, room) => {
             side = 1
             game.rightUserID = null
         } else throw new Error('tictactoe_leavePlayer: Request from non-player!')
-        console.log('tictactoe_playerLeft on side: ' + side)
-        io.to(room).emit('tictactoe_playerLeft', {side})
+        /* Additionally, if the player left mid game, this counts as a forfeit, and should be broadcasted to all users */
+        io.to(room).emit('tictactoe_playerLeft', {side, midGame})
     })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]
