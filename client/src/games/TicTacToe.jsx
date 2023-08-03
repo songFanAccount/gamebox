@@ -85,6 +85,7 @@ export default function TicTacToe() {
                     cancelFunc={() => 
                         {
                             setRestartReq(false)
+                            socket.emit('tictactoe_newGameReqCancel')
                         }
                     }
                 />
