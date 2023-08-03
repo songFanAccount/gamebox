@@ -177,11 +177,7 @@ export default function TicTacToe() {
             }})
         } else {
             /* 2/2 player join, since game starts, reset board and forfeit state */
-            setBoard([
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]
-            ])
+            resetGame()
             setForfeit(null)
             setPlayers({
                 left: {
