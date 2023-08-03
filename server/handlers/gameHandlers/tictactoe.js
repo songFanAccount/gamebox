@@ -2,17 +2,7 @@
 let games = {}
 const rooms = global.rooms
 module.exports = (io, socket, room) => {
-    function newGame(room) {
-        /* Assume that this function can only be called if there are two players in the game */
-        const game = games[room]
-        if(!game) throw new Error('Unexpected newGame request from room ' + room)
-        /* 
-        Resetting for new game
-        - Unchanged: left/rightUserID,
-        - xSide: Should be swapped (not randomised) for the new game
-        - All others should reset to init values
-        */
-        /* Resetting to init values */
+    function resetBoard(game) {
         game.lastRowIndex = -1
         game.lastColIndex = -1
         game.turn = -1
@@ -28,6 +18,19 @@ module.exports = (io, socket, room) => {
         game.colWin = false 
         game.leftDiagWin = false 
         game.rightDiagWin = false
+    }
+    function newGame(room) {
+        /* Assume that this function can only be called if there are two players in the game */
+        const game = games[room]
+        if(!game) throw new Error('Unexpected newGame request from room ' + room)
+        /* 
+        Resetting for new game
+        - Unchanged: left/rightUserID,
+        - xSide: Should be swapped (not randomised) for the new game
+        - All others should reset to init values
+        */
+        /* Resetting to init values */
+        resetBoard(game)
         /* Swapping X and O sides for new game */
         game.xSide = -game.xSide
         io.to(game.leftUserID).emit('tictactoe_setPlaySide', {side: game.xSide})
@@ -106,7 +109,8 @@ module.exports = (io, socket, room) => {
         if(!game.leftUserID) game.leftUserID = socket.id
         else if(!game.rightUserID) {
             game.rightUserID = socket.id
-            /* Since this player is the second, the 1v1 game will begin. So, assign X or O to them */
+            /* Since this player is the second, the 1v1 game will begin. So, clear last game stats, and assign new X or O to players */
+            resetBoard(game)
             const rand = Math.random()
             if(rand < 0.5) game.xSide = -1
             else game.xSide = 1
