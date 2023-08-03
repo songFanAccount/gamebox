@@ -1,12 +1,13 @@
 import { Box, Button, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { motion } from "framer-motion";
-import { GBButton, GBText } from '../components/generalComponents'
+import { GBButton, GBRequestModal, GBStandardConfirmModal, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 export default function TicTacToe() {
     const socket = global.socket
+    /* Game related info */
     const [board, setBoard] = useState([
         [0, 0, 0],
         [0, 0, 0],
@@ -15,12 +16,130 @@ export default function TicTacToe() {
     const [turn, setTurn] = useState(-1) // -1 for X, 1 for O
     const [winner, setWinner] = useState(0) // -1 for X, 1 for O, 0 for undetermined
     const [draw, setDraw] = useState(false)
+    const [forfeit, setForfeit] = useState(null) // null for no forfeit, others should store the display name of the player who forfeited
     const [rowWin, setRowWin] = useState(-1) // -1 for no row win, otherwise 0,1,2 for which row won
     const [colWin, setColWin] = useState(-1) // -1 for no column win, otherwise 0,1,2 for which column won
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
-    socket.on('tictactoe_setGameState', ({game}) => {
+    /* Room related info */
+    const [playSide, setPlaySide] = useState(0) // -1 for X, 1 for right, 0 for not playing
+    const [isPlaying, setIsPlaying] = useState(0) // -1 for left, 1 for right, 0 for not playing - spectating
+    const [players, setPlayers] = useState({
+        left: {
+            displayName: null,
+            side: null
+        },
+        right: {
+            displayName: null,
+            side: null
+        }
+    })
+    /* Modals stuff */
+    const [restartReq, setRestartReq] = useState(false)
+    const [restartConf, setRestartConf] = useState(false)
+    const [forfeitConf, setForfeitConf] = useState(false)
+    const JoinButton = () => {
+        if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
+        else if(players.right.displayName) return <></>
+        else return <GBButton width={120} onClick={joinAsPlayer}>Join</GBButton>
+    }
+    const Versus = () => {
+        let leftText = players.left.displayName
+        if(!leftText) leftText = '?'
+        else {
+            const leftSide = players.left.side
+            if(leftSide) {
+                leftText += ` (${leftSide === -1 ? 'X' : 'O'})`
+            } else {
+                leftText += ' (?)'
+            }
+        }
+        let rightText = players.right.displayName
+        if(!rightText) rightText = '?'
+        else {
+            const rightSide = players.right.side
+            if(rightSide) {
+                rightText += ` (${rightSide === -1 ? 'X' : 'O'})`
+            } else {
+                rightText += ' (?)'
+            }
+        }
+        return <GBText text={`${leftText} vs ${rightText}`}/>
+    }
+    const RestartButton = () => {
+        /* Restart button should only show up for current players, and only when in game (2 players) */
+        const show = isPlaying && players.right.displayName
+        return show
+        ?
+            <GBButton onClick={requestNewGame}>
+                Restart
+            </GBButton>
+        :
+            <></>
+    }
+    const Modals = () => {
+        return (
+            <>
+                <GBRequestModal
+                    open={restartReq}
+                    title="Awaiting response..."
+                    desc="Both players need to agree in order to restart the game."
+                    cancelFunc={() => 
+                        {
+                            setRestartReq(false)
+                            socket.emit('tictactoe_newGameReqCancel')
+                        }
+                    }
+                />
+                <GBStandardConfirmModal
+                    open={restartConf}
+                    onClose={() => setRestartConf(false)}
+                    title="Restart request"
+                    desc="Your opponent has requested to restart the game, what do you say?"
+                    cancelText="Decline"
+                    cancelFunc={
+                        () => {
+                            setRestartConf(false)
+                            socket.emit('tictactoe_restartRes', {restart: false})
+                        }
+                    }
+                    confirmFunc={() => 
+                        {
+                            setRestartConf(false)
+                            socket.emit('tictactoe_restartRes', {restart: true})
+                        }
+                    }
+                />
+                <GBStandardConfirmModal
+                    open={forfeitConf}
+                    onClose={() => setForfeitConf(false)}
+                    title="Forfeit?"
+                    desc="Leaving mid game will count as a forfeit! Are you sure?"
+                    cancelText="Cancel"
+                    cancelFunc={() => setForfeitConf(false)}
+                    confirmText="Forfeit"
+                    confirmFunc={() => 
+                        {
+                            setForfeitConf(false)
+                            leaveGame()
+                        }
+                    }
+                />
+            </>
+        )
+    }
+    socket.on('tictactoe_setGameState', ({game, curPlayers}) => {
         if(!game) return
+        setPlayers({
+            left: {
+                displayName: curPlayers.leftName,
+                side: game.xSide
+            },
+            right: {
+                displayName: curPlayers.rightName,
+                side: -game.xSide
+            }
+        })
         setBoard(game.board)
         setTurn(game.turn)
         if(game.winner !== 0) {
@@ -31,7 +150,8 @@ export default function TicTacToe() {
             setWinner(game.winner)
         } else if(game.draw) setDraw(true)
     })
-    socket.on('tictactoe_newGame', () => {
+    function resetGame() {
+        setRestartReq(false)
         setBoard([
             [0, 0, 0],
             [0, 0, 0],
@@ -44,6 +164,77 @@ export default function TicTacToe() {
         setColWin(-1)
         setLeftDiagWin(false)
         setRightDiagWin(false)
+    }
+    socket.on('tictactoe_newGame', () => {
+        resetGame()
+    })
+    socket.on('tictactoe_newPlayerJoin', ({displayName, xSide}) => {
+        if(!players.left.displayName) {
+            /* 1/2 player join */
+            setPlayers({...players, left: {
+                displayName,
+                side: null
+            }})
+        } else {
+            /* 2/2 player join, since game starts, reset board and forfeit state */
+            resetGame()
+            setForfeit(null)
+            setPlayers({
+                left: {
+                    displayName: players.left.displayName,
+                    side: xSide
+                },
+                right: {
+                    displayName,
+                    side: -xSide
+                }
+            })
+        }
+    })
+    socket.on('tictactoe_setXSide', ({xSide}) => {
+        setPlayers({
+            left: {
+                displayName: players.left.displayName,
+                side: xSide
+            },
+            right: {
+                displayName: players.right.displayName,
+                side: -xSide
+            }
+        })
+    })
+    socket.on('tictactoe_setPlaySide', ({side}) => { setPlaySide(side) })
+    socket.on('tictactoe_restartReq', () => { setRestartConf(true) })
+    socket.on('tictactoe_restartReqCancel', () => { setRestartConf(false) })
+    socket.on('tictactoe_declineRestart', () => { setRestartReq(false) })
+    socket.on('tictactoe_playerLeft', ({side, midGame}) => {
+        /* If someone left mid game, reset relevant info, and display the forfeit in game status */
+        if(midGame) {
+            const player = side === -1 ? players.left : players.right
+            setForfeit(player.displayName)
+            setTurn(-1)
+            if(winner) {
+                setRowWin(-1)
+                setColWin(-1)
+                setLeftDiagWin(false)
+                setRightDiagWin(false)
+            }
+            setWinner(0)
+            setDraw(false)
+            setPlaySide(0)
+        }
+        /* Side should be either -1 (left) or 1 (right) */
+        if(side === -1) {
+            setPlayers({
+                left: players.right.displayName ? {displayName: players.right.displayName, side: null} : {displayName: null, side: null},
+                right: {displayName: null, side: null}
+            })
+        } else if(side === 1) {
+            setPlayers({
+                left: {displayName: players.left.displayName, side: null},
+                right: {displayName: null, side: null}
+            })
+        }
     })
     socket.on('tictactoe_clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
@@ -62,13 +253,36 @@ export default function TicTacToe() {
             setWinner(winner)
         /* Process draw if applicable */
         } else if(draw) setDraw(true)
-        setTurn(-turn)
+        else setTurn(-turn)
     })
     function clickSquare(rowIndex, colIndex) {
         socket.emit('tictactoe_click', {rowIndex, colIndex})
     }
     function requestNewGame() {
+        /* If game has finished (win/draw), this should just skip the request and just restart */
+        if(winner !== 0) {
+            socket.emit('tictactoe_restartRes', {restart: true})
+            return
+        }
+        /* Open up a modal while waiting for the other player to respond to this request */
+        setRestartReq(true)
         socket.emit('tictactoe_newGameReq')
+    }
+    function joinAsPlayer() {
+        setIsPlaying(players.left.displayName ? 1 : -1)
+        socket.emit('tictactoe_joinAsPlayer')
+    }
+    function leaveGame() {
+        setIsPlaying(0)
+        socket.emit('tictactoe_leaveAsPlayer')
+    }
+    function leaveAsPlayer() {
+        /* If there is an ongoing game, this action should result in a forfeit. Prompt the user with a modal */
+        if(playSide !== 0 && winner === 0 && !draw) {
+            setForfeitConf(true)
+            return
+        }
+        leaveGame()
     }
     const squareWidth = 100
     const Element = ({el}) => {
@@ -93,19 +307,18 @@ export default function TicTacToe() {
         }
     }
     const GameStatus = () => {
-        if(winner === 0) {
-            return draw 
-            ? (
-                <GBText text='Draw!'/>
-            )
-            : (
-                <GBText text={`${turn}'s turn!`}/>
-            )
-        } else {
-            return (
-                <GBText text={`${winner} wins!`}/>
-            )
+        if(forfeit) return <GBText text={`${forfeit} forfeited!`}/>
+        if(!players.right.displayName) {
+            /* Game does not have two players yet, game not in progress */
+            return <GBText text="Join the game to start!"/>
         }
+        const curPlayer = turn === players.left.side ? players.left : players.right
+        let displayMsg
+        if(winner === 0) {
+            if(draw) displayMsg = 'Draw!'
+            else displayMsg = turn === playSide ? 'Your turn!' : `${curPlayer.displayName}'s turn!`
+        } else displayMsg = turn === playSide ? 'You win!' : `${curPlayer.displayName} wins!`
+        return <GBText text={displayMsg}/>
     }
     const drawAnim = {
         hidden: { pathLength: 0, opacity: 0, stroke: "#FFFFFF", strokeWidth: 5 },
@@ -119,88 +332,115 @@ export default function TicTacToe() {
         }
       };
     return (
-        <Box>
+        <Stack
+            direction="column"
+            alignItems="center"
+            rowGap={5}
+        >
             <GBText text="Tic Tac Toe"/>
-            <GameStatus/>
-            <Stack direction="column"
+            <Stack
+                direction="row"
+                alignItems="center"
+                columnGap={10}
                 sx={{
-                    width: 300, height: 300,
-                    border: 1, borderColor: '#FFFFFF'
+                    height: 'fit-content'
                 }}
             >
-                <Box
-                    component={motion.svg}
-                    initial="hidden"
-                    animate="visible"
-                    sx={{
-                        width: 300, height: 300,
-                        position: 'absolute',
-                    }}
+                <Stack
+                    direction="column"
+                    alignItems="center"
+                    rowGap={3}
                 >
-                    {rowWin !== -1 && 
-                        <motion.line
-                            x1="18"
-                            y1={50 + rowWin * 100}
-                            x2="282"
-                            y2={50 + rowWin * 100}
-                            variants={drawAnim}
-                        />
-                    }
-                    {colWin !== -1 && 
-                        <motion.line
-                            x1={50 + colWin * 100}
-                            y1="18"
-                            x2={50 + colWin * 100}
-                            y2="282"
-                            variants={drawAnim}
-                        />
-                    }
-                    {leftDiagWin && 
-                        <motion.line
-                            x1="20"
-                            y1="20"
-                            x2="280"
-                            y2="280"
-                            variants={drawAnim}
-                        />
-                    }
-                    {rightDiagWin && 
-                        <motion.line
-                            x1="280"
-                            y1="20"
-                            x2="20"
-                            y2="280"
-                            variants={drawAnim}
-                        />
-                    }
-                </Box>
-                {board.map((row, rowIndex)=> (
-                    <Stack direction="row">
-                        {row.map((el, colIndex) => (
-                            <Button
-                                className={`tictactoe-${rowIndex}-${colIndex}`}
-                                disableRipple
-                                disabled={el !== 0 || winner !== 0}
-                                onClick={() => clickSquare(rowIndex, colIndex)}
-                                sx={{
-                                    p:0, m:0, 
-                                    width: squareWidth, height: squareWidth,
-                                    border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 0,
-                                    display: 'flex', justifyContent: 'center', alignItems: 'center',
-                                    '&:hover': {
-                                        backgroundColor: 'transparent',
-                                    }
-                                }}
+                    <GameStatus/>
+                    <Stack direction="column"
+                        sx={{
+                            width: 300, height: 300,
+                            border: 1, borderColor: '#FFFFFF'
+                        }}
+                        >
+                        <Box
+                            component={motion.svg}
+                            initial="hidden"
+                            animate="visible"
+                            sx={{
+                                width: 300, height: 300,
+                                position: 'absolute',
+                            }}
                             >
-                                <Element el={el}/>
-                            </Button>
+                            {rowWin !== -1 && 
+                                <motion.line
+                                    x1="18"
+                                    y1={50 + rowWin * 100}
+                                    x2="282"
+                                    y2={50 + rowWin * 100}
+                                    variants={drawAnim}
+                                />
+                            }
+                            {colWin !== -1 && 
+                                <motion.line
+                                    x1={50 + colWin * 100}
+                                    y1="18"
+                                    x2={50 + colWin * 100}
+                                    y2="282"
+                                    variants={drawAnim}
+                                    />
+                                }
+                            {leftDiagWin && 
+                                <motion.line
+                                    x1="20"
+                                    y1="20"
+                                    x2="280"
+                                    y2="280"
+                                    variants={drawAnim}
+                                    />
+                                }
+                            {rightDiagWin && 
+                                <motion.line
+                                    x1="280"
+                                    y1="20"
+                                    x2="20"
+                                    y2="280"
+                                    variants={drawAnim}
+                                />
+                            }
+                        </Box>
+                        {board.map((row, rowIndex)=> (
+                            <Stack direction="row">
+                                {row.map((el, colIndex) => (
+                                    <Button
+                                    className={`tictactoe-${rowIndex}-${colIndex}`}
+                                    disableRipple
+                                        disabled={isPlaying === 0 || !players.right.displayName || turn !== playSide || el !== 0 || winner !== 0}
+                                        onClick={() => clickSquare(rowIndex, colIndex)}
+                                        sx={{
+                                            p:0, m:0, 
+                                            width: squareWidth, height: squareWidth,
+                                            border: 1, borderColor: '#FFFFFF', boxSizing: 'border-box', borderRadius: 0,
+                                            display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                            }
+                                        }}
+                                        >
+                                        <Element el={el}/>
+                                    </Button>
+                                ))}
+                            </Stack>
                         ))}
                     </Stack>
-                ))}
-                <GBButton py={3} onClick={requestNewGame}>
-                    Restart
-                </GBButton>
+                    <RestartButton/>
+                </Stack>
+                
+                <Stack direction="column" alignItems="center"
+                    sx={{
+                        width: 350, height: 300
+                    }}
+                >
+                    <Versus/>
+                    <JoinButton/>
+                </Stack>
             </Stack>
-        </Box>
+            <Modals/>
+        </Stack>
     )
 }

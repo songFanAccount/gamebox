@@ -72,7 +72,12 @@ export default function GameLayout() {
         return () => {
             socket.removeAllListeners('gameroom_newHost')
             socket.removeAllListeners('gameroom_newGame')
-            socket.emit('leave_room', {roomCode})
+            socket.emit('leave_room', {roomCode}, ({roomDeleted}) => {
+                if(roomDeleted && curGameRef.current) {
+                    socket.emit(`${curGameRef.current}_terminate`, {roomCode})
+                    socket.emit(`${curGameRef.current}_unsubscribe`)
+                }
+            })
         }
     // eslint-disable-next-line
     }, [])
