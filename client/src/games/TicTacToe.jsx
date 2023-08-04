@@ -183,6 +183,11 @@ export default function TicTacToe() {
             setRightDiagWin(game.rightDiagWin)
             setWinner(game.winner)
         } else if(game.draw) setDraw(true)
+        /* Set game stats */
+        setCurVsStats({
+            leftWins: game.stats.leftWins,
+            rightWins: game.stats.rightWins
+        })
     })
     function resetGame() {
         setRestartReq(false)

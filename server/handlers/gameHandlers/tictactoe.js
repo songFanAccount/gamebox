@@ -180,7 +180,13 @@ module.exports = (io, socket, room) => {
             game.colWin = colWin
             game.leftDiagWin = leftDiagWin
             game.rightDiagWin = rightDiagWin
-            game.turn === -1 ? game.stats.leftWins++ : game.stats.rightWins++
+            if(game.turn === -1) {
+                if(game.xSide === -1) game.stats.leftWins++
+                else game.stats.rightWins++
+            } else {
+                if(game.xSide === -1) game.stats.rightWins++
+                else game.stats.leftWins++
+            }
         }
         /* If not, check if a draw has occurred (no more empty spaces) */
         else if(draw) game.draw = true
