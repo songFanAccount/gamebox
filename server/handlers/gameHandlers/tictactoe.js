@@ -143,6 +143,9 @@ module.exports = (io, socket, room) => {
         } else throw new Error('tictactoe_leavePlayer: Request from non-player!')
         /* Additionally, if the player left mid game, this counts as a forfeit, and should be broadcasted to all users */
         io.to(room).emit('tictactoe_playerLeft', {side, midGame})
+        /* Reset game stats */
+        game.stats.leftWins = 0
+        game.stats.rightWins = 0
     })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]

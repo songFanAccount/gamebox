@@ -274,6 +274,11 @@ export default function TicTacToe() {
                 right: {displayName: null, side: null}
             })
         }
+        /* Reset stats to 0 */
+        setCurVsStats({
+            leftWins: 0,
+            rightWins: 0
+        })
     })
     socket.on('tictactoe_clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
