@@ -478,17 +478,18 @@ export default function TicTacToe() {
                             </Stack>
                         ))}
                     </Stack>
-                    <RestartButton/>
+                    <Stack
+                        direction="row"
+                        justifyContent={isPlaying && players.right.displayName ? "space-between" : 'center'}
+                        sx={{
+                            width: 1
+                        }}
+                    >
+                        <JoinButton/>
+                        <RestartButton/>
+                    </Stack>
                 </Stack>
-                
-                <Stack direction="column" alignItems="center"
-                    sx={{
-                        width: 350, height: 300
-                    }}
-                >
-                    <Versus/>
-                    <JoinButton/>
-                </Stack>
+                <Versus/>
             </Stack>
             <Modals/>
         </Stack>
