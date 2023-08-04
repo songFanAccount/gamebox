@@ -34,6 +34,10 @@ export default function TicTacToe() {
             side: null
         }
     })
+    const [curVsStats, setCurVsStats] = useState({
+        leftWins: 0,
+        rightWins: 0
+    })
     /* Modals stuff */
     const [restartReq, setRestartReq] = useState(false)
     const [restartConf, setRestartConf] = useState(false)
@@ -64,7 +68,37 @@ export default function TicTacToe() {
                 rightText += ' (?)'
             }
         }
-        return <GBText text={`${leftText} vs ${rightText}`}/>
+        return (
+            <Stack
+                direction="row"
+                columnGap={2}
+            >
+                <Stack
+                    direction="column"
+                    rowGap={2}
+                    alignItems="end"
+                >
+                    <GBText text={leftText}/>
+                    <GBText text={curVsStats.leftWins}/>
+                </Stack>
+                <Stack
+                    direction="column"
+                    rowGap={2}
+                    alignItems="center"
+                >
+                    <GBText text="vs"/>
+                    <GBText text=":"/>
+                </Stack>
+                <Stack
+                    direction="column"
+                    rowGap={2}
+                    alignItems="start"
+                >
+                    <GBText text={rightText}/>
+                    <GBText text={curVsStats.rightWins}/>
+                </Stack>
+            </Stack>
+        )
     }
     const RestartButton = () => {
         /* Restart button should only show up for current players, and only when in game (2 players) */
@@ -251,6 +285,12 @@ export default function TicTacToe() {
             setLeftDiagWin(leftDiagWin)
             setRightDiagWin(rightDiagWin)
             setWinner(winner)
+            /* Update stats */
+            const winnerSide = turn === players.left.side ? -1 : 1
+            setCurVsStats({
+                leftWins: winnerSide === -1 ? curVsStats.leftWins + 1 : curVsStats.leftWins,
+                rightWins: winnerSide === 1 ? curVsStats.rightWins + 1 : curVsStats.rightWins
+            })
         /* Process draw if applicable */
         } else if(draw) setDraw(true)
         else setTurn(-turn)

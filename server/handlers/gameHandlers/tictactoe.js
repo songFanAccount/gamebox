@@ -58,7 +58,10 @@ module.exports = (io, socket, room) => {
             ],
             winner: 0, draw: false,
             rowWin: false, colWin: false, leftDiagWin: false, rightDiagWin: false,
-            stats: {}
+            stats: {
+                leftWins: 0,
+                rightWins: 0
+            }
         }
     }
     initNewGameObj(room)
@@ -177,6 +180,7 @@ module.exports = (io, socket, room) => {
             game.colWin = colWin
             game.leftDiagWin = leftDiagWin
             game.rightDiagWin = rightDiagWin
+            game.turn === -1 ? game.stats.leftWins++ : game.stats.rightWins++
         }
         /* If not, check if a draw has occurred (no more empty spaces) */
         else if(draw) game.draw = true
