@@ -65,6 +65,31 @@ module.exports = (io, socket, room) => {
         }
     }
     initNewGameObj(room)
+    function leaveAsPlayer() {
+        if(!games.hasOwnProperty(room)) return
+        const game = games[room]
+        let side
+        const midGame = game.rightUserID && game.winner === 0 && !game.draw
+        if(game.leftUserID === socket.id) {
+            side = -1
+            /* If there is someone on the right side, make them the new left player */
+            if(game.rightUserID) {
+                game.leftUserID = game.rightUserID
+                game.rightUserID = null
+            } else game.leftUserID = null
+        } else if (game.rightUserID === socket.id) {
+            side = 1
+            game.rightUserID = null
+        } else return
+        /* Additionally, if the player left mid game, this counts as a forfeit, and should be broadcasted to all users */
+        io.to(room).emit('tictactoe_playerLeft', {side, midGame})
+        /* Reset game stats */
+        game.stats.leftWins = 0
+        game.stats.rightWins = 0
+    }
+    socket.on('disconnecting', () => {
+        leaveAsPlayer()
+    })
     socket.on('tictactoe_newGameReq', () => {
         /* Game should only restart if both current players agree to it, so, notify the other player of this request */
         const game = games[room]
@@ -98,16 +123,20 @@ module.exports = (io, socket, room) => {
         socket.removeAllListeners('tictactoe_joinAsPlayer')
         socket.removeAllListeners('tictactoe_leaveAsPlayer')
         socket.removeAllListeners('tictactoe_unsubscribe')
+        socket.removeAllListeners('disconnecting')
     }
     socket.on('tictactoe_unsubscribe', () => {
+        console.log('unsubscribe called')
         unsubscribeEvents()
     })
     socket.on('tictactoe_terminate', ({roomCode}) => {
+        console.log('tictactoe_terminate called')
         if(!games.hasOwnProperty(roomCode)) return
         delete games[roomCode]
     })
     socket.on('tictactoe_joinAsPlayer', () => {
         if(!games.hasOwnProperty(room)) return
+        console.log('joinAsPlayer called')
         const game = games[room]
         if(!game.leftUserID) game.leftUserID = socket.id
         else if(!game.rightUserID) {
@@ -126,26 +155,7 @@ module.exports = (io, socket, room) => {
         io.to(room).emit('tictactoe_newPlayerJoin', {displayName, xSide: game.xSide})
     })
     socket.on('tictactoe_leaveAsPlayer', () => {
-        if(!games.hasOwnProperty(room)) return
-        const game = games[room]
-        let side
-        const midGame = game.rightUserID && game.winner === 0 && !game.draw
-        if(game.leftUserID === socket.id) {
-            side = -1
-            /* If there is someone on the right side, make them the new left player */
-            if(game.rightUserID) {
-                game.leftUserID = game.rightUserID
-                game.rightUserID = null
-            } else game.leftUserID = null
-        } else if (game.rightUserID === socket.id) {
-            side = 1
-            game.rightUserID = null
-        } else throw new Error('tictactoe_leavePlayer: Request from non-player!')
-        /* Additionally, if the player left mid game, this counts as a forfeit, and should be broadcasted to all users */
-        io.to(room).emit('tictactoe_playerLeft', {side, midGame})
-        /* Reset game stats */
-        game.stats.leftWins = 0
-        game.stats.rightWins = 0
+        leaveAsPlayer()
     })
     socket.on('tictactoe_click', ({rowIndex, colIndex}) => {
         const game = games[room]

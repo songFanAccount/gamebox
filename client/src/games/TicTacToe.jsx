@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion";
 import { GBButton, GBRequestModal, GBStandardConfirmModal, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,7 +22,7 @@ export default function TicTacToe() {
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
     /* Room related info */
-    const [playSide, setPlaySide] = useState(0) // -1 for X, 1 for right, 0 for not playing
+    const [playSide, setPlaySide] = useState(0) // -1 for X, 1 for O, 0 for not playing
     const [isPlaying, setIsPlaying] = useState(0) // -1 for left, 1 for right, 0 for not playing - spectating
     const [players, setPlayers] = useState({
         left: {
@@ -42,6 +42,23 @@ export default function TicTacToe() {
     const [restartReq, setRestartReq] = useState(false)
     const [restartConf, setRestartConf] = useState(false)
     const [forfeitConf, setForfeitConf] = useState(false)
+    /* Cleaning up if the player unexpectedly leaves the room (like closing browser) */
+    useEffect(() => {
+        return () => {
+            socket.emit('tictactoe_leaveAsPlayer')
+            socket.emit('tictactoe_unsubscribe')
+            socket.removeAllListeners('tictactoe_setGameState')
+            socket.removeAllListeners('tictactoe_newGame')
+            socket.removeAllListeners('tictactoe_newPlayerJoin')
+            socket.removeAllListeners('tictactoe_setXSide')
+            socket.removeAllListeners('tictactoe_setPlaySide')
+            socket.removeAllListeners('tictactoe_restartReq')
+            socket.removeAllListeners('tictactoe_restartReqCancel')
+            socket.removeAllListeners('tictactoe_declineRestart')
+            socket.removeAllListeners('tictactoe_playerLeft')
+            socket.removeAllListeners('tictactoe_clickResponse')
+        }
+    }, [])
     const JoinButton = () => {
         if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
         else if(players.right.displayName) return <></>
@@ -268,6 +285,8 @@ export default function TicTacToe() {
                 left: players.right.displayName ? {displayName: players.right.displayName, side: null} : {displayName: null, side: null},
                 right: {displayName: null, side: null}
             })
+            /* Additionally, if this user is the player on the right side, we need to set isPlaying to now the left side (-1) */
+            if(isPlaying === 1) setIsPlaying(-1)
         } else if(side === 1) {
             setPlayers({
                 left: {displayName: players.left.displayName, side: null},

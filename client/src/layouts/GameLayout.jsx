@@ -73,9 +73,10 @@ export default function GameLayout() {
             socket.removeAllListeners('gameroom_newHost')
             socket.removeAllListeners('gameroom_newGame')
             socket.emit('leave_room', {roomCode}, ({roomDeleted}) => {
-                if(roomDeleted && curGameRef.current) {
-                    socket.emit(`${curGameRef.current}_terminate`, {roomCode})
-                    socket.emit(`${curGameRef.current}_unsubscribe`)
+                if(curGameRef.current) {
+                    if(roomDeleted) {
+                        socket.emit(`${curGameRef.current}_terminate`, {roomCode})
+                    }
                 }
             })
         }
