@@ -137,6 +137,7 @@ module.exports = (io, socket) => {
         io.to(socket.id).emit('update_localStorage_room', {roomCode: code, password: isEmptyStr(password) ? null : password, userID: socket.id})
     })
     socket.on('leave_room', ({roomCode}, callback) => {
+        console.log('leave room is called')
         leaveRoom(roomCode, socket, callback)
     })
     socket.on('gameroom_isHost', ({roomCode}, callback) => {

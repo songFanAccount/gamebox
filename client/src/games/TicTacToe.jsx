@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion";
 import { GBButton, GBRequestModal, GBStandardConfirmModal, GBText } from '../components/generalComponents'
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,7 +22,7 @@ export default function TicTacToe() {
     const [leftDiagWin, setLeftDiagWin] = useState(false)
     const [rightDiagWin, setRightDiagWin] = useState(false)
     /* Room related info */
-    const [playSide, setPlaySide] = useState(0) // -1 for X, 1 for right, 0 for not playing
+    const [playSide, setPlaySide] = useState(0) // -1 for X, 1 for O, 0 for not playing
     const [isPlaying, setIsPlaying] = useState(0) // -1 for left, 1 for right, 0 for not playing - spectating
     const [players, setPlayers] = useState({
         left: {
@@ -34,10 +34,31 @@ export default function TicTacToe() {
             side: null
         }
     })
+    const [curVsStats, setCurVsStats] = useState({
+        leftWins: 0,
+        rightWins: 0
+    })
     /* Modals stuff */
     const [restartReq, setRestartReq] = useState(false)
     const [restartConf, setRestartConf] = useState(false)
     const [forfeitConf, setForfeitConf] = useState(false)
+    /* Cleaning up if the player unexpectedly leaves the room (like closing browser) */
+    useEffect(() => {
+        return () => {
+            socket.emit('tictactoe_leaveAsPlayer')
+            socket.emit('tictactoe_unsubscribe')
+            socket.removeAllListeners('tictactoe_setGameState')
+            socket.removeAllListeners('tictactoe_newGame')
+            socket.removeAllListeners('tictactoe_newPlayerJoin')
+            socket.removeAllListeners('tictactoe_setXSide')
+            socket.removeAllListeners('tictactoe_setPlaySide')
+            socket.removeAllListeners('tictactoe_restartReq')
+            socket.removeAllListeners('tictactoe_restartReqCancel')
+            socket.removeAllListeners('tictactoe_declineRestart')
+            socket.removeAllListeners('tictactoe_playerLeft')
+            socket.removeAllListeners('tictactoe_clickResponse')
+        }
+    }, [])
     const JoinButton = () => {
         if(isPlaying) return <GBButton onClick={leaveAsPlayer}>Leave</GBButton>
         else if(players.right.displayName) return <></>
@@ -64,7 +85,37 @@ export default function TicTacToe() {
                 rightText += ' (?)'
             }
         }
-        return <GBText text={`${leftText} vs ${rightText}`}/>
+        return (
+            <Stack
+                direction="row"
+                columnGap={2}
+            >
+                <Stack
+                    direction="column"
+                    rowGap={2}
+                    alignItems="end"
+                >
+                    <GBText text={leftText}/>
+                    <GBText text={curVsStats.leftWins}/>
+                </Stack>
+                <Stack
+                    direction="column"
+                    rowGap={2}
+                    alignItems="center"
+                >
+                    <GBText text="vs"/>
+                    <GBText text=":"/>
+                </Stack>
+                <Stack
+                    direction="column"
+                    rowGap={2}
+                    alignItems="start"
+                >
+                    <GBText text={rightText}/>
+                    <GBText text={curVsStats.rightWins}/>
+                </Stack>
+            </Stack>
+        )
     }
     const RestartButton = () => {
         /* Restart button should only show up for current players, and only when in game (2 players) */
@@ -149,6 +200,11 @@ export default function TicTacToe() {
             setRightDiagWin(game.rightDiagWin)
             setWinner(game.winner)
         } else if(game.draw) setDraw(true)
+        /* Set game stats */
+        setCurVsStats({
+            leftWins: game.stats.leftWins,
+            rightWins: game.stats.rightWins
+        })
     })
     function resetGame() {
         setRestartReq(false)
@@ -229,12 +285,19 @@ export default function TicTacToe() {
                 left: players.right.displayName ? {displayName: players.right.displayName, side: null} : {displayName: null, side: null},
                 right: {displayName: null, side: null}
             })
+            /* Additionally, if this user is the player on the right side, we need to set isPlaying to now the left side (-1) */
+            if(isPlaying === 1) setIsPlaying(-1)
         } else if(side === 1) {
             setPlayers({
                 left: {displayName: players.left.displayName, side: null},
                 right: {displayName: null, side: null}
             })
         }
+        /* Reset stats to 0 */
+        setCurVsStats({
+            leftWins: 0,
+            rightWins: 0
+        })
     })
     socket.on('tictactoe_clickResponse', ({rowIndex, colIndex, winner, draw, rowWin, colWin, leftDiagWin, rightDiagWin}) => {
         const newBoardState = 
@@ -251,6 +314,12 @@ export default function TicTacToe() {
             setLeftDiagWin(leftDiagWin)
             setRightDiagWin(rightDiagWin)
             setWinner(winner)
+            /* Update stats */
+            const winnerSide = turn === players.left.side ? -1 : 1
+            setCurVsStats({
+                leftWins: winnerSide === -1 ? curVsStats.leftWins + 1 : curVsStats.leftWins,
+                rightWins: winnerSide === 1 ? curVsStats.rightWins + 1 : curVsStats.rightWins
+            })
         /* Process draw if applicable */
         } else if(draw) setDraw(true)
         else setTurn(-turn)
@@ -428,17 +497,18 @@ export default function TicTacToe() {
                             </Stack>
                         ))}
                     </Stack>
-                    <RestartButton/>
+                    <Stack
+                        direction="row"
+                        justifyContent={isPlaying && players.right.displayName ? "space-between" : 'center'}
+                        sx={{
+                            width: 1
+                        }}
+                    >
+                        <JoinButton/>
+                        <RestartButton/>
+                    </Stack>
                 </Stack>
-                
-                <Stack direction="column" alignItems="center"
-                    sx={{
-                        width: 350, height: 300
-                    }}
-                >
-                    <Versus/>
-                    <JoinButton/>
-                </Stack>
+                <Versus/>
             </Stack>
             <Modals/>
         </Stack>
